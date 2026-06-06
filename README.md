@@ -1,5 +1,7 @@
 # Tower Defense 3D
 
+[中文版](README_zh.md)
+
 A 3D tower defense game built with [Avalonia UI](https://avaloniaui.net/) and [Aura3D](https://github.com/CeSun/Aura3D).
 
 Place towers along a winding path to stop waves of enemies from reaching the exit. Manage gold, choose the right tower mix, and survive all 5 waves.

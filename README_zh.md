@@ -1,5 +1,7 @@
 # Tower Defense 3D
 
+[English](README.md)
+
 基于 [Avalonia UI](https://avaloniaui.net/) 和 [Aura3D](https://github.com/CeSun/Aura3D) 构建的 3D 塔防游戏。
 
 在蜿蜒的路径上放置防御塔，阻止一波波敌人抵达终点。管理金币、搭配塔型，挺过全部 5 波进攻。
