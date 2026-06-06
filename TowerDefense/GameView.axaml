@@ -54,19 +54,19 @@
                                HorizontalAlignment="Center" />
                     <Button x:Name="ArrowBtn" Click="OnSelectArrow"
                             Background="#CC2d5a27" Foreground="White"
-                            FontSize="13" FontWeight="Bold"
+                            FontSize="13" FontWeight="Bold" Focusable="False"
                             Padding="14,8" CornerRadius="6" Width="180">
                         🏹 Arrow (50g)
                     </Button>
                     <Button x:Name="CannonBtn" Click="OnSelectCannon"
                             Background="#CC8b3a3a" Foreground="White"
-                            FontSize="13" FontWeight="Bold"
+                            FontSize="13" FontWeight="Bold" Focusable="False"
                             Padding="14,8" CornerRadius="6" Width="180">
                         💣 Cannon (100g)
                     </Button>
                     <Button x:Name="IceBtn" Click="OnSelectIce"
                             Background="#CC2d5a5a" Foreground="White"
-                            FontSize="13" FontWeight="Bold"
+                            FontSize="13" FontWeight="Bold" Focusable="False"
                             Padding="14,8" CornerRadius="6" Width="180">
                         ❄️ Ice (75g)
                     </Button>

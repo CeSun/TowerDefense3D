@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Numerics;
 using Aura3D.Avalonia;
 using Aura3D.Core;
 using Aura3D.Core.Geometries;
@@ -9,6 +7,9 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
+using System.Diagnostics;
+using System.Numerics;
 using DrawingColor = System.Drawing.Color;
 
 namespace TowerDefense;
@@ -381,6 +382,10 @@ public partial class GameView : UserControl
 
         // Project HP bars from 3D world to screen overlay
         var cam = AuraView.MainCamera;
+        // WorldToScreen returns coordinates in render-target pixels (scaled by RenderScaling),
+        // but the HP canvas overlay uses DIPs. Divide by RenderScaling to map correctly.
+        var source = AuraView.GetPresentationSource();
+        float renderScale = source != null ? (float)source.RenderScaling : 1.0f;
         foreach (var enemy in _gm.Enemies)
         {
             // World position above the enemy sphere
@@ -388,10 +393,13 @@ public partial class GameView : UserControl
             var screen = cam.WorldToScreen(barWorld);
             if (screen == null) continue;
 
+            float sx = screen.Value.X / renderScale;
+            float sy = screen.Value.Y / renderScale;
+
             if (_enemyHpBgs.TryGetValue(enemy.Id, out var bg))
             {
-                Canvas.SetLeft(bg, screen.Value.X - 20);
-                Canvas.SetTop(bg, screen.Value.Y - 2);
+                Canvas.SetLeft(bg, sx - 20);
+                Canvas.SetTop(bg, sy - 2);
             }
             if (_enemyHpBars.TryGetValue(enemy.Id, out var hp))
             {
@@ -404,8 +412,8 @@ public partial class GameView : UserControl
                         : ratio < 0.6f ? Avalonia.Media.Brushes.Yellow
                         : Avalonia.Media.Brushes.LimeGreen;
                 }
-                Canvas.SetLeft(hp, screen.Value.X - 20);
-                Canvas.SetTop(hp, screen.Value.Y - 2);
+                Canvas.SetLeft(hp, sx - 20);
+                Canvas.SetTop(hp, sy - 2);
             }
         }
 
@@ -610,13 +618,15 @@ public partial class GameView : UserControl
 
     private void UpdateTowerButtonHighlight()
     {
-        ArrowBtn.BorderThickness = new Avalonia.Thickness(_selectedTower == TowerType.Arrow ? 3 : 0);
+        var showSelected = _isPlacing;
+
+        ArrowBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.Arrow ? 3 : 0);
         ArrowBtn.BorderBrush = Avalonia.Media.Brushes.White;
 
-        CannonBtn.BorderThickness = new Avalonia.Thickness(_selectedTower == TowerType.Cannon ? 3 : 0);
+        CannonBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.Cannon ? 3 : 0);
         CannonBtn.BorderBrush = Avalonia.Media.Brushes.White;
 
-        IceBtn.BorderThickness = new Avalonia.Thickness(_selectedTower == TowerType.Ice ? 3 : 0);
+        IceBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.Ice ? 3 : 0);
         IceBtn.BorderBrush = Avalonia.Media.Brushes.White;
     }
 
