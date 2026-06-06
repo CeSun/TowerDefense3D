@@ -1,0 +1,102 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:a="https://github.com/CeSun/Aura3D"
+             x:Class="TowerDefense.GameView">
+    <Grid>
+        <!-- 3D View fills entire area -->
+        <a:Aura3DView x:Name="AuraView"
+                       SceneInitialized="OnSceneInitialized"
+                       SceneUpdated="OnSceneUpdated"
+                       ObjectPicked="OnObjectPicked" />
+
+        <!-- HP bar overlay -->
+        <Canvas x:Name="HpBarCanvas" IsHitTestVisible="False" />
+
+        <!-- === HUD layout: top bar + right sidebar === -->
+        <Grid Margin="8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Top HUD -->
+            <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                        Orientation="Horizontal" Spacing="12">
+                <Border Background="#CC1a1a2e" CornerRadius="6" Padding="10,5">
+                    <TextBlock x:Name="GoldText" Text="Gold: 200"
+                               Foreground="#FFD700" FontSize="16" FontWeight="Bold" />
+                </Border>
+                <Border Background="#CC1a1a2e" CornerRadius="6" Padding="10,5">
+                    <TextBlock x:Name="LivesText" Text="Lives: 20"
+                               Foreground="#FF6B6B" FontSize="16" FontWeight="Bold" />
+                </Border>
+                <Border Background="#CC1a1a2e" CornerRadius="6" Padding="10,5">
+                    <TextBlock x:Name="WaveText" Text="Wave: -"
+                               Foreground="#4ECDC4" FontSize="16" FontWeight="Bold" />
+                </Border>
+                <Border Background="#CC1a1a2e" CornerRadius="6" Padding="10,5">
+                    <TextBlock x:Name="StatusText" Text="Select a tower and place it on green cells"
+                               Foreground="White" FontSize="13" />
+                </Border>
+            </StackPanel>
+
+            <!-- Right-side tower panel -->
+            <StackPanel Grid.Row="1" Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Margin="0,0,4,0" Spacing="8">
+
+                <StackPanel x:Name="TowerBtnPanel" IsVisible="False" Spacing="8">
+                    <TextBlock Text="TOWERS" Foreground="#AAA" FontSize="11" FontWeight="Bold"
+                               HorizontalAlignment="Center" />
+                    <Button x:Name="ArrowBtn" Click="OnSelectArrow"
+                            Background="#CC2d5a27" Foreground="White"
+                            FontSize="13" FontWeight="Bold"
+                            Padding="14,8" CornerRadius="6" Width="180">
+                        🏹 Arrow (50g)
+                    </Button>
+                    <Button x:Name="CannonBtn" Click="OnSelectCannon"
+                            Background="#CC8b3a3a" Foreground="White"
+                            FontSize="13" FontWeight="Bold"
+                            Padding="14,8" CornerRadius="6" Width="180">
+                        💣 Cannon (100g)
+                    </Button>
+                    <Button x:Name="IceBtn" Click="OnSelectIce"
+                            Background="#CC2d5a5a" Foreground="White"
+                            FontSize="13" FontWeight="Bold"
+                            Padding="14,8" CornerRadius="6" Width="180">
+                        ❄️ Ice (75g)
+                    </Button>
+                    <Separator Background="#444" Height="1" Margin="0,4" />
+                </StackPanel>
+
+                <Button x:Name="StartBtn" Click="OnStartGame"
+                        Background="#CC4a4a8a" Foreground="White"
+                        FontSize="13" FontWeight="Bold"
+                        Padding="14,8" CornerRadius="6" Width="180">
+                    ▶ Start Game
+                </Button>
+                <Button x:Name="ResetBtn" Click="OnReset"
+                        Background="#CC6a4a4a" Foreground="White"
+                        FontSize="13" FontWeight="Bold"
+                        Padding="14,8" CornerRadius="6" Width="180">
+                    ↺ Reset
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Game Over Overlay -->
+        <Panel x:Name="GameOverPanel" IsVisible="False"
+               Background="#BB000000" ZIndex="100">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
+                <TextBlock x:Name="GameOverTitle" FontSize="48" FontWeight="Bold"
+                           HorizontalAlignment="Center" />
+                <TextBlock x:Name="GameOverSubtext" FontSize="20"
+                           HorizontalAlignment="Center" Foreground="#CCC" />
+            </StackPanel>
+        </Panel>
+    </Grid>
+</UserControl>
