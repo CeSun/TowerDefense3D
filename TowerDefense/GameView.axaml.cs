@@ -212,30 +212,107 @@ public partial class GameView : UserControl
         var darkMat = translucent
             ? CreateTranslucentMaterial(Darken(def.Color, 0.6f))
             : CreateColorMaterial(Darken(def.Color, 0.6f));
+        var lightMat = translucent
+            ? CreateTranslucentMaterial(Lighten(def.Color, 0.4f))
+            : CreateColorMaterial(Lighten(def.Color, 0.4f));
 
+        // Common base
         var baseMesh = new Mesh { Geometry = _boxGeo!.Clone(), Material = darkMat };
         baseMesh.Scale = new Vector3(0.55f, 0.1f, 0.55f);
         baseMesh.Position = new Vector3(0, 0.1f, 0);
         node.AddChild(baseMesh, AttachToParentRule.KeepLocal);
 
+        // Common body cylinder
         var bodyMesh = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = mat };
         bodyMesh.Scale = new Vector3(0.3f, 0.4f, 0.3f);
         bodyMesh.Position = new Vector3(0, 0.5f, 0);
         node.AddChild(bodyMesh, AttachToParentRule.KeepLocal);
 
-        if (def.Type == TowerType.Arrow)
+        switch (def.Type)
         {
-            var topMesh = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
-            topMesh.Scale = new Vector3(0.08f, 0.25f, 0.08f);
-            topMesh.Position = new Vector3(0, 1.0f, 0);
-            node.AddChild(topMesh, AttachToParentRule.KeepLocal);
-        }
-        else
-        {
-            var topMesh = new Mesh { Geometry = _sphereGeo!.Clone(), Material = mat };
-            topMesh.Scale = new Vector3(0.22f, 0.22f, 0.22f);
-            topMesh.Position = new Vector3(0, 0.95f, 0);
-            node.AddChild(topMesh, AttachToParentRule.KeepLocal);
+            case TowerType.Arrow:
+            {
+                var topMesh = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
+                topMesh.Scale = new Vector3(0.08f, 0.25f, 0.08f);
+                topMesh.Position = new Vector3(0, 1.0f, 0);
+                node.AddChild(topMesh, AttachToParentRule.KeepLocal);
+                break;
+            }
+            case TowerType.Sniper:
+            {
+                // Tall thin barrel
+                var barrel = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
+                barrel.Scale = new Vector3(0.1f, 0.5f, 0.1f);
+                barrel.Position = new Vector3(0, 1.1f, 0);
+                node.AddChild(barrel, AttachToParentRule.KeepLocal);
+
+                // Scope ring at the top
+                var ring = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = lightMat };
+                ring.Scale = new Vector3(0.18f, 0.06f, 0.18f);
+                ring.Position = new Vector3(0, 1.35f, 0);
+                node.AddChild(ring, AttachToParentRule.KeepLocal);
+                break;
+            }
+            case TowerType.MultiShot:
+            {
+                // 3 arrow barrels arranged in a fan (center, left, right)
+                float[] angles = { 0, -30, 30 }; // degrees around Y axis
+                float radius = 0.1f;
+                foreach (var ang in angles)
+                {
+                    var rad = ang * MathF.PI / 180f;
+                    var barrel = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
+                    barrel.Scale = new Vector3(0.07f, 0.22f, 0.07f);
+                    barrel.Position = new Vector3(
+                        MathF.Sin(rad) * radius,
+                        1.05f,
+                        MathF.Cos(rad) * radius
+                    );
+                    // Tilt each barrel outward (rotate around X to lean away from center)
+                    barrel.RotationDegrees = new Vector3(ang * 0.4f, 0, 0);
+                    node.AddChild(barrel, AttachToParentRule.KeepLocal);
+                }
+                break;
+            }
+            case TowerType.Poison:
+            {
+                // Small sphere body + tiny spikes
+                var poisonBall = new Mesh { Geometry = _sphereGeo!.Clone(), Material = lightMat };
+                poisonBall.Scale = new Vector3(0.28f, 0.28f, 0.28f);
+                poisonBall.Position = new Vector3(0, 0.95f, 0);
+                node.AddChild(poisonBall, AttachToParentRule.KeepLocal);
+
+                // Spike on top
+                var spike = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
+                spike.Scale = new Vector3(0.05f, 0.18f, 0.05f);
+                spike.Position = new Vector3(0, 1.2f, 0);
+                node.AddChild(spike, AttachToParentRule.KeepLocal);
+                break;
+            }
+            case TowerType.Sun:
+            {
+                // Large bright sphere (glowing center)
+                var sunCore = new Mesh { Geometry = _sphereGeo!.Clone(), Material = lightMat };
+                sunCore.Scale = new Vector3(0.35f, 0.35f, 0.35f);
+                sunCore.Position = new Vector3(0, 0.95f, 0);
+                node.AddChild(sunCore, AttachToParentRule.KeepLocal);
+
+                // Outer glow ring
+                var glowRing = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = mat };
+                glowRing.Scale = new Vector3(0.42f, 0.04f, 0.42f);
+                glowRing.Position = new Vector3(0, 0.8f, 0);
+                node.AddChild(glowRing, AttachToParentRule.KeepLocal);
+                break;
+            }
+            default:
+            {
+                // Cannon, Ice: sphere top
+                var topMesh = new Mesh { Geometry = _sphereGeo!.Clone(), Material = mat };
+                topMesh.Scale = new Vector3(0.22f, 0.22f, 0.22f);
+                topMesh.Position = new Vector3(0, 0.95f, 0);
+                node.AddChild(topMesh, AttachToParentRule.KeepLocal);
+                break;
+            }
         }
         return node;
     }
@@ -499,6 +576,42 @@ public partial class GameView : UserControl
         StatusText.Text = "Selected: Ice Tower (75g) — Click map to place";
     }
 
+    private void OnSelectMulti(object? sender, RoutedEventArgs e)
+    {
+        _selectedTower = TowerType.MultiShot;
+        _isPlacing = true;
+        UpdateTowerButtonHighlight();
+        RebuildGhost();
+        StatusText.Text = "Selected: Multi-Shot (150g) — Fires 3 arrows in a fan";
+    }
+
+    private void OnSelectSniper(object? sender, RoutedEventArgs e)
+    {
+        _selectedTower = TowerType.Sniper;
+        _isPlacing = true;
+        UpdateTowerButtonHighlight();
+        RebuildGhost();
+        StatusText.Text = "Selected: Sniper (130g) — Long range, 30% crit ×3";
+    }
+
+    private void OnSelectPoison(object? sender, RoutedEventArgs e)
+    {
+        _selectedTower = TowerType.Poison;
+        _isPlacing = true;
+        UpdateTowerButtonHighlight();
+        RebuildGhost();
+        StatusText.Text = "Selected: Poison (100g) — Damage over time";
+    }
+
+    private void OnSelectSun(object? sender, RoutedEventArgs e)
+    {
+        _selectedTower = TowerType.Sun;
+        _isPlacing = true;
+        UpdateTowerButtonHighlight();
+        RebuildGhost();
+        StatusText.Text = "Selected: Sun (175g) — Continuous AOE burn";
+    }
+
     private void ClearPlacement()
     {
         _isPlacing = false;
@@ -628,6 +741,18 @@ public partial class GameView : UserControl
 
         IceBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.Ice ? 3 : 0);
         IceBtn.BorderBrush = Avalonia.Media.Brushes.White;
+
+        MultiBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.MultiShot ? 3 : 0);
+        MultiBtn.BorderBrush = Avalonia.Media.Brushes.White;
+
+        SniperBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.Sniper ? 3 : 0);
+        SniperBtn.BorderBrush = Avalonia.Media.Brushes.White;
+
+        PoisonBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.Poison ? 3 : 0);
+        PoisonBtn.BorderBrush = Avalonia.Media.Brushes.White;
+
+        SunBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.Sun ? 3 : 0);
+        SunBtn.BorderBrush = Avalonia.Media.Brushes.White;
     }
 
     // ==================== Game Over ====================
@@ -677,5 +802,14 @@ public partial class GameView : UserControl
             (byte)(c.R * factor),
             (byte)(c.G * factor),
             (byte)(c.B * factor));
+    }
+
+    private static DrawingColor Lighten(DrawingColor c, float amount)
+    {
+        return DrawingColor.FromArgb(
+            c.A,
+            (byte)Math.Min(255, c.R + (255 - c.R) * amount),
+            (byte)Math.Min(255, c.G + (255 - c.G) * amount),
+            (byte)Math.Min(255, c.B + (255 - c.B) * amount));
     }
 }

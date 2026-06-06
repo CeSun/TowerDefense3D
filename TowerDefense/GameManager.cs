@@ -245,6 +245,7 @@ public class GameManager
         UpdateEnemies(dt);
         UpdateTowers(dt);
         UpdateProjectiles(dt);
+        UpdateDotEffects(dt);
         CheckGameOver();
     }
 
@@ -390,51 +391,102 @@ public class GameManager
 
     private void UpdateTowers(float dt)
     {
-        float gameTime = (float)dt; // We accumulate via LastFireTime
-
         foreach (var tower in Towers)
         {
-            // Find target
-            EnemyInstance? bestTarget = null;
-            float bestDistance = 0;
+            // Sun tower — continuous AOE, no projectile
+            if (tower.Def.AoeRadius > 0)
+            {
+                for (int i = Enemies.Count - 1; i >= 0; i--)
+                {
+                    var enemy = Enemies[i];
+                    if (enemy.IsDead || enemy.ReachedEnd) continue;
+                    float dist = Vector3.Distance(tower.Position, enemy.Position);
+                    if (dist <= tower.Def.AoeRadius)
+                    {
+                        DamageEnemy(enemy, tower.Def.Damage * dt);
+                    }
+                }
+                continue;
+            }
 
+            // Collect all enemies in range, sorted by path distance (descending)
+            var targetsInRange = new List<EnemyInstance>();
             foreach (var enemy in Enemies)
             {
                 if (enemy.IsDead || enemy.ReachedEnd) continue;
                 float dist = Vector3.Distance(tower.Position, enemy.Position);
                 if (dist <= tower.Def.Range)
-                {
-                    // Prefer enemy furthest along the path
-                    if (bestTarget == null || enemy.PathDistance > bestDistance)
-                    {
-                        bestTarget = enemy;
-                        bestDistance = enemy.PathDistance;
-                    }
-                }
+                    targetsInRange.Add(enemy);
+            }
+            targetsInRange.Sort((a, b) => b.PathDistance.CompareTo(a.PathDistance));
+
+            if (targetsInRange.Count == 0)
+            {
+                tower.Target = null;
+                continue;
             }
 
-            tower.Target = bestTarget;
+            tower.Target = targetsInRange[0];
 
-            if (bestTarget == null) continue;
-
-            // Fire logic — using LastFireTime accumulated via gameTime
+            // Fire logic
             tower.LastFireTime += dt;
             float fireInterval = 1.0f / tower.Def.FireRate;
 
             if (tower.LastFireTime >= fireInterval)
             {
                 tower.LastFireTime = 0;
-                FireProjectile(tower, bestTarget);
+
+                int shotCount = tower.Def.MultiShotCount;
+                if (shotCount > targetsInRange.Count)
+                    shotCount = targetsInRange.Count;
+
+                if (shotCount <= 1)
+                {
+                    FireProjectile(tower, targetsInRange[0]);
+                }
+                else
+                {
+                    // Multi-shot: fire at top N targets in a fan pattern
+                    float halfArc = tower.Def.ArcAngle * (shotCount - 1) / 2f;
+                    for (int i = 0; i < shotCount; i++)
+                    {
+                        float angle = -halfArc + i * tower.Def.ArcAngle;
+                        FireProjectile(tower, targetsInRange[i], angleDeg: angle);
+                    }
+                }
             }
         }
     }
 
-    private void FireProjectile(TowerInstance tower, EnemyInstance target)
+    private void FireProjectile(TowerInstance tower, EnemyInstance target, float angleDeg = 0)
     {
+        var dir = target.Position - tower.Position;
+        Vector3 initialDir;
+
+        if (angleDeg != 0)
+        {
+            // Rotate direction around Y axis by angleDeg
+            float rad = angleDeg * MathF.PI / 180f;
+            float cos = MathF.Cos(rad);
+            float sin = MathF.Sin(rad);
+            initialDir = new Vector3(
+                dir.X * cos - dir.Z * sin,
+                dir.Y,
+                dir.X * sin + dir.Z * cos
+            );
+        }
+        else
+        {
+            initialDir = dir;
+        }
+
+        // Spawn projectile with a small offset in the fire direction
+        var spawnPos = tower.Position + new Vector3(0, 0.6f, 0) + Vector3.Normalize(initialDir) * 0.3f;
+
         var projectile = new ProjectileData
         {
             Id = _nextId++,
-            Position = tower.Position + new Vector3(0, 0.6f, 0),
+            Position = spawnPos,
             TargetEnemyId = target.Id,
             TargetPosition = target.Position,
             Damage = tower.Def.Damage,
@@ -442,6 +494,10 @@ public class GameManager
             SplashRadius = tower.Def.SplashRadius,
             SlowAmount = tower.Def.SlowAmount,
             Color = tower.Def.Color,
+            CritChance = tower.Def.CritChance,
+            CritMultiplier = tower.Def.CritMultiplier,
+            DotDamage = tower.Def.DotDamage,
+            DotDuration = tower.Def.DotDuration,
         };
 
         Projectiles.Add(projectile);
@@ -484,6 +540,12 @@ public class GameManager
     {
         var target = Enemies.FirstOrDefault(e => e.Id == proj.TargetEnemyId);
 
+        // Calculate damage with crit
+        float finalDamage = proj.Damage;
+        bool crit = proj.CritChance > 0 && _rng.NextDouble() < proj.CritChance;
+        if (crit)
+            finalDamage *= proj.CritMultiplier;
+
         if (proj.SplashRadius > 0)
         {
             // Splash damage
@@ -492,13 +554,15 @@ public class GameManager
                 if (enemy.IsDead || enemy.ReachedEnd) continue;
                 if (Vector3.Distance(enemy.Position, proj.Position) <= proj.SplashRadius)
                 {
-                    DamageEnemy(enemy, proj.Damage);
+                    DamageEnemy(enemy, finalDamage);
+                    ApplyDot(enemy, proj.DotDamage, proj.DotDuration);
                 }
             }
         }
         else if (target != null)
         {
-            DamageEnemy(target, proj.Damage);
+            DamageEnemy(target, finalDamage);
+            ApplyDot(target, proj.DotDamage, proj.DotDuration);
         }
 
         // Apply slow to all enemies in range
@@ -512,6 +576,36 @@ public class GameManager
                 {
                     enemy.SlowFactor = proj.SlowAmount;
                     enemy.SlowTimer = 2.0f;
+                }
+            }
+        }
+    }
+
+    private void ApplyDot(EnemyInstance enemy, float dotDamage, float dotDuration)
+    {
+        if (dotDamage <= 0 || dotDuration <= 0) return;
+        // Only refresh if the new DOT is stronger
+        if (dotDamage >= enemy.DotDamage)
+        {
+            enemy.DotDamage = dotDamage;
+            enemy.DotTimer = dotDuration;
+        }
+    }
+
+    private void UpdateDotEffects(float dt)
+    {
+        for (int i = Enemies.Count - 1; i >= 0; i--)
+        {
+            var enemy = Enemies[i];
+            if (enemy.IsDead || enemy.ReachedEnd) continue;
+            if (enemy.DotTimer > 0)
+            {
+                DamageEnemy(enemy, enemy.DotDamage * dt);
+                enemy.DotTimer -= dt;
+                if (enemy.DotTimer <= 0)
+                {
+                    enemy.DotDamage = 0;
+                    enemy.DotTimer = 0;
                 }
             }
         }

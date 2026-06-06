@@ -71,6 +71,30 @@
                         ❄️ Ice (75g)
                     </Button>
                     <Separator Background="#444" Height="1" Margin="0,4" />
+                    <Button x:Name="MultiBtn" Click="OnSelectMulti"
+                            Background="#CC8B5A00" Foreground="White"
+                            FontSize="13" FontWeight="Bold" Focusable="False"
+                            Padding="14,8" CornerRadius="6" Width="180">
+                        🧨 Multi (150g)
+                    </Button>
+                    <Button x:Name="SniperBtn" Click="OnSelectSniper"
+                            Background="#CC5A2D8B" Foreground="White"
+                            FontSize="13" FontWeight="Bold" Focusable="False"
+                            Padding="14,8" CornerRadius="6" Width="180">
+                        🎯 Sniper (130g)
+                    </Button>
+                    <Button x:Name="PoisonBtn" Click="OnSelectPoison"
+                            Background="#CC6B8B23" Foreground="White"
+                            FontSize="13" FontWeight="Bold" Focusable="False"
+                            Padding="14,8" CornerRadius="6" Width="180">
+                        ☠️ Poison (100g)
+                    </Button>
+                    <Button x:Name="SunBtn" Click="OnSelectSun"
+                            Background="#CCB8860B" Foreground="White"
+                            FontSize="13" FontWeight="Bold" Focusable="False"
+                            Padding="14,8" CornerRadius="6" Width="180">
+                        ☀️ Sun (175g)
+                    </Button>
                 </StackPanel>
 
                 <Button x:Name="StartBtn" Click="OnStartGame"

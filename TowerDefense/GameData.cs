@@ -5,7 +5,7 @@ namespace TowerDefense;
 
 // ==================== Tower Types ====================
 
-public enum TowerType { Arrow, Cannon, Ice }
+public enum TowerType { Arrow, Cannon, Ice, MultiShot, Sniper, Poison, Sun }
 
 public record TowerDefinition(
     TowerType Type,
@@ -17,7 +17,14 @@ public record TowerDefinition(
     float ProjectileSpeed,
     Color Color,
     float SplashRadius = 0,
-    float SlowAmount = 0
+    float SlowAmount = 0,
+    int MultiShotCount = 1,
+    float ArcAngle = 0,
+    float CritChance = 0,
+    float CritMultiplier = 2.0f,
+    float DotDamage = 0,
+    float DotDuration = 0,
+    float AoeRadius = 0
 )
 {
     public static readonly TowerDefinition Arrow = new(
@@ -55,11 +62,66 @@ public record TowerDefinition(
         SlowAmount: 0.5f
     );
 
+    public static readonly TowerDefinition MultiShot = new(
+        Type: TowerType.MultiShot,
+        Name: "Multi-Shot",
+        Cost: 150,
+        Damage: 12,
+        Range: 3.0f,
+        FireRate: 1.0f,
+        ProjectileSpeed: 6f,
+        Color: Color.Orange,
+        MultiShotCount: 3,
+        ArcAngle: 25f
+    );
+
+    public static readonly TowerDefinition Sniper = new(
+        Type: TowerType.Sniper,
+        Name: "Sniper",
+        Cost: 130,
+        Damage: 50,
+        Range: 5.0f,
+        FireRate: 0.5f,
+        ProjectileSpeed: 10f,
+        Color: Color.Purple,
+        CritChance: 0.3f,
+        CritMultiplier: 3.0f
+    );
+
+    public static readonly TowerDefinition Poison = new(
+        Type: TowerType.Poison,
+        Name: "Poison Tower",
+        Cost: 100,
+        Damage: 8,
+        Range: 3.5f,
+        FireRate: 1.5f,
+        ProjectileSpeed: 5f,
+        Color: Color.GreenYellow,
+        DotDamage: 20f,
+        DotDuration: 3.0f
+    );
+
+    public static readonly TowerDefinition Sun = new(
+        Type: TowerType.Sun,
+        Name: "Sun Tower",
+        Cost: 175,
+        Damage: 18,
+        Range: 2.5f,
+        FireRate: 0,
+        ProjectileSpeed: 0,
+        Color: Color.Gold,
+        AoeRadius: 2.5f
+    );
+
     public static TowerDefinition Get(TowerType type) => type switch
     {
         TowerType.Arrow => Arrow,
         TowerType.Cannon => Cannon,
         TowerType.Ice => Ice,
+        TowerType.MultiShot => MultiShot,
+        TowerType.Sniper => Sniper,
+        TowerType.Poison => Poison,
+        TowerType.Sun => Sun,
         _ => Arrow
     };
 }
@@ -143,6 +205,8 @@ public class EnemyInstance
     public bool ReachedEnd { get; set; }
     public float SlowTimer { get; set; }
     public float SlowFactor { get; set; } = 1.0f; // 1 = normal, 0.5 = half speed
+    public float DotDamage { get; set; } // damage per second from poison
+    public float DotTimer { get; set; } // remaining DOT duration
 }
 
 public class ProjectileData
@@ -157,6 +221,10 @@ public class ProjectileData
     public float SplashRadius { get; set; }
     public float SlowAmount { get; set; }
     public Color Color { get; set; }
+    public float CritChance { get; set; }
+    public float CritMultiplier { get; set; } = 2.0f;
+    public float DotDamage { get; set; }
+    public float DotDuration { get; set; }
 }
 
 // ==================== Wave Configuration ====================
