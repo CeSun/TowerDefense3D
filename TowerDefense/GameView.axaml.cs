@@ -231,88 +231,88 @@ public partial class GameView : UserControl
         switch (def.Type)
         {
             case TowerType.Arrow:
-            {
-                var topMesh = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
-                topMesh.Scale = new Vector3(0.08f, 0.25f, 0.08f);
-                topMesh.Position = new Vector3(0, 1.0f, 0);
-                node.AddChild(topMesh, AttachToParentRule.KeepLocal);
-                break;
-            }
-            case TowerType.Sniper:
-            {
-                // Tall thin barrel
-                var barrel = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
-                barrel.Scale = new Vector3(0.1f, 0.5f, 0.1f);
-                barrel.Position = new Vector3(0, 1.1f, 0);
-                node.AddChild(barrel, AttachToParentRule.KeepLocal);
-
-                // Scope ring at the top
-                var ring = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = lightMat };
-                ring.Scale = new Vector3(0.18f, 0.06f, 0.18f);
-                ring.Position = new Vector3(0, 1.35f, 0);
-                node.AddChild(ring, AttachToParentRule.KeepLocal);
-                break;
-            }
-            case TowerType.MultiShot:
-            {
-                // 3 arrow barrels arranged in a fan (center, left, right)
-                float[] angles = { 0, -30, 30 }; // degrees around Y axis
-                float radius = 0.1f;
-                foreach (var ang in angles)
                 {
-                    var rad = ang * MathF.PI / 180f;
-                    var barrel = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
-                    barrel.Scale = new Vector3(0.07f, 0.22f, 0.07f);
-                    barrel.Position = new Vector3(
-                        MathF.Sin(rad) * radius,
-                        1.05f,
-                        MathF.Cos(rad) * radius
-                    );
-                    // Tilt each barrel outward (rotate around X to lean away from center)
-                    barrel.RotationDegrees = new Vector3(ang * 0.4f, 0, 0);
-                    node.AddChild(barrel, AttachToParentRule.KeepLocal);
+                    var topMesh = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
+                    topMesh.Scale = new Vector3(0.08f, 0.25f, 0.08f);
+                    topMesh.Position = new Vector3(0, 1.0f, 0);
+                    node.AddChild(topMesh, AttachToParentRule.KeepLocal);
+                    break;
                 }
-                break;
-            }
+            case TowerType.Sniper:
+                {
+                    // Tall thin barrel
+                    var barrel = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
+                    barrel.Scale = new Vector3(0.1f, 0.5f, 0.1f);
+                    barrel.Position = new Vector3(0, 1.1f, 0);
+                    node.AddChild(barrel, AttachToParentRule.KeepLocal);
+
+                    // Scope ring at the top
+                    var ring = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = lightMat };
+                    ring.Scale = new Vector3(0.18f, 0.06f, 0.18f);
+                    ring.Position = new Vector3(0, 1.35f, 0);
+                    node.AddChild(ring, AttachToParentRule.KeepLocal);
+                    break;
+                }
+            case TowerType.MultiShot:
+                {
+                    // 3 arrow barrels arranged in a fan (center, left, right)
+                    float[] angles = { 0, -30, 30 }; // degrees around Y axis
+                    float radius = 0.1f;
+                    foreach (var ang in angles)
+                    {
+                        var rad = ang * MathF.PI / 180f;
+                        var barrel = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
+                        barrel.Scale = new Vector3(0.07f, 0.22f, 0.07f);
+                        barrel.Position = new Vector3(
+                            MathF.Sin(rad) * radius,
+                            1.05f,
+                            MathF.Cos(rad) * radius
+                        );
+                        // Tilt each barrel outward (rotate around X to lean away from center)
+                        barrel.RotationDegrees = new Vector3(ang * 0.4f, 0, 0);
+                        node.AddChild(barrel, AttachToParentRule.KeepLocal);
+                    }
+                    break;
+                }
             case TowerType.Poison:
-            {
-                // Small sphere body + tiny spikes
-                var poisonBall = new Mesh { Geometry = _sphereGeo!.Clone(), Material = lightMat };
-                poisonBall.Scale = new Vector3(0.28f, 0.28f, 0.28f);
-                poisonBall.Position = new Vector3(0, 0.95f, 0);
-                node.AddChild(poisonBall, AttachToParentRule.KeepLocal);
+                {
+                    // Small sphere body + tiny spikes
+                    var poisonBall = new Mesh { Geometry = _sphereGeo!.Clone(), Material = lightMat };
+                    poisonBall.Scale = new Vector3(0.28f, 0.28f, 0.28f);
+                    poisonBall.Position = new Vector3(0, 0.95f, 0);
+                    node.AddChild(poisonBall, AttachToParentRule.KeepLocal);
 
-                // Spike on top
-                var spike = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
-                spike.Scale = new Vector3(0.05f, 0.18f, 0.05f);
-                spike.Position = new Vector3(0, 1.2f, 0);
-                node.AddChild(spike, AttachToParentRule.KeepLocal);
-                break;
-            }
+                    // Spike on top
+                    var spike = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
+                    spike.Scale = new Vector3(0.05f, 0.18f, 0.05f);
+                    spike.Position = new Vector3(0, 1.2f, 0);
+                    node.AddChild(spike, AttachToParentRule.KeepLocal);
+                    break;
+                }
             case TowerType.Sun:
-            {
-                // Large bright sphere (glowing center)
-                var sunCore = new Mesh { Geometry = _sphereGeo!.Clone(), Material = lightMat };
-                sunCore.Scale = new Vector3(0.35f, 0.35f, 0.35f);
-                sunCore.Position = new Vector3(0, 0.95f, 0);
-                node.AddChild(sunCore, AttachToParentRule.KeepLocal);
+                {
+                    // Large bright sphere (glowing center)
+                    var sunCore = new Mesh { Geometry = _sphereGeo!.Clone(), Material = lightMat };
+                    sunCore.Scale = new Vector3(0.35f, 0.35f, 0.35f);
+                    sunCore.Position = new Vector3(0, 0.95f, 0);
+                    node.AddChild(sunCore, AttachToParentRule.KeepLocal);
 
-                // Outer glow ring
-                var glowRing = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = mat };
-                glowRing.Scale = new Vector3(0.42f, 0.04f, 0.42f);
-                glowRing.Position = new Vector3(0, 0.8f, 0);
-                node.AddChild(glowRing, AttachToParentRule.KeepLocal);
-                break;
-            }
+                    // Outer glow ring
+                    var glowRing = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = mat };
+                    glowRing.Scale = new Vector3(0.42f, 0.04f, 0.42f);
+                    glowRing.Position = new Vector3(0, 0.8f, 0);
+                    node.AddChild(glowRing, AttachToParentRule.KeepLocal);
+                    break;
+                }
             default:
-            {
-                // Cannon, Ice: sphere top
-                var topMesh = new Mesh { Geometry = _sphereGeo!.Clone(), Material = mat };
-                topMesh.Scale = new Vector3(0.22f, 0.22f, 0.22f);
-                topMesh.Position = new Vector3(0, 0.95f, 0);
-                node.AddChild(topMesh, AttachToParentRule.KeepLocal);
-                break;
-            }
+                {
+                    // Cannon, Ice: sphere top
+                    var topMesh = new Mesh { Geometry = _sphereGeo!.Clone(), Material = mat };
+                    topMesh.Scale = new Vector3(0.22f, 0.22f, 0.22f);
+                    topMesh.Position = new Vector3(0, 0.95f, 0);
+                    node.AddChild(topMesh, AttachToParentRule.KeepLocal);
+                    break;
+                }
         }
         return node;
     }
@@ -358,13 +358,15 @@ public partial class GameView : UserControl
         var hpBg = new Border
         {
             Background = Avalonia.Media.Brushes.DarkGray,
-            Width = 40, Height = 5,
+            Width = 40,
+            Height = 5,
             CornerRadius = new Avalonia.CornerRadius(2),
         };
         var hpFill = new Border
         {
             Background = Avalonia.Media.Brushes.LimeGreen,
-            Width = 36, Height = 3,
+            Width = 36,
+            Height = 3,
             CornerRadius = new Avalonia.CornerRadius(1),
             Margin = new Avalonia.Thickness(2, 1, 2, 1),
         };
@@ -462,7 +464,6 @@ public partial class GameView : UserControl
         // WorldToScreen returns coordinates in render-target pixels (scaled by RenderScaling),
         // but the HP canvas overlay uses DIPs. Divide by RenderScaling to map correctly.
         var source = AuraView.GetPresentationSource();
-        float renderScale = source != null ? (float)source.RenderScaling : 1.0f;
         foreach (var enemy in _gm.Enemies)
         {
             // World position above the enemy sphere
@@ -470,8 +471,8 @@ public partial class GameView : UserControl
             var screen = cam.WorldToScreen(barWorld);
             if (screen == null) continue;
 
-            float sx = screen.Value.X / renderScale;
-            float sy = screen.Value.Y / renderScale;
+            float sx = screen.Value.X;
+            float sy = screen.Value.Y;
 
             if (_enemyHpBgs.TryGetValue(enemy.Id, out var bg))
             {
