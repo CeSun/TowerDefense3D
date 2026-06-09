@@ -25,13 +25,12 @@ public partial class GameView : UserControl
     // ==================== Scene Nodes ====================
     private Node? _groundNode;
     private readonly List<Node> _pathNodes = new();
+    private readonly List<Node> _mapNodes = new(); // all map-specific nodes for cleanup
     private readonly Dictionary<int, Node> _enemyNodes = new();
     private readonly Dictionary<int, Border> _enemyHpBars = new();
     private readonly Dictionary<int, Border> _enemyHpBgs = new();
     private readonly Dictionary<int, Node> _towerNodes = new();
     private readonly Dictionary<int, Node> _projectileNodes = new();
-
-
 
     // ==================== Geometry Cache ====================
     private BoxGeometry? _boxGeo;
@@ -43,8 +42,13 @@ public partial class GameView : UserControl
     private Material? _groundMat;
     private Material? _buildableMat;
     private Material? _pathMat;
+
     // ==================== UI State ====================
     private bool _gameOverShown;
+    private bool _sceneInitialized;
+
+    // Callback to return to editor (set by MainWindow)
+    public Action? OnBackToEditor { get; set; }
 
     public GameView()
     {
@@ -63,6 +67,22 @@ public partial class GameView : UserControl
         UpdateTowerButtonHighlight();
     }
 
+    // ==================== Map Loading ====================
+
+    /// <summary>
+    /// Load a map into the game view, rebuilding the 3D scene.
+    /// </summary>
+    public void LoadMap(MapData map)
+    {
+        _gm.LoadMap(map);
+
+        if (_sceneInitialized)
+        {
+            ClearMapScene();
+            BuildMapScene(AuraView);
+        }
+    }
+
     // ==================== Scene Initialization ====================
 
     private void OnSceneInitialized(object? sender, InitializedRoutedEventArgs e)
@@ -71,28 +91,21 @@ public partial class GameView : UserControl
         view.AutoRequestNextFrameRendering = false;
 
         // Camera setup — top-down angled view
-        // PlaneGeometry is horizontal (XZ plane, normal +Y).
-        // Camera sits above and south of the map, looking north-down at the center.
         view.MainCamera.Position = new Vector3(10, 16, 20);
         view.MainCamera.RotationDegrees = new Vector3(-55, 0, 0);
         view.Scene.Background = Texture.CreateFromColor(DrawingColor.DarkSlateGray);
         view.PointerMoved += OnPointerMoved;
 
-        // Create geometries
+        // Create geometries (reusable)
         _boxGeo = new BoxGeometry();
         _sphereGeo = new SphereGeometry();
         _cylinderGeo = new CylinderGeometry();
         _planeGeo = new PlaneGeometry();
 
-        // Create materials
+        // Create materials (reusable)
         _groundMat = CreateColorMaterial(DrawingColor.DarkGreen);
         _buildableMat = CreateColorMaterial(DrawingColor.FromArgb(255, 34, 139, 34));
         _pathMat = CreateColorMaterial(DrawingColor.SandyBrown);
-
-        // Build the scene
-        BuildGround(view);
-        BuildPath(view);
-        BuildGridCells(view);
 
         // Main directional light with CSM shadows
         var dl = new DirectionalLight
@@ -109,7 +122,7 @@ public partial class GameView : UserControl
             }
         };
         view.AddNode(dl);
-        view.Scene.MainDirectionalLight = dl;  // enable CSM
+        view.Scene.MainDirectionalLight = dl;
 
         // Ambient fill light
         var ambientLight = new DirectionalLight();
@@ -117,10 +130,63 @@ public partial class GameView : UserControl
         ambientLight.LightColor = DrawingColor.FromArgb(255, 80, 80, 100);
         view.AddNode(ambientLight);
 
+        // Build the map scene
+        BuildMapScene(view);
+
+        _sceneInitialized = true;
         view.RequestNextFrameRendering();
     }
 
-    // ==================== Scene Building ====================
+    // ==================== Map Scene Building ====================
+
+    private void ClearMapScene()
+    {
+        var view = AuraView;
+
+        // Remove ground
+        if (_groundNode != null)
+        {
+            view.Remove(_groundNode);
+            _groundNode = null;
+        }
+
+        // Remove path nodes
+        foreach (var node in _pathNodes)
+            view.Remove(node);
+        _pathNodes.Clear();
+
+        // Remove other map nodes (grid dots, markers)
+        foreach (var node in _mapNodes)
+            view.Remove(node);
+        _mapNodes.Clear();
+
+        // Clear game object nodes
+        foreach (var (_, node) in _enemyNodes) view.Remove(node);
+        foreach (var (_, hp) in _enemyHpBars) HpBarCanvas.Children.Remove(hp);
+        foreach (var (_, bg) in _enemyHpBgs) HpBarCanvas.Children.Remove(bg);
+        foreach (var (_, node) in _towerNodes) view.Remove(node);
+        foreach (var (_, node) in _projectileNodes) view.Remove(node);
+
+        _enemyNodes.Clear();
+        _enemyHpBars.Clear();
+        _enemyHpBgs.Clear();
+        _towerNodes.Clear();
+        _projectileNodes.Clear();
+    }
+
+    private void BuildMapScene(Aura3DView view)
+    {
+        BuildGround(view);
+        BuildPath(view);
+        BuildGridCells(view);
+        BuildMarkers(view);
+
+        // Adjust camera for new map size
+        view.MainCamera.Position = new Vector3(
+            _gm.GridCols / 2f,
+            Math.Max(_gm.GridCols, _gm.GridRows) * 1.3f,
+            _gm.GridRows + 4);
+    }
 
     private void BuildGround(Aura3DView view)
     {
@@ -130,8 +196,8 @@ public partial class GameView : UserControl
             Material = _groundMat!,
             Name = "Ground",
         };
-        groundMesh.Scale = new Vector3(GameManager.GridCols + 2, 1, GameManager.GridRows + 2);
-        groundMesh.Position = new Vector3(GameManager.GridCols / 2f, -0.05f, GameManager.GridRows / 2f);
+        groundMesh.Scale = new Vector3(_gm.GridCols + 2, 1, _gm.GridRows + 2);
+        groundMesh.Position = new Vector3(_gm.GridCols / 2f, -0.05f, _gm.GridRows / 2f);
 
         _groundNode = groundMesh;
         view.AddNode(_groundNode);
@@ -139,9 +205,9 @@ public partial class GameView : UserControl
 
     private void BuildPath(Aura3DView view)
     {
-        for (int col = 0; col < GameManager.GridCols; col++)
+        for (int col = 0; col < _gm.GridCols; col++)
         {
-            for (int row = 0; row < GameManager.GridRows; row++)
+            for (int row = 0; row < _gm.GridRows; row++)
             {
                 if (!_gm.PathCells[col, row]) continue;
 
@@ -157,33 +223,13 @@ public partial class GameView : UserControl
                 view.AddNode(cellMesh);
             }
         }
-
-        // Entry marker
-        var entryMarker = new Mesh
-        {
-            Geometry = _boxGeo!,
-            Material = CreateColorMaterial(DrawingColor.LimeGreen),
-        };
-        entryMarker.Scale = new Vector3(0.4f, 0.15f, 1.2f);
-        entryMarker.Position = new Vector3(-0.3f, 0.06f, 6.5f);
-        view.AddNode(entryMarker);
-
-        // Exit marker
-        var exitMarker = new Mesh
-        {
-            Geometry = _boxGeo!,
-            Material = CreateColorMaterial(DrawingColor.Red),
-        };
-        exitMarker.Scale = new Vector3(0.4f, 0.15f, 1.2f);
-        exitMarker.Position = new Vector3(GameManager.GridCols + 0.3f, 0.06f, 6.5f);
-        view.AddNode(exitMarker);
     }
 
     private void BuildGridCells(Aura3DView view)
     {
-        for (int col = 0; col < GameManager.GridCols; col++)
+        for (int col = 0; col < _gm.GridCols; col++)
         {
-            for (int row = 0; row < GameManager.GridRows; row++)
+            for (int row = 0; row < _gm.GridRows; row++)
             {
                 if (_gm.PathCells[col, row]) continue;
 
@@ -194,9 +240,37 @@ public partial class GameView : UserControl
                 };
                 dot.Scale = new Vector3(0.15f, 0.02f, 0.15f);
                 dot.Position = _gm.GridToWorld(col, row) + new Vector3(0, 0.02f, 0);
+                _mapNodes.Add(dot);
                 view.AddNode(dot);
             }
         }
+    }
+
+    private void BuildMarkers(Aura3DView view)
+    {
+        // Entry marker — position at first path waypoint
+        var entryMarker = new Mesh
+        {
+            Geometry = _boxGeo!,
+            Material = CreateColorMaterial(DrawingColor.LimeGreen),
+        };
+        entryMarker.Scale = new Vector3(0.4f, 0.15f, 1.2f);
+        var firstWp = _gm.PathPositions.Count > 0 ? _gm.PathPositions[0] : Vector3.Zero;
+        entryMarker.Position = firstWp + new Vector3(-0.3f, 0.04f, 0);
+        _mapNodes.Add(entryMarker);
+        view.AddNode(entryMarker);
+
+        // Exit marker
+        var exitMarker = new Mesh
+        {
+            Geometry = _boxGeo!,
+            Material = CreateColorMaterial(DrawingColor.Red),
+        };
+        exitMarker.Scale = new Vector3(0.4f, 0.15f, 1.2f);
+        var lastWp = _gm.PathPositions.Count > 0 ? _gm.PathPositions[^1] : Vector3.Zero;
+        exitMarker.Position = lastWp + new Vector3(0.3f, 0.04f, 0);
+        _mapNodes.Add(exitMarker);
+        view.AddNode(exitMarker);
     }
 
     // ==================== Tower Nodes ====================
@@ -240,13 +314,11 @@ public partial class GameView : UserControl
                 }
             case TowerType.Sniper:
                 {
-                    // Tall thin barrel
                     var barrel = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
                     barrel.Scale = new Vector3(0.1f, 0.5f, 0.1f);
                     barrel.Position = new Vector3(0, 1.1f, 0);
                     node.AddChild(barrel, AttachToParentRule.KeepLocal);
 
-                    // Scope ring at the top
                     var ring = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = lightMat };
                     ring.Scale = new Vector3(0.18f, 0.06f, 0.18f);
                     ring.Position = new Vector3(0, 1.35f, 0);
@@ -255,8 +327,7 @@ public partial class GameView : UserControl
                 }
             case TowerType.MultiShot:
                 {
-                    // 3 arrow barrels arranged in a fan (center, left, right)
-                    float[] angles = { 0, -30, 30 }; // degrees around Y axis
+                    float[] angles = { 0, -30, 30 };
                     float radius = 0.1f;
                     foreach (var ang in angles)
                     {
@@ -268,7 +339,6 @@ public partial class GameView : UserControl
                             1.05f,
                             MathF.Cos(rad) * radius
                         );
-                        // Tilt each barrel outward (rotate around X to lean away from center)
                         barrel.RotationDegrees = new Vector3(ang * 0.4f, 0, 0);
                         node.AddChild(barrel, AttachToParentRule.KeepLocal);
                     }
@@ -276,13 +346,11 @@ public partial class GameView : UserControl
                 }
             case TowerType.Poison:
                 {
-                    // Small sphere body + tiny spikes
                     var poisonBall = new Mesh { Geometry = _sphereGeo!.Clone(), Material = lightMat };
                     poisonBall.Scale = new Vector3(0.28f, 0.28f, 0.28f);
                     poisonBall.Position = new Vector3(0, 0.95f, 0);
                     node.AddChild(poisonBall, AttachToParentRule.KeepLocal);
 
-                    // Spike on top
                     var spike = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
                     spike.Scale = new Vector3(0.05f, 0.18f, 0.05f);
                     spike.Position = new Vector3(0, 1.2f, 0);
@@ -291,13 +359,11 @@ public partial class GameView : UserControl
                 }
             case TowerType.Sun:
                 {
-                    // Large bright sphere (glowing center)
                     var sunCore = new Mesh { Geometry = _sphereGeo!.Clone(), Material = lightMat };
                     sunCore.Scale = new Vector3(0.35f, 0.35f, 0.35f);
                     sunCore.Position = new Vector3(0, 0.95f, 0);
                     node.AddChild(sunCore, AttachToParentRule.KeepLocal);
 
-                    // Outer glow ring
                     var glowRing = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = mat };
                     glowRing.Scale = new Vector3(0.42f, 0.04f, 0.42f);
                     glowRing.Position = new Vector3(0, 0.8f, 0);
@@ -306,7 +372,6 @@ public partial class GameView : UserControl
                 }
             default:
                 {
-                    // Cannon, Ice: sphere top
                     var topMesh = new Mesh { Geometry = _sphereGeo!.Clone(), Material = mat };
                     topMesh.Scale = new Vector3(0.22f, 0.22f, 0.22f);
                     topMesh.Position = new Vector3(0, 0.95f, 0);
@@ -461,12 +526,8 @@ public partial class GameView : UserControl
 
         // Project HP bars from 3D world to screen overlay
         var cam = AuraView.MainCamera;
-        // WorldToScreen returns coordinates in render-target pixels (scaled by RenderScaling),
-        // but the HP canvas overlay uses DIPs. Divide by RenderScaling to map correctly.
-        var source = AuraView.GetPresentationSource();
         foreach (var enemy in _gm.Enemies)
         {
-            // World position above the enemy sphere
             var barWorld = enemy.Position + new Vector3(0, enemy.Def.Radius * 2 + 0.40f, 0);
             var screen = cam.WorldToScreen(barWorld);
             if (screen == null) continue;
@@ -516,7 +577,6 @@ public partial class GameView : UserControl
         var worldPos = args.WorldPosition;
         var grid = _gm.WorldToGrid(worldPos);
 
-        // Debug: always show what was picked
         var nodeName = args.Node.Name ?? "?";
         var dbg = $"Picked [{nodeName}] @ world({worldPos.X:F1},{worldPos.Y:F1},{worldPos.Z:F1})";
 
@@ -686,6 +746,8 @@ public partial class GameView : UserControl
         };
     }
 
+    // ==================== Game Controls ====================
+
     private void OnStartGame(object? sender, RoutedEventArgs e)
     {
         if (!_gm.HasStarted)
@@ -700,7 +762,27 @@ public partial class GameView : UserControl
 
     private void OnReset(object? sender, RoutedEventArgs e)
     {
-        // Clear all tracked scene nodes
+        ClearAllGameNodes();
+        _gm.Reset();
+
+        // Reset UI
+        StartBtn.IsEnabled = true;
+        StartBtn.Content = "▶ Start Game";
+        GameOverPanel.IsVisible = false;
+        _gameOverShown = false;
+        TowerBtnPanel.IsVisible = false;
+        ClearPlacement();
+        StatusText.Text = "Press Start Game to begin";
+    }
+
+    private void OnBackToEditorClick(object? sender, RoutedEventArgs e)
+    {
+        ClearAllGameNodes();
+        OnBackToEditor?.Invoke();
+    }
+
+    private void ClearAllGameNodes()
+    {
         foreach (var (_, node) in _enemyNodes) AuraView.Remove(node);
         foreach (var (_, hp) in _enemyHpBars) HpBarCanvas.Children.Remove(hp);
         foreach (var (_, bg) in _enemyHpBgs) HpBarCanvas.Children.Remove(bg);
@@ -712,17 +794,7 @@ public partial class GameView : UserControl
         _enemyHpBgs.Clear();
         _towerNodes.Clear();
         _projectileNodes.Clear();
-
-        _gm.Reset();
-
-        // Reset UI
-        StartBtn.IsEnabled = true;
-        StartBtn.Content = "▶ Start Game";
-        GameOverPanel.IsVisible = false;
-        _gameOverShown = false;
-        TowerBtnPanel.IsVisible = false;
-        ClearPlacement();
-        StatusText.Text = "Press Start Game to begin";
+        RemoveGhost();
     }
 
     private void OnGameReset()

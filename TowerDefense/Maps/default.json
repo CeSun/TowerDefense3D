@@ -1,0 +1,54 @@
+{
+  "name": "Default Map",
+  "gridCols": 20,
+  "gridRows": 12,
+  "cellSize": 1.0,
+  "pathWaypoints": [
+    { "col": -1, "row": 6 },
+    { "col": 3, "row": 6 },
+    { "col": 3, "row": 2 },
+    { "col": 9, "row": 2 },
+    { "col": 9, "row": 10 },
+    { "col": 15, "row": 10 },
+    { "col": 15, "row": 6 },
+    { "col": 20, "row": 6 }
+  ],
+  "waves": [
+    {
+      "delayBeforeWave": 3.0,
+      "entries": [
+        { "enemyType": "Basic", "count": 8, "spawnInterval": 1.2 }
+      ]
+    },
+    {
+      "delayBeforeWave": 5.0,
+      "entries": [
+        { "enemyType": "Basic", "count": 6, "spawnInterval": 0.9 },
+        { "enemyType": "Fast", "count": 4, "spawnInterval": 1.5 }
+      ]
+    },
+    {
+      "delayBeforeWave": 5.0,
+      "entries": [
+        { "enemyType": "Basic", "count": 8, "spawnInterval": 0.7 },
+        { "enemyType": "Fast", "count": 6, "spawnInterval": 1.0 },
+        { "enemyType": "Tank", "count": 2, "spawnInterval": 2.0 }
+      ]
+    },
+    {
+      "delayBeforeWave": 5.0,
+      "entries": [
+        { "enemyType": "Fast", "count": 10, "spawnInterval": 0.8 },
+        { "enemyType": "Tank", "count": 4, "spawnInterval": 1.5 }
+      ]
+    },
+    {
+      "delayBeforeWave": 5.0,
+      "entries": [
+        { "enemyType": "Basic", "count": 10, "spawnInterval": 0.5 },
+        { "enemyType": "Fast", "count": 8, "spawnInterval": 0.7 },
+        { "enemyType": "Tank", "count": 6, "spawnInterval": 1.2 }
+      ]
+    }
+  ]
+}

@@ -10,25 +10,22 @@ public class GameManager
 {
     // ==================== Grid & Path ====================
 
-    public const int GridCols = 20;
-    public const int GridRows = 12;
-    public const float CellSize = 1f;
+    public int GridCols { get; private set; } = 20;
+    public int GridRows { get; private set; } = 12;
+    public float CellSize { get; private set; } = 1f;
 
-    // Path waypoints — enemies follow these (world positions)
-    private static readonly (int Col, int Row)[] PathWaypointCells = new[]
-    {
-        (-1, 6), (3, 6), (3, 2), (9, 2), (9, 10), (15, 10), (15, 6), (20, 6)
-    };
+    // Path waypoints — enemies follow these (world positions), loaded from map data
+    private List<WaypointCell> _pathWaypointCells = new();
 
     // Precomputed path: list of world positions for each step
     public List<Vector3> PathPositions { get; } = new();
     public float TotalPathLength { get; private set; }
 
     // Which cells are on the path (non-buildable)
-    public bool[,] PathCells { get; } = new bool[GridCols, GridRows];
+    public bool[,] PathCells { get; private set; } = new bool[20, 12];
 
     // Which cells have towers
-    public bool[,] OccupiedCells { get; } = new bool[GridCols, GridRows];
+    public bool[,] OccupiedCells { get; private set; } = new bool[20, 12];
 
     /// <summary>
     /// Returns the cell index (col, row) for a world position on the XZ plane, or null if out of bounds.
@@ -57,7 +54,7 @@ public class GameManager
     public int Gold { get; private set; } = 200;
     public int Lives { get; private set; } = 20;
     public int CurrentWave { get; private set; } = 0; // 0 = not started, 1-5 = active
-    public int TotalWaves => WaveConfig.DefaultWaves.Count;
+    public int TotalWaves => _waves.Count;
     public bool IsGameOver { get; private set; }
     public bool IsVictory { get; private set; }
     public bool HasStarted { get; private set; }
@@ -84,42 +81,122 @@ public class GameManager
     private readonly Random _rng = new(42);
 
     // Wave spawning state
+    private List<WaveConfig> _waves = new();
     private float _waveTimer;
     private bool _waveInProgress;
     private int _currentEntryIndex;
     private int _spawnedInEntry;
     private float _spawnTimer;
 
+    // Current loaded map
+    public MapData CurrentMap { get; private set; } = null!;
+
     // ==================== Initialization ====================
 
     public GameManager()
     {
+        LoadMap(MapData.CreateDefault());
+    }
+
+    /// <summary>
+    /// Load a new map, rebuilding the path and resetting all game state.
+    /// </summary>
+    public void LoadMap(MapData map)
+    {
+        CurrentMap = map;
+
+        // Apply map dimensions
+        GridCols = map.GridCols;
+        GridRows = map.GridRows;
+        CellSize = map.CellSize;
+
+        // Copy waypoints
+        _pathWaypointCells = new List<WaypointCell>(map.PathWaypoints);
+
+        // Reallocate grid arrays
+        PathCells = new bool[GridCols, GridRows];
+        OccupiedCells = new bool[GridCols, GridRows];
+
+        // Build path from waypoints
+        PathPositions.Clear();
         BuildPath();
+
+        // Load wave config
+        _waves = map.Waves.Select(w => new WaveConfig
+        {
+            WaveNumber = map.Waves.IndexOf(w) + 1,
+            DelayBeforeWave = w.DelayBeforeWave,
+            Entries = w.Entries.Select(e => new WaveEntry(
+                Enum.TryParse<EnemyType>(e.EnemyType, out var type) ? type : EnemyType.Basic,
+                e.Count,
+                e.SpawnInterval
+            )).ToList(),
+        }).ToList();
+
+        // Reset runtime state
+        ResetState();
+    }
+
+    /// <summary>
+    /// Reload the current map (resets game without changing map data).
+    /// </summary>
+    public void Reset()
+    {
+        // Broadcast removal for all existing objects so the view can clean up nodes
+        foreach (var t in Towers.ToList()) TowerRemoved?.Invoke(t);
+        foreach (var e in Enemies.ToList()) EnemyRemoved?.Invoke(e);
+        foreach (var p in Projectiles.ToList()) ProjectileRemoved?.Invoke(p);
+
+        Towers.Clear();
+        Enemies.Clear();
+        Projectiles.Clear();
+        Array.Clear(OccupiedCells, 0, OccupiedCells.Length);
+
+        ResetState();
+
+        GameReset?.Invoke();
+        GameStateChanged?.Invoke();
+    }
+
+    private void ResetState()
+    {
+        Gold = 200;
+        Lives = 20;
+        CurrentWave = 0;
+        IsGameOver = false;
+        IsVictory = false;
+        HasStarted = false;
+        _nextId = 0;
+        _waveTimer = 0;
+        _waveInProgress = false;
+        _currentEntryIndex = 0;
+        _spawnedInEntry = 0;
+        _spawnTimer = 0;
     }
 
     private void BuildPath()
     {
         // Convert waypoint cells to a connected path through grid cells
-        for (int w = 1; w < PathWaypointCells.Length; w++)
+        for (int w = 1; w < _pathWaypointCells.Count; w++)
         {
-            var (fromCol, fromRow) = PathWaypointCells[w - 1];
-            var (toCol, toRow) = PathWaypointCells[w];
+            var from = _pathWaypointCells[w - 1];
+            var to = _pathWaypointCells[w];
 
             // Walk horizontally then vertically
-            int stepX = Math.Sign(toCol - fromCol);
-            int stepZ = Math.Sign(toRow - fromRow);
+            int stepX = Math.Sign(to.Col - from.Col);
+            int stepZ = Math.Sign(to.Row - from.Row);
 
-            int cx = fromCol, cz = fromRow;
+            int cx = from.Col, cz = from.Row;
 
             // Horizontal
-            while (cx != toCol)
+            while (cx != to.Col)
             {
                 cx += stepX;
                 MarkPathCell(cx, cz);
             }
 
             // Vertical
-            while (cz != toRow)
+            while (cz != to.Row)
             {
                 cz += stepZ;
                 MarkPathCell(cx, cz);
@@ -127,24 +204,23 @@ public class GameManager
         }
 
         // Build world-space path positions (center of each path cell, in order)
-        // Start from entry point
-        for (int w = 1; w < PathWaypointCells.Length; w++)
+        for (int w = 1; w < _pathWaypointCells.Count; w++)
         {
-            var (fromCol, fromRow) = PathWaypointCells[w - 1];
-            var (toCol, toRow) = PathWaypointCells[w];
+            var from = _pathWaypointCells[w - 1];
+            var to = _pathWaypointCells[w];
 
-            int stepX = Math.Sign(toCol - fromCol);
-            int stepZ = Math.Sign(toRow - fromRow);
+            int stepX = Math.Sign(to.Col - from.Col);
+            int stepZ = Math.Sign(to.Row - from.Row);
 
-            int cx = fromCol, cz = fromRow;
+            int cx = from.Col, cz = from.Row;
 
-            while (cx != toCol)
+            while (cx != to.Col)
             {
                 cx += stepX;
                 if (cx >= 0 && cx < GridCols && cz >= 0 && cz < GridRows)
                     PathPositions.Add(new Vector3(cx + 0.5f, 0.05f, cz + 0.5f));
             }
-            while (cz != toRow)
+            while (cz != to.Row)
             {
                 cz += stepZ;
                 if (cx >= 0 && cx < GridCols && cz >= 0 && cz < GridRows)
@@ -153,7 +229,8 @@ public class GameManager
         }
 
         // Add exit position
-        PathPositions.Add(new Vector3(GridCols + 0.5f, 0.05f, 6.5f));
+        var lastWp = _pathWaypointCells[^1];
+        PathPositions.Add(new Vector3(lastWp.Col + 0.5f, 0.05f, lastWp.Row + 0.5f));
 
         // Compute total path length
         TotalPathLength = 0;
@@ -198,34 +275,6 @@ public class GameManager
         return true;
     }
 
-    public void Reset()
-    {
-        // Broadcast removal for all existing objects so the view can clean up nodes
-        foreach (var t in Towers.ToList()) TowerRemoved?.Invoke(t);
-        foreach (var e in Enemies.ToList()) EnemyRemoved?.Invoke(e);
-        foreach (var p in Projectiles.ToList()) ProjectileRemoved?.Invoke(p);
-
-        Towers.Clear();
-        Enemies.Clear();
-        Projectiles.Clear();
-        Array.Clear(OccupiedCells, 0, OccupiedCells.Length);
-        Gold = 200;
-        Lives = 20;
-        CurrentWave = 0;
-        IsGameOver = false;
-        IsVictory = false;
-        HasStarted = false;
-        _nextId = 0;
-        _waveTimer = 0;
-        _waveInProgress = false;
-        _currentEntryIndex = 0;
-        _spawnedInEntry = 0;
-        _spawnTimer = 0;
-
-        GameReset?.Invoke();
-        GameStateChanged?.Invoke();
-    }
-
     public void StartGame()
     {
         if (HasStarted) return;
@@ -256,7 +305,7 @@ public class GameManager
         if (!_waveInProgress)
         {
             _waveTimer += dt;
-            if (_waveTimer >= WaveConfig.DefaultWaves[CurrentWave - 1].DelayBeforeWave)
+            if (_waveTimer >= _waves[CurrentWave - 1].DelayBeforeWave)
             {
                 _waveInProgress = true;
                 _currentEntryIndex = 0;
@@ -266,7 +315,7 @@ public class GameManager
             return;
         }
 
-        var wave = WaveConfig.DefaultWaves[CurrentWave - 1];
+        var wave = _waves[CurrentWave - 1];
 
         // Check if all entries are done
         if (_currentEntryIndex >= wave.Entries.Count)
@@ -328,7 +377,7 @@ public class GameManager
             MaxHP = def.MaxHP,
             Speed = def.Speed,
             PathDistance = 0,
-            Position = PathPositions[0],
+            Position = PathPositions.Count > 0 ? PathPositions[0] : Vector3.Zero,
         };
 
         Enemies.Add(enemy);

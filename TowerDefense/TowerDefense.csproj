@@ -13,4 +13,8 @@
     <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.0" />
     <PackageReference Include="Avalonia" Version="12.0.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Maps\**" CopyToOutputDirectory="PreserveNewest" LinkBase="Maps" />
+  </ItemGroup>
 </Project>

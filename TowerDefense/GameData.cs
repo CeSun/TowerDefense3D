@@ -237,37 +237,4 @@ public class WaveConfig
     public List<WaveEntry> Entries { get; init; } = new();
     public float DelayBeforeWave { get; init; } = 5f; // seconds before wave starts
 
-    public static List<WaveConfig> DefaultWaves = new()
-    {
-        new WaveConfig
-        {
-            WaveNumber = 1,
-            DelayBeforeWave = 3f,
-            Entries = { new(EnemyType.Basic, 8, 1.2f) }
-        },
-        new WaveConfig
-        {
-            WaveNumber = 2,
-            DelayBeforeWave = 5f,
-            Entries = { new(EnemyType.Basic, 6, 0.9f), new(EnemyType.Fast, 4, 1.5f) }
-        },
-        new WaveConfig
-        {
-            WaveNumber = 3,
-            DelayBeforeWave = 5f,
-            Entries = { new(EnemyType.Basic, 8, 0.7f), new(EnemyType.Fast, 6, 1.0f), new(EnemyType.Tank, 2, 2.0f) }
-        },
-        new WaveConfig
-        {
-            WaveNumber = 4,
-            DelayBeforeWave = 5f,
-            Entries = { new(EnemyType.Fast, 10, 0.8f), new(EnemyType.Tank, 4, 1.5f) }
-        },
-        new WaveConfig
-        {
-            WaveNumber = 5,
-            DelayBeforeWave = 5f,
-            Entries = { new(EnemyType.Basic, 10, 0.5f), new(EnemyType.Fast, 8, 0.7f), new(EnemyType.Tank, 6, 1.2f) }
-        },
-    };
 }
