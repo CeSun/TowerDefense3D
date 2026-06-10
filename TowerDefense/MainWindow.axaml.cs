@@ -1,10 +1,10 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 
 namespace TowerDefense;
 
 public partial class MainWindow : Window
 {
+    private MenuView? _menuView;
     private GameView? _gameView;
     private MapEditorView? _editorView;
     private MapData _currentMapData = null!;
@@ -20,19 +20,50 @@ public partial class MainWindow : Window
         // Fall back to a relative path during development
         if (!Directory.Exists(_mapsDir))
         {
-            // Try the project source directory
             var projectDir = FindProjectMapsDir();
             if (projectDir != null)
                 _mapsDir = projectDir;
         }
 
-        // Start in editor mode
-        SwitchToEditor();
+        EnsureMapsDir();
+
+        // Check for command-line args to skip the menu
+        var args = Environment.GetCommandLineArgs();
+        if (args.Contains("--game"))
+        {
+            ShowGame();
+        }
+        else if (args.Contains("--editor"))
+        {
+            ShowEditor();
+        }
+        else if (args.Contains("--play"))
+        {
+            // --play <mapfile> — directly play a specific map
+            var idx = Array.IndexOf(args, "--play");
+            if (idx + 1 < args.Length)
+            {
+                var mapPath = args[idx + 1];
+                if (!Path.IsPathRooted(mapPath))
+                    mapPath = Path.Combine(_mapsDir, mapPath);
+                ShowGame(mapPath);
+            }
+            else
+            {
+                ShowGame();
+            }
+        }
+        else
+        {
+            // Default: show the main menu
+            ShowMenu();
+        }
     }
+
+    // ==================== Maps Directory ====================
 
     private static string? FindProjectMapsDir()
     {
-        // Walk up from base directory to find TowerDefense/Maps
         var dir = AppContext.BaseDirectory;
         for (int i = 0; i < 6; i++)
         {
@@ -48,68 +79,130 @@ public partial class MainWindow : Window
         return null;
     }
 
-    private void SwitchToEditor()
+    private void EnsureMapsDir()
+    {
+        if (!Directory.Exists(_mapsDir))
+            Directory.CreateDirectory(_mapsDir);
+
+        // Ensure a default map exists
+        var defaultPath = Path.Combine(_mapsDir, "default.json");
+        if (!File.Exists(defaultPath))
+        {
+            MapData.CreateDefault().SaveToFile(defaultPath);
+        }
+    }
+
+    private int CountMaps()
+    {
+        if (!Directory.Exists(_mapsDir)) return 0;
+        return Directory.GetFiles(_mapsDir, "*.json").Length;
+    }
+
+    private string[] GetMapFiles()
+    {
+        if (!Directory.Exists(_mapsDir)) return Array.Empty<string>();
+        return Directory.GetFiles(_mapsDir, "*.json");
+    }
+
+    // ==================== Navigation ====================
+
+    private void ShowMenu()
+    {
+        if (_menuView == null)
+        {
+            _menuView = new MenuView();
+            _menuView.OnPlayGame = () => ShowGame();
+            _menuView.OnOpenEditor = () => ShowEditor();
+        }
+
+        _menuView.MapCount = CountMaps();
+        ContentArea.Content = _menuView;
+    }
+
+    private void ShowGame(string? mapFilePath = null)
+    {
+        if (_gameView == null)
+        {
+            _gameView = new GameView();
+            _gameView.OnMainMenu = () => ShowMenu();
+            _gameView.OnBackToEditor = () => ShowEditor();
+        }
+
+        _gameView.SetMapsDirectory(_mapsDir);
+
+        if (mapFilePath != null && File.Exists(mapFilePath))
+        {
+            // Load specific map file
+            var map = MapData.LoadFromFile(mapFilePath);
+            if (map != null)
+            {
+                _gameView.LoadMap(map);
+                _gameView.SelectMapFile(mapFilePath);
+            }
+            else
+            {
+                _gameView.LoadMap(MapData.CreateDefault());
+            }
+        }
+        else
+        {
+            // Load first available map or default
+            var mapFiles = GetMapFiles();
+            if (mapFiles.Length > 0)
+            {
+                var map = MapData.LoadFromFile(mapFiles[0]);
+                _gameView.LoadMap(map ?? MapData.CreateDefault());
+                _gameView.SelectMapFile(mapFiles[0]);
+            }
+            else
+            {
+                _gameView.LoadMap(MapData.CreateDefault());
+            }
+        }
+
+        // Pure game mode: show map selector, hide editor-specific buttons
+        _gameView.SetPureGameMode(true);
+
+        ContentArea.Content = _gameView;
+    }
+
+    /// <summary>
+    /// Launch game view from the editor (test map).
+    /// </summary>
+    private void ShowGameFromEditor(MapData map)
+    {
+        if (_gameView == null)
+        {
+            _gameView = new GameView();
+            _gameView.OnMainMenu = () => ShowMenu();
+            _gameView.OnBackToEditor = () => ShowEditor();
+        }
+
+        _gameView.SetMapsDirectory(_mapsDir);
+        _gameView.LoadMap(map);
+
+        // Editor-launched mode: show "Back to Editor", hide map selector
+        _gameView.SetPureGameMode(false);
+
+        ContentArea.Content = _gameView;
+    }
+
+    private void ShowEditor()
     {
         if (_editorView == null)
         {
             _editorView = new MapEditorView();
             _editorView.OnPlayMap = OnPlayMap;
+            _editorView.OnMainMenu = () => ShowMenu();
             _editorView.Initialize(_mapsDir);
         }
 
         ContentArea.Content = _editorView;
-        _currentMapData = _editorView.GetCurrentMap();
-        UpdateToolbarHighlight(false);
-    }
-
-    private void SwitchToPlay()
-    {
-        if (_gameView == null)
-        {
-            _gameView = new GameView();
-            _gameView.OnBackToEditor = () => SwitchToEditor();
-        }
-
-        _gameView.LoadMap(_currentMapData);
-        ContentArea.Content = _gameView;
-        UpdateToolbarHighlight(true);
     }
 
     private void OnPlayMap(MapData map)
     {
         _currentMapData = map;
-        SwitchToPlay();
-    }
-
-    private void OnSwitchToPlay(object? sender, RoutedEventArgs e)
-    {
-        _currentMapData = _editorView?.GetCurrentMap() ?? MapData.CreateDefault();
-        SwitchToPlay();
-    }
-
-    private void OnSwitchToEditor(object? sender, RoutedEventArgs e)
-    {
-        SwitchToEditor();
-    }
-
-    private void UpdateToolbarHighlight(bool isPlayMode)
-    {
-        PlayModeBtn.Background = isPlayMode
-            ? new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xCC, 0x2d, 0x7a, 0x27))
-            : new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xCC, 0x2d, 0x5a, 0x27));
-        PlayModeBtn.BorderThickness = isPlayMode
-            ? new Avalonia.Thickness(2, 2, 2, 2)
-            : new Avalonia.Thickness(0);
-        PlayModeBtn.BorderBrush = Avalonia.Media.Brushes.White;
-
-        EditorModeBtn.Background = !isPlayMode
-            ? new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xCC, 0x5a, 0x8a, 0x5a))
-            : new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0xCC, 0x4a, 0x6a, 0x8a));
-        EditorModeBtn.BorderThickness = !isPlayMode
-            ? new Avalonia.Thickness(2, 2, 2, 2)
-            : new Avalonia.Thickness(0);
-        EditorModeBtn.BorderBrush = Avalonia.Media.Brushes.White;
-
-        CurrentMapLabel.Text = $"Map: {_currentMapData.Name}";
+        ShowGameFromEditor(map);
     }
 }

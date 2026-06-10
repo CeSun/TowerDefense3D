@@ -40,8 +40,9 @@ public partial class MapEditorView : UserControl
     private Material? _buildableMat;
     private Material? _pathMat;
 
-    // ==================== Callback ====================
+    // ==================== Callbacks ====================
     public Action<MapData>? OnPlayMap { get; set; }
+    public Action? OnMainMenu { get; set; }
 
     // ==================== Initialization ====================
 
@@ -1013,6 +1014,11 @@ public partial class MapEditorView : UserControl
             return;
         }
         OnPlayMap?.Invoke(_mapData);
+    }
+
+    private void OnMainMenuClick(object? sender, RoutedEventArgs e)
+    {
+        OnMainMenu?.Invoke();
     }
 
     // ==================== Helpers ====================

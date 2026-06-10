@@ -46,9 +46,14 @@ public partial class GameView : UserControl
     // ==================== UI State ====================
     private bool _gameOverShown;
     private bool _sceneInitialized;
+    private bool _isPureGameMode;
+    private string _mapsDir = string.Empty;
+    private string? _currentMapFile;
+    private bool _suppressMapSelect; // prevent re-entrant loading
 
-    // Callback to return to editor (set by MainWindow)
+    // Callbacks (set by MainWindow)
     public Action? OnBackToEditor { get; set; }
+    public Action? OnMainMenu { get; set; }
 
     public GameView()
     {
@@ -65,6 +70,84 @@ public partial class GameView : UserControl
         _gm.GameReset += OnGameReset;
 
         UpdateTowerButtonHighlight();
+    }
+
+    // ==================== Mode Configuration ====================
+
+    /// <summary>
+    /// Set the maps directory and refresh the map selector dropdown.
+    /// </summary>
+    public void SetMapsDirectory(string mapsDir)
+    {
+        _mapsDir = mapsDir;
+        RefreshMapSelector();
+    }
+
+    /// <summary>
+    /// Toggle between pure game mode (map selector, Main Menu button)
+    /// and editor-launched mode (Back to Editor button, no map selector).
+    /// </summary>
+    public void SetPureGameMode(bool pure)
+    {
+        _isPureGameMode = pure;
+        MapSelectorPanel.IsVisible = pure;
+        NavBackBtn.Content = pure ? "🏠 Main Menu" : "🗺 Back to Editor";
+    }
+
+    /// <summary>
+    /// Select a specific map file in the dropdown (without triggering reload).
+    /// </summary>
+    public void SelectMapFile(string filePath)
+    {
+        _currentMapFile = filePath;
+        var name = Path.GetFileNameWithoutExtension(filePath);
+        _suppressMapSelect = true;
+        MapSelectCombo.SelectedItem = name;
+        _suppressMapSelect = false;
+    }
+
+    private void RefreshMapSelector()
+    {
+        MapSelectCombo.Items.Clear();
+        if (Directory.Exists(_mapsDir))
+        {
+            foreach (var file in Directory.GetFiles(_mapsDir, "*.json"))
+            {
+                MapSelectCombo.Items.Add(Path.GetFileNameWithoutExtension(file));
+            }
+        }
+        if (MapSelectCombo.Items.Count == 0)
+        {
+            MapSelectCombo.Items.Add("default");
+        }
+    }
+
+    private void OnMapSelectChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_suppressMapSelect) return;
+        if (MapSelectCombo.SelectedItem is string name)
+        {
+            var filePath = Path.Combine(_mapsDir, name + ".json");
+            if (File.Exists(filePath))
+            {
+                var map = MapData.LoadFromFile(filePath);
+                if (map != null)
+                {
+                    _currentMapFile = filePath;
+                    LoadMap(map);
+                    // Reset game state for the new map
+                    ClearAllGameNodes();
+                    _gm.Reset();
+                    StartBtn.IsEnabled = true;
+                    StartBtn.Content = "▶ Start Game";
+                    GameOverPanel.IsVisible = false;
+                    _gameOverShown = false;
+                    TowerBtnPanel.IsVisible = false;
+                    ClearPlacement();
+                    StatusText.Text = $"Loaded: {map.Name} — Press Start Game to begin";
+                }
+            }
+        }
     }
 
     // ==================== Map Loading ====================
@@ -785,10 +868,18 @@ public partial class GameView : UserControl
         StatusText.Text = "Press Start Game to begin";
     }
 
-    private void OnBackToEditorClick(object? sender, RoutedEventArgs e)
+    private void OnNavBack(object? sender, RoutedEventArgs e)
     {
         ClearAllGameNodes();
-        OnBackToEditor?.Invoke();
+
+        if (_isPureGameMode)
+        {
+            OnMainMenu?.Invoke();
+        }
+        else
+        {
+            OnBackToEditor?.Invoke();
+        }
     }
 
     private void ClearAllGameNodes()

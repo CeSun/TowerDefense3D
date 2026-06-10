@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TowerDefense.MenuView">
+    <Grid Background="#FF1a1a2e">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="24">
+            <!-- Title -->
+            <TextBlock Text="🏰 Tower Defense 3D"
+                       FontSize="48" FontWeight="Bold"
+                       Foreground="#FFD700"
+                       HorizontalAlignment="Center" />
+            <TextBlock Text="Aura3D"
+                       FontSize="16"
+                       Foreground="#888"
+                       HorizontalAlignment="Center"
+                       Margin="0,-12,0,0" />
+
+            <Separator Background="#333" Height="1" Width="400" Margin="0,8" />
+
+            <!-- Play Game Button -->
+            <Button x:Name="PlayGameBtn" Click="OnPlayGameClick"
+                    Background="#CC2d5a27" Foreground="White"
+                    FontSize="22" FontWeight="Bold"
+                    Padding="60,20" CornerRadius="12" Width="360"
+                    HorizontalContentAlignment="Center"
+                    Cursor="Hand">
+                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                    <TextBlock Text="▶" FontSize="24" />
+                    <TextBlock Text="Play Game" FontSize="22" FontWeight="Bold" />
+                </StackPanel>
+            </Button>
+
+            <!-- Map Editor Button -->
+            <Button x:Name="EditorBtn" Click="OnOpenEditorClick"
+                    Background="#CC4a6a8a" Foreground="White"
+                    FontSize="22" FontWeight="Bold"
+                    Padding="60,20" CornerRadius="12" Width="360"
+                    HorizontalContentAlignment="Center"
+                    Cursor="Hand">
+                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                    <TextBlock Text="🗺" FontSize="24" />
+                    <TextBlock Text="Map Editor" FontSize="22" FontWeight="Bold" />
+                </StackPanel>
+            </Button>
+
+            <!-- Map count hint -->
+            <TextBlock x:Name="MapCountLabel" Text=""
+                       Foreground="#666" FontSize="12"
+                       HorizontalAlignment="Center" />
+        </StackPanel>
+    </Grid>
+</UserControl>

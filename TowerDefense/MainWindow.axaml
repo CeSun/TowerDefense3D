@@ -6,33 +6,7 @@
         Width="1280" Height="800"
         WindowState="Maximized">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <!-- Mode Toggle Toolbar -->
-        <Border Grid.Row="0" Background="#EE1a1a2e" Padding="8,4">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button x:Name="PlayModeBtn" Click="OnSwitchToPlay"
-                        Background="#CC2d5a27" Foreground="White"
-                        FontSize="13" FontWeight="Bold"
-                        Padding="16,6" CornerRadius="4">
-                    ▶ Play Mode
-                </Button>
-                <Button x:Name="EditorModeBtn" Click="OnSwitchToEditor"
-                        Background="#CC4a6a8a" Foreground="White"
-                        FontSize="13" FontWeight="Bold"
-                        Padding="16,6" CornerRadius="4">
-                    🗺 Map Editor
-                </Button>
-                <TextBlock x:Name="CurrentMapLabel" Text="Map: Default Map"
-                           Foreground="#AAA" FontSize="13" VerticalAlignment="Center"
-                           Margin="16,0,0,0" />
-            </StackPanel>
-        </Border>
-
-        <!-- Content Area -->
-        <ContentControl Grid.Row="1" x:Name="ContentArea" />
+        <!-- Content Area — navigated between Menu / Editor / Game views -->
+        <ContentControl Grid.Row="0" x:Name="ContentArea" />
     </Grid>
 </Window>

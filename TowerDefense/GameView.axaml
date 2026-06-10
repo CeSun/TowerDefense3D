@@ -26,6 +26,18 @@
             <!-- Top HUD -->
             <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                         Orientation="Horizontal" Spacing="12">
+                <!-- Map selector (visible in pure game mode) -->
+                <Border x:Name="MapSelectorPanel" Background="#CC1a1a2e"
+                        CornerRadius="6" Padding="8,5" IsVisible="False">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="Map:" Foreground="#AAA" FontSize="13"
+                                   VerticalAlignment="Center" />
+                        <ComboBox x:Name="MapSelectCombo" Width="160"
+                                  FontSize="13"
+                                  SelectionChanged="OnMapSelectChanged">
+                        </ComboBox>
+                    </StackPanel>
+                </Border>
                 <Border Background="#CC1a1a2e" CornerRadius="6" Padding="10,5">
                     <TextBlock x:Name="GoldText" Text="Gold: 200"
                                Foreground="#FFD700" FontSize="16" FontWeight="Bold" />
@@ -109,11 +121,12 @@
                         Padding="14,8" CornerRadius="6" Width="180">
                     ↺ Reset
                 </Button>
-                <Button x:Name="BackToEditorBtn" Click="OnBackToEditorClick"
+                <!-- Dynamic nav button: "Main Menu" in pure mode, "Back to Editor" when editor-launched -->
+                <Button x:Name="NavBackBtn" Click="OnNavBack"
                         Background="#CC4a6a8a" Foreground="White"
                         FontSize="13" FontWeight="Bold"
                         Padding="14,8" CornerRadius="6" Width="180">
-                    🗺 Back to Editor
+                    🏠 Main Menu
                 </Button>
             </StackPanel>
         </Grid>
@@ -126,6 +139,21 @@
                            HorizontalAlignment="Center" />
                 <TextBlock x:Name="GameOverSubtext" FontSize="20"
                            HorizontalAlignment="Center" Foreground="#CCC" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12"
+                            Margin="0,12,0,0">
+                    <Button x:Name="GameOverReplayBtn" Click="OnReset"
+                            Background="#CC2d5a27" Foreground="White"
+                            FontSize="15" FontWeight="Bold"
+                            Padding="20,10" CornerRadius="6">
+                        🔄 Play Again
+                    </Button>
+                    <Button x:Name="GameOverMenuBtn" Click="OnNavBack"
+                            Background="#CC4a6a8a" Foreground="White"
+                            FontSize="15" FontWeight="Bold"
+                            Padding="20,10" CornerRadius="6">
+                        🏠 Main Menu
+                    </Button>
+                </StackPanel>
             </StackPanel>
         </Panel>
     </Grid>
