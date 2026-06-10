@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using System.Reflection;
 
 namespace TowerDefense;
 
@@ -14,15 +15,28 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        // Determine maps directory (next to the executable or in project during dev)
-        _mapsDir = Path.Combine(AppContext.BaseDirectory, "Maps");
+        // Use ApplicationData as the writable maps directory (works cross-platform: Desktop + Android).
+        // This is Android's internal app-private storage — no permissions required.
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        _mapsDir = Path.Combine(appData, "Maps");
 
-        // Fall back to a relative path during development
-        if (!Directory.Exists(_mapsDir))
+        // Extract built-in maps from embedded resources on first run (or if directory is missing).
+        ExtractEmbeddedMaps();
+
+        // Fall back to desktop dev paths if extraction didn't yield anything.
+        if (!Directory.Exists(_mapsDir) || Directory.GetFiles(_mapsDir, "*.json").Length == 0)
         {
-            var projectDir = FindProjectMapsDir();
-            if (projectDir != null)
-                _mapsDir = projectDir;
+            var fallback = Path.Combine(AppContext.BaseDirectory, "Maps");
+            if (Directory.Exists(fallback))
+            {
+                _mapsDir = fallback;
+            }
+            else
+            {
+                var projectDir = FindProjectMapsDir();
+                if (projectDir != null)
+                    _mapsDir = projectDir;
+            }
         }
 
         EnsureMapsDir();
@@ -61,6 +75,49 @@ public partial class MainWindow : Window
     }
 
     // ==================== Maps Directory ====================
+
+    /// <summary>
+    /// Extract built-in map JSON files from embedded resources to the app data directory.
+    /// This ensures maps bundled in the APK are available on first launch (Android) and
+    /// provides a clean writable copy on Desktop as well.
+    /// </summary>
+    private void ExtractEmbeddedMaps()
+    {
+        // Already populated — skip extraction to avoid overwriting user changes.
+        if (Directory.Exists(_mapsDir) && Directory.GetFiles(_mapsDir, "*.json").Length > 0)
+            return;
+
+        var assembly = typeof(MapData).Assembly;
+        var prefix = $"{assembly.GetName().Name}.Maps.";
+
+        foreach (var resourceName in assembly.GetManifestResourceNames())
+        {
+            if (!resourceName.StartsWith(prefix) || !resourceName.EndsWith(".json"))
+                continue;
+
+            // Extract just the filename (e.g. "1.json")
+            var fileName = resourceName.Substring(prefix.Length);
+
+            try
+            {
+                Directory.CreateDirectory(_mapsDir);
+
+                var targetPath = Path.Combine(_mapsDir, fileName);
+                if (File.Exists(targetPath))
+                    continue; // Don't overwrite existing files.
+
+                using var stream = assembly.GetManifestResourceStream(resourceName);
+                if (stream == null) continue;
+
+                using var fileStream = File.Create(targetPath);
+                stream.CopyTo(fileStream);
+            }
+            catch
+            {
+                // Best-effort: skip files that fail (e.g. permissions, disk full).
+            }
+        }
+    }
 
     private static string? FindProjectMapsDir()
     {

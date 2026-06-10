@@ -16,5 +16,6 @@
 
   <ItemGroup>
     <Content Include="Maps\**" CopyToOutputDirectory="PreserveNewest" LinkBase="Maps" />
+    <EmbeddedResource Include="Maps\**" LinkBase="Maps" />
   </ItemGroup>
 </Project>
