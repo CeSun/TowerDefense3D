@@ -1,0 +1,56 @@
+{
+  "name": "2",
+  "gridCols": 20,
+  "gridRows": 12,
+  "cellSize": 1.0,
+  "startCell": {
+    "col": 0,
+    "row": 2
+  },
+  "endCell": {
+    "col": 18,
+    "row": 10
+  },
+  "pathWaypoints": [
+    {
+      "col": 10,
+      "row": 2
+    },
+    {
+      "col": 10,
+      "row": 10
+    }
+  ],
+  "waves": [
+    {
+      "delayBeforeWave": 3.0,
+      "entries": [
+        {
+          "enemyType": "Basic",
+          "count": 6,
+          "spawnInterval": 1.4
+        }
+      ]
+    },
+    {
+      "delayBeforeWave": 4.0,
+      "entries": [
+        {
+          "enemyType": "Basic",
+          "count": 9,
+          "spawnInterval": 1.1
+        }
+      ]
+    },
+    {
+      "delayBeforeWave": 5.0,
+      "entries": [
+        {
+          "enemyType": "Basic",
+          "count": 12,
+          "spawnInterval": 0.9
+        }
+      ]
+    }
+  ]
+}

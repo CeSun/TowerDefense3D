@@ -20,26 +20,20 @@
             <Button x:Name="PlayGameBtn" Click="OnPlayGameClick"
                     Background="#CC2d5a27" Foreground="White"
                     FontSize="22" FontWeight="Bold"
-                    Padding="60,20" CornerRadius="12" Width="360"
+                    Padding="40,18" CornerRadius="12" Width="320"
                     HorizontalContentAlignment="Center"
                     Cursor="Hand">
-                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
-                    <TextBlock Text="▶" FontSize="24" />
-                    <TextBlock Text="Play Game" FontSize="22" FontWeight="Bold" />
-                </StackPanel>
+                ▶  Play Game
             </Button>
 
             <!-- Map Editor Button -->
             <Button x:Name="EditorBtn" Click="OnOpenEditorClick"
                     Background="#CC4a6a8a" Foreground="White"
                     FontSize="22" FontWeight="Bold"
-                    Padding="60,20" CornerRadius="12" Width="360"
+                    Padding="40,18" CornerRadius="12" Width="320"
                     HorizontalContentAlignment="Center"
                     Cursor="Hand">
-                <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
-                    <TextBlock Text="🗺" FontSize="24" />
-                    <TextBlock Text="Map Editor" FontSize="22" FontWeight="Bold" />
-                </StackPanel>
+                🗺  Map Editor
             </Button>
 
             <!-- Map count hint -->

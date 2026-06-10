@@ -84,8 +84,8 @@ public partial class MainWindow : Window
         if (!Directory.Exists(_mapsDir))
             Directory.CreateDirectory(_mapsDir);
 
-        // Ensure a default map exists
-        var defaultPath = Path.Combine(_mapsDir, "default.json");
+        // Ensure Level 1 exists
+        var defaultPath = Path.Combine(_mapsDir, "1.json");
         if (!File.Exists(defaultPath))
         {
             MapData.CreateDefault().SaveToFile(defaultPath);
@@ -125,44 +125,9 @@ public partial class MainWindow : Window
         {
             _gameView = new GameView();
             _gameView.OnMainMenu = () => ShowMenu();
-            _gameView.OnBackToEditor = () => ShowEditor();
         }
 
         _gameView.SetMapsDirectory(_mapsDir);
-
-        if (mapFilePath != null && File.Exists(mapFilePath))
-        {
-            // Load specific map file
-            var map = MapData.LoadFromFile(mapFilePath);
-            if (map != null)
-            {
-                _gameView.LoadMap(map);
-                _gameView.SelectMapFile(mapFilePath);
-            }
-            else
-            {
-                _gameView.LoadMap(MapData.CreateDefault());
-            }
-        }
-        else
-        {
-            // Load first available map or default
-            var mapFiles = GetMapFiles();
-            if (mapFiles.Length > 0)
-            {
-                var map = MapData.LoadFromFile(mapFiles[0]);
-                _gameView.LoadMap(map ?? MapData.CreateDefault());
-                _gameView.SelectMapFile(mapFiles[0]);
-            }
-            else
-            {
-                _gameView.LoadMap(MapData.CreateDefault());
-            }
-        }
-
-        // Pure game mode: show map selector, hide editor-specific buttons
-        _gameView.SetPureGameMode(true);
-
         ContentArea.Content = _gameView;
     }
 
@@ -175,14 +140,10 @@ public partial class MainWindow : Window
         {
             _gameView = new GameView();
             _gameView.OnMainMenu = () => ShowMenu();
-            _gameView.OnBackToEditor = () => ShowEditor();
         }
 
         _gameView.SetMapsDirectory(_mapsDir);
-        _gameView.LoadMap(map);
-
-        // Editor-launched mode: show "Back to Editor", hide map selector
-        _gameView.SetPureGameMode(false);
+        _gameView.SetSelectedLevel(map.Name);
 
         ContentArea.Content = _gameView;
     }

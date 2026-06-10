@@ -18,23 +18,30 @@
         <!-- Editor Sidebar -->
         <ScrollViewer Grid.Column="1" Background="#EE1a1a2e">
             <StackPanel Spacing="8" Margin="8">
-                <!-- Map File Operations -->
-                <TextBlock Text="MAP FILE" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <!-- Level Management -->
+                <TextBlock Text="LEVELS" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <ComboBox x:Name="MapListCombo"
                            SelectionChanged="OnMapSelected" />
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <Button x:Name="NewMapBtn" Click="OnNewMap"
-                            Background="#CC4a6a8a" Foreground="White" FontSize="12"
+                            Background="#CC4a6a8a" Foreground="White" FontSize="11"
                             Padding="8,4" CornerRadius="4">
                         🆕 New
                     </Button>
+                    <Button x:Name="DeleteMapBtn" Click="OnDeleteMap"
+                            Background="#CC6a2a2a" Foreground="White" FontSize="11"
+                            Padding="8,4" CornerRadius="4">
+                        🗑 Delete
+                    </Button>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="4">
                     <Button x:Name="SaveBtn" Click="OnSaveMap"
-                            Background="#CC2d6a4a" Foreground="White" FontSize="12"
+                            Background="#CC2d6a4a" Foreground="White" FontSize="11"
                             Padding="8,4" CornerRadius="4">
                         💾 Save
                     </Button>
                     <Button x:Name="SaveAsBtn" Click="OnSaveAsMap"
-                            Background="#CC4a6a4a" Foreground="White" FontSize="12"
+                            Background="#CC4a6a4a" Foreground="White" FontSize="11"
                             Padding="8,4" CornerRadius="4">
                         📄 Save As
                     </Button>

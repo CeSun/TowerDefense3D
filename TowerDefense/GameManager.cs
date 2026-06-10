@@ -181,6 +181,8 @@ public class GameManager
 
     private void BuildPath()
     {
+        if (_pathWaypointCells.Count == 0) return;
+
         // Convert waypoint cells to a connected path through grid cells
         for (int w = 1; w < _pathWaypointCells.Count; w++)
         {

@@ -72,12 +72,30 @@ public partial class MapEditorView : UserControl
         if (!Directory.Exists(_mapsDir))
             Directory.CreateDirectory(_mapsDir);
 
-        // Ensure default.json exists
-        var defaultPath = Path.Combine(_mapsDir, "default.json");
+        // Ensure 1.json exists
+        var defaultPath = Path.Combine(_mapsDir, "1.json");
         if (!File.Exists(defaultPath))
         {
             MapData.CreateDefault().SaveToFile(defaultPath);
         }
+    }
+
+    private static string LevelDisplay(int num) => $"Level {num}";
+    private static int ParseLevelNum(string display) => int.Parse(display.Replace("Level ", ""));
+
+    private int GetNextLevelNumber()
+    {
+        int max = 0;
+        if (Directory.Exists(_mapsDir))
+        {
+            foreach (var file in Directory.GetFiles(_mapsDir, "*.json"))
+            {
+                var name = Path.GetFileNameWithoutExtension(file);
+                if (int.TryParse(name, out int num) && num > max)
+                    max = num;
+            }
+        }
+        return max + 1;
     }
 
     private void RefreshMapList()
@@ -85,13 +103,19 @@ public partial class MapEditorView : UserControl
         MapListCombo.Items.Clear();
         if (Directory.Exists(_mapsDir))
         {
+            var numbers = new List<int>();
             foreach (var file in Directory.GetFiles(_mapsDir, "*.json"))
             {
-                MapListCombo.Items.Add(Path.GetFileNameWithoutExtension(file));
+                var name = Path.GetFileNameWithoutExtension(file);
+                if (int.TryParse(name, out int num))
+                    numbers.Add(num);
             }
+            numbers.Sort();
+            foreach (var num in numbers)
+                MapListCombo.Items.Add(LevelDisplay(num));
         }
         if (MapListCombo.Items.Count == 0)
-            MapListCombo.Items.Add("default");
+            MapListCombo.Items.Add(LevelDisplay(1));
         MapListCombo.SelectedIndex = 0;
     }
 
@@ -916,9 +940,10 @@ public partial class MapEditorView : UserControl
         if (string.IsNullOrEmpty(_mapsDir))
             return;
 
-        if (MapListCombo.SelectedItem is string name)
+        if (MapListCombo.SelectedItem is string display)
         {
-            var filePath = Path.Combine(_mapsDir, name + ".json");
+            int num = ParseLevelNum(display);
+            var filePath = Path.Combine(_mapsDir, num + ".json");
             if (File.Exists(filePath))
             {
                 LoadMapFromFile(filePath);
@@ -937,17 +962,42 @@ public partial class MapEditorView : UserControl
 
     private void OnNewMap(object? sender, RoutedEventArgs e)
     {
+        var next = GetNextLevelNumber();
         _mapData = new MapData
         {
-            Name = "New Map",
+            Name = next.ToString(),
             GridCols = 20,
             GridRows = 12,
             CellSize = 1f,
         };
-        _currentFilePath = null;
+        _currentFilePath = Path.Combine(_mapsDir, next + ".json");
+        _mapData.SaveToFile(_currentFilePath);
+        RefreshMapList();
+        MapListCombo.SelectedItem = LevelDisplay(next);
         SyncUIFromMap();
         RebuildMapScene();
-        GridStatusText.Text = "New map created. Set START, END, and waypoints to define the path.";
+        GridStatusText.Text = $"Level {next} created. Set START, END, and waypoints to define the path.";
+    }
+
+    private void OnDeleteMap(object? sender, RoutedEventArgs e)
+    {
+        if (MapListCombo.SelectedItem is not string display) return;
+        if (MapListCombo.Items.Count <= 1)
+        {
+            GridStatusText.Text = "Cannot delete the last level.";
+            return;
+        }
+
+        int num = ParseLevelNum(display);
+        var filePath = Path.Combine(_mapsDir, num + ".json");
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+        }
+
+        RefreshMapList();
+        MapListCombo.SelectedIndex = 0;
+        GridStatusText.Text = $"Deleted {display}.";
     }
 
     private void OnSaveMap(object? sender, RoutedEventArgs e)
@@ -961,20 +1011,24 @@ public partial class MapEditorView : UserControl
 
         if (_currentFilePath == null)
         {
-            var name = PromptMapName();
-            if (string.IsNullOrWhiteSpace(name)) return;
-
-            _mapData.Name = name;
-            _currentFilePath = Path.Combine(_mapsDir, name + ".json");
+            var next = GetNextLevelNumber();
+            _mapData.Name = next.ToString();
+            _currentFilePath = Path.Combine(_mapsDir, next + ".json");
         }
         else
         {
-            _mapData.Name = Path.GetFileNameWithoutExtension(_currentFilePath);
+            var fname = Path.GetFileNameWithoutExtension(_currentFilePath);
+            _mapData.Name = int.TryParse(fname, out _) ? fname : "1";
         }
 
         _mapData.SaveToFile(_currentFilePath);
         RefreshMapList();
-        MapListCombo.SelectedItem = _mapData.Name;
+        // Select the saved level in the combo (handle legacy non-numeric names)
+        var name = Path.GetFileNameWithoutExtension(_currentFilePath);
+        if (int.TryParse(name, out int num) && MapListCombo.Items.Contains(LevelDisplay(num)))
+            MapListCombo.SelectedItem = LevelDisplay(num);
+        else
+            MapListCombo.SelectedIndex = 0;
         GridStatusText.Text = $"Saved: {_currentFilePath}";
     }
 
@@ -987,20 +1041,13 @@ public partial class MapEditorView : UserControl
             return;
         }
 
-        var name = PromptMapName();
-        if (string.IsNullOrWhiteSpace(name)) return;
-
-        _mapData.Name = name;
-        _currentFilePath = Path.Combine(_mapsDir, name + ".json");
+        var next = GetNextLevelNumber();
+        _mapData.Name = next.ToString();
+        _currentFilePath = Path.Combine(_mapsDir, next + ".json");
         _mapData.SaveToFile(_currentFilePath);
         RefreshMapList();
-        MapListCombo.SelectedItem = name;
-        GridStatusText.Text = $"Saved as: {_currentFilePath}";
-    }
-
-    private string? PromptMapName()
-    {
-        return $"map_{DateTime.Now:yyyyMMdd_HHmmss}";
+        MapListCombo.SelectedItem = LevelDisplay(next);
+        GridStatusText.Text = $"Saved as Level {next}: {_currentFilePath}";
     }
 
     // ==================== Test Map ====================

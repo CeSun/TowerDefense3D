@@ -46,13 +46,12 @@ public partial class GameView : UserControl
     // ==================== UI State ====================
     private bool _gameOverShown;
     private bool _sceneInitialized;
-    private bool _isPureGameMode;
     private string _mapsDir = string.Empty;
-    private string? _currentMapFile;
-    private bool _suppressMapSelect; // prevent re-entrant loading
+    private int _highestUnlockedLevel = 1;
+    private int _selectedLevelNum;
+    private readonly Dictionary<int, Button> _levelCards = new();
 
-    // Callbacks (set by MainWindow)
-    public Action? OnBackToEditor { get; set; }
+    // Callback
     public Action? OnMainMenu { get; set; }
 
     public GameView()
@@ -72,82 +71,228 @@ public partial class GameView : UserControl
         UpdateTowerButtonHighlight();
     }
 
-    // ==================== Mode Configuration ====================
+    // ==================== Level Grid ====================
 
     /// <summary>
-    /// Set the maps directory and refresh the map selector dropdown.
+    /// Set the maps directory and build the level select grid.
     /// </summary>
     public void SetMapsDirectory(string mapsDir)
     {
         _mapsDir = mapsDir;
-        RefreshMapSelector();
+        BuildLevelGrid();
     }
 
     /// <summary>
-    /// Toggle between pure game mode (map selector, Main Menu button)
-    /// and editor-launched mode (Back to Editor button, no map selector).
+    /// Auto-select a level in the grid (called from editor to pre-select the edited level).
     /// </summary>
-    public void SetPureGameMode(bool pure)
+    public void SetSelectedLevel(string name)
     {
-        _isPureGameMode = pure;
-        MapSelectorPanel.IsVisible = pure;
-        NavBackBtn.Content = pure ? "🏠 Main Menu" : "🗺 Back to Editor";
+        if (int.TryParse(name, out int num))
+        {
+            // Make sure the editor's level is unlocked for testing
+            if (num > _highestUnlockedLevel)
+                _highestUnlockedLevel = num;
+            BuildLevelGrid();
+            SelectLevel(num);
+        }
     }
 
-    /// <summary>
-    /// Select a specific map file in the dropdown (without triggering reload).
-    /// </summary>
-    public void SelectMapFile(string filePath)
+    private List<int> GetLevelNumbers()
     {
-        _currentMapFile = filePath;
-        var name = Path.GetFileNameWithoutExtension(filePath);
-        _suppressMapSelect = true;
-        MapSelectCombo.SelectedItem = name;
-        _suppressMapSelect = false;
-    }
-
-    private void RefreshMapSelector()
-    {
-        MapSelectCombo.Items.Clear();
+        var numbers = new List<int>();
         if (Directory.Exists(_mapsDir))
         {
             foreach (var file in Directory.GetFiles(_mapsDir, "*.json"))
             {
-                MapSelectCombo.Items.Add(Path.GetFileNameWithoutExtension(file));
+                var fname = Path.GetFileNameWithoutExtension(file);
+                if (int.TryParse(fname, out int num))
+                    numbers.Add(num);
             }
         }
-        if (MapSelectCombo.Items.Count == 0)
+        numbers.Sort();
+        if (numbers.Count == 0) numbers.Add(1);
+        return numbers;
+    }
+
+    private void BuildLevelGrid()
+    {
+        LevelGrid.Children.Clear();
+        _levelCards.Clear();
+
+        var numbers = GetLevelNumbers();
+        foreach (var num in numbers)
         {
-            MapSelectCombo.Items.Add("default");
+            bool unlocked = num <= _highestUnlockedLevel;
+            var card = new Button
+            {
+                Width = 110, Height = 90,
+                Margin = new Avalonia.Thickness(6),
+                CornerRadius = new Avalonia.CornerRadius(8),
+                FontSize = 14,
+                FontWeight = Avalonia.Media.FontWeight.Bold,
+                Foreground = Avalonia.Media.Brushes.White,
+                Content = unlocked ? $"Level {num}" : $"🔒\nLevel {num}",
+                Tag = num,
+            };
+            card.Click += (_, _) => SelectLevel(num);
+
+            if (unlocked)
+            {
+                card.Background = Avalonia.Media.Brush.Parse("#CC2d5a27");
+                card.BorderBrush = Avalonia.Media.Brushes.LimeGreen;
+                card.BorderThickness = new Avalonia.Thickness(0);
+            }
+            else
+            {
+                card.Background = Avalonia.Media.Brush.Parse("#CC3a3a4a");
+                card.BorderBrush = Avalonia.Media.Brush.Parse("#555");
+                card.BorderThickness = new Avalonia.Thickness(1);
+            }
+
+            _levelCards[num] = card;
+            LevelGrid.Children.Add(card);
+        }
+
+        // Reset selection
+        _selectedLevelNum = 0;
+        DetailLevelNum.Text = "Select a Level";
+        DetailWaves.Text = "";
+        DetailEnemies.Text = "";
+        DetailPath.Text = "";
+        DetailStatus.Text = "";
+        LevelStartBtn.IsVisible = false;
+    }
+
+    private void SelectLevel(int num)
+    {
+        _selectedLevelNum = num;
+        UpdateLevelCardStyles();
+        UpdateLevelDetails(num);
+    }
+
+    private void UpdateLevelCardStyles()
+    {
+        foreach (var (n, card) in _levelCards)
+        {
+            bool selected = n == _selectedLevelNum;
+            bool unlocked = n <= _highestUnlockedLevel;
+
+            if (selected)
+            {
+                card.BorderBrush = Avalonia.Media.Brushes.Gold;
+                card.BorderThickness = new Avalonia.Thickness(3);
+                card.Background = Avalonia.Media.Brush.Parse("#CC3a7a3a");
+            }
+            else if (unlocked)
+            {
+                card.BorderBrush = Avalonia.Media.Brushes.LimeGreen;
+                card.BorderThickness = new Avalonia.Thickness(0);
+                card.Background = Avalonia.Media.Brush.Parse("#CC2d5a27");
+            }
+            else
+            {
+                card.BorderBrush = Avalonia.Media.Brush.Parse("#555");
+                card.BorderThickness = new Avalonia.Thickness(1);
+                card.Background = Avalonia.Media.Brush.Parse("#CC3a3a4a");
+            }
         }
     }
 
-    private void OnMapSelectChanged(object? sender, SelectionChangedEventArgs e)
+    private void UpdateLevelDetails(int num)
     {
-        if (_suppressMapSelect) return;
-        if (MapSelectCombo.SelectedItem is string name)
+        var filePath = Path.Combine(_mapsDir, num + ".json");
+        if (!File.Exists(filePath))
         {
-            var filePath = Path.Combine(_mapsDir, name + ".json");
-            if (File.Exists(filePath))
-            {
-                var map = MapData.LoadFromFile(filePath);
-                if (map != null)
-                {
-                    _currentMapFile = filePath;
-                    LoadMap(map);
-                    // Reset game state for the new map
-                    ClearAllGameNodes();
-                    _gm.Reset();
-                    StartBtn.IsEnabled = true;
-                    StartBtn.Content = "▶ Start Game";
-                    GameOverPanel.IsVisible = false;
-                    _gameOverShown = false;
-                    TowerBtnPanel.IsVisible = false;
-                    ClearPlacement();
-                    StatusText.Text = $"Loaded: {map.Name} — Press Start Game to begin";
-                }
-            }
+            DetailLevelNum.Text = $"Level {num}";
+            DetailWaves.Text = "File not found";
+            DetailStatus.Text = "";
+            LevelStartBtn.IsVisible = false;
+            return;
         }
+
+        var map = MapData.LoadFromFile(filePath);
+        if (map == null)
+        {
+            DetailLevelNum.Text = $"Level {num}";
+            DetailWaves.Text = "Failed to load";
+            LevelStartBtn.IsVisible = false;
+            return;
+        }
+
+        DetailLevelNum.Text = $"Level {num}";
+        DetailWaves.Text = $"Waves: {map.Waves.Count}";
+        int totalEnemies = map.Waves.Sum(w => w.Entries.Sum(e => e.Count));
+        DetailEnemies.Text = $"Total Enemies: {totalEnemies}";
+        int waypointCount = (map.StartCell != null ? 1 : 0) + map.PathWaypoints.Count + (map.EndCell != null ? 1 : 0);
+        DetailPath.Text = $"Grid: {map.GridCols}×{map.GridRows} | Waypoints: {waypointCount}";
+
+        bool unlocked = num <= _highestUnlockedLevel;
+        if (!unlocked)
+        {
+            DetailStatus.Text = $"🔒 Locked — beat Level {_highestUnlockedLevel} first";
+            LevelStartBtn.IsVisible = false;
+        }
+        else
+        {
+            DetailStatus.Text = map.IsComplete ? "✅ Ready" : "⚠️ Incomplete (missing start/end/waves)";
+            LevelStartBtn.IsVisible = true;
+        }
+
+        // Preview the map in 3D
+        LoadMap(map);
+    }
+
+    private void OnLevelStartClick(object? sender, RoutedEventArgs e)
+    {
+        if (_selectedLevelNum <= 0) return;
+        if (_selectedLevelNum > _highestUnlockedLevel) return;
+
+        var filePath = Path.Combine(_mapsDir, _selectedLevelNum + ".json");
+        if (!File.Exists(filePath)) return;
+        var map = MapData.LoadFromFile(filePath);
+        if (map == null) return;
+
+        // Hide level select, show game HUD
+        LevelSelectPanel.IsVisible = false;
+        GameHudPanel.IsVisible = true;
+        GameOverPanel.IsVisible = false;
+        _gameOverShown = false;
+
+        // Load and start
+        ClearAllGameNodes();
+        _gm.LoadMap(map);
+        if (_sceneInitialized)
+        {
+            ClearMapScene();
+            BuildMapScene(AuraView);
+        }
+        _gm.Reset();
+        _gm.StartGame();
+
+        TowerBtnPanel.IsVisible = true;
+        ClearPlacement();
+        StatusText.Text = $"Level {_selectedLevelNum} — Select a tower and place it!";
+    }
+
+    private void OnBackToLevelSelect(object? sender, RoutedEventArgs e)
+    {
+        ReturnToLevelSelect();
+    }
+
+    private void ReturnToLevelSelect()
+    {
+        GameHudPanel.IsVisible = false;
+        GameOverPanel.IsVisible = false;
+        _gameOverShown = false;
+        LevelSelectPanel.IsVisible = true;
+
+        ClearAllGameNodes();
+        _gm.Reset();
+        ClearPlacement();
+
+        // Refresh grid (may have new unlocks)
+        BuildLevelGrid();
+        LevelSelectStatus.Text = "Choose a level to begin";
     }
 
     // ==================== Map Loading ====================
@@ -841,54 +986,36 @@ public partial class GameView : UserControl
 
     // ==================== Game Controls ====================
 
-    private void OnStartGame(object? sender, RoutedEventArgs e)
+    private void OnMainMenuClick(object? sender, RoutedEventArgs e)
     {
-        if (!_gm.HasStarted)
-        {
-            _gm.StartGame();
-            StartBtn.IsEnabled = false;
-            StartBtn.Content = "⚔ Game Running...";
-            TowerBtnPanel.IsVisible = true;
-            StatusText.Text = "Game started! Select a tower and place it";
-        }
+        ClearAllGameNodes();
+        _sceneInitialized = false;
+        _pathNodes.Clear();
+        _mapNodes.Clear();
+        _groundNode = null;
+        OnMainMenu?.Invoke();
     }
 
     private void OnReset(object? sender, RoutedEventArgs e)
     {
+        // Restart current level
         ClearAllGameNodes();
         _gm.Reset();
-
-        // Reset UI
-        StartBtn.IsEnabled = true;
-        StartBtn.Content = "▶ Start Game";
+        _gm.StartGame();
         GameOverPanel.IsVisible = false;
         _gameOverShown = false;
-        TowerBtnPanel.IsVisible = false;
+        TowerBtnPanel.IsVisible = true;
         ClearPlacement();
-        StatusText.Text = "Press Start Game to begin";
-    }
-
-    private void OnNavBack(object? sender, RoutedEventArgs e)
-    {
-        ClearAllGameNodes();
-
-        if (_isPureGameMode)
-        {
-            OnMainMenu?.Invoke();
-        }
-        else
-        {
-            OnBackToEditor?.Invoke();
-        }
+        StatusText.Text = $"Level {_selectedLevelNum} — Select a tower and place it!";
     }
 
     private void ClearAllGameNodes()
     {
-        foreach (var (_, node) in _enemyNodes) AuraView.Remove(node);
+        foreach (var (_, node) in _enemyNodes) TryRemoveNode(AuraView, node);
         foreach (var (_, hp) in _enemyHpBars) HpBarCanvas.Children.Remove(hp);
         foreach (var (_, bg) in _enemyHpBgs) HpBarCanvas.Children.Remove(bg);
-        foreach (var (_, node) in _towerNodes) AuraView.Remove(node);
-        foreach (var (_, node) in _projectileNodes) AuraView.Remove(node);
+        foreach (var (_, node) in _towerNodes) TryRemoveNode(AuraView, node);
+        foreach (var (_, node) in _projectileNodes) TryRemoveNode(AuraView, node);
 
         _enemyNodes.Clear();
         _enemyHpBars.Clear();
@@ -896,12 +1023,6 @@ public partial class GameView : UserControl
         _towerNodes.Clear();
         _projectileNodes.Clear();
         RemoveGhost();
-
-        // Reset scene state so the next LoadMap won't try to remove stale nodes
-        _sceneInitialized = false;
-        _pathNodes.Clear();
-        _mapNodes.Clear();
-        _groundNode = null;
     }
 
     private void OnGameReset()
@@ -941,12 +1062,25 @@ public partial class GameView : UserControl
     {
         _gameOverShown = true;
         GameOverPanel.IsVisible = true;
+        GameOverNextBtn.IsVisible = false;
 
         if (_gm.IsVictory)
         {
             GameOverTitle.Text = "🏆 VICTORY!";
             GameOverTitle.Foreground = Avalonia.Media.Brushes.Gold;
             GameOverSubtext.Text = $"All waves defeated! Final gold: {_gm.Gold}";
+
+            // Unlock next level
+            if (_selectedLevelNum >= _highestUnlockedLevel)
+            {
+                _highestUnlockedLevel = _selectedLevelNum + 1;
+                GameOverSubtext.Text += $"\nLevel {_highestUnlockedLevel} unlocked!";
+            }
+
+            // Show "Next Level" button if next level exists
+            var nextPath = Path.Combine(_mapsDir, (_selectedLevelNum + 1) + ".json");
+            if (File.Exists(nextPath))
+                GameOverNextBtn.IsVisible = true;
         }
         else
         {
@@ -954,6 +1088,34 @@ public partial class GameView : UserControl
             GameOverTitle.Foreground = Avalonia.Media.Brushes.Red;
             GameOverSubtext.Text = $"The enemy broke through! Reached wave {_gm.CurrentWave}/{_gm.TotalWaves}";
         }
+    }
+
+    private void OnNextLevelClick(object? sender, RoutedEventArgs e)
+    {
+        var next = _selectedLevelNum + 1;
+        var filePath = Path.Combine(_mapsDir, next + ".json");
+        if (!File.Exists(filePath)) return;
+
+        var map = MapData.LoadFromFile(filePath);
+        if (map == null) return;
+
+        _selectedLevelNum = next;
+        ClearAllGameNodes();
+        _gm.LoadMap(map);
+        if (_sceneInitialized)
+        {
+            ClearMapScene();
+            BuildMapScene(AuraView);
+        }
+        _gm.Reset();
+        _gm.StartGame();
+
+        GameOverPanel.IsVisible = false;
+        _gameOverShown = false;
+        GameHudPanel.IsVisible = true;
+        TowerBtnPanel.IsVisible = true;
+        ClearPlacement();
+        StatusText.Text = $"Level {next} — Select a tower and place it!";
     }
 
     // ==================== Helpers ====================

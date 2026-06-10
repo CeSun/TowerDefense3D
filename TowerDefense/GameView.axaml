@@ -3,17 +3,87 @@
              xmlns:a="https://github.com/CeSun/Aura3D"
              x:Class="TowerDefense.GameView">
     <Grid>
-        <!-- 3D View fills entire area -->
+        <!-- 3D View fills entire area as background -->
         <a:Aura3DView x:Name="AuraView"
                        SceneInitialized="OnSceneInitialized"
                        SceneUpdated="OnSceneUpdated"
                        ObjectPicked="OnObjectPicked" />
 
-        <!-- HP bar overlay -->
+        <!-- HP bar overlay (only used during gameplay) -->
         <Canvas x:Name="HpBarCanvas" IsHitTestVisible="False" />
 
-        <!-- === HUD layout: top bar + right sidebar === -->
-        <Grid Margin="8">
+        <!-- ============================================ -->
+        <!-- LEVEL SELECT SCREEN                          -->
+        <!-- ============================================ -->
+        <Grid x:Name="LevelSelectPanel" ZIndex="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="280" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Top bar -->
+            <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                    Background="#CC0d0d1a" Padding="12,8" Margin="8,8,8,0"
+                    CornerRadius="6">
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <TextBlock Text="SELECT LEVEL" Foreground="White"
+                               FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+                    <TextBlock x:Name="LevelSelectStatus" Foreground="#AAA" FontSize="13"
+                               VerticalAlignment="Center"
+                               Text="Choose a level to begin" />
+                    <Button x:Name="LevelSelectMenuBtn" Click="OnMainMenuClick"
+                            Background="#CC4a6a8a" Foreground="White"
+                            FontSize="12" FontWeight="Bold"
+                            Padding="12,6" CornerRadius="4"
+                            HorizontalAlignment="Right">
+                        🏠 Main Menu
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <!-- Level grid (left) -->
+            <ScrollViewer Grid.Row="1" Grid.Column="0" Margin="8,4,4,8">
+                <WrapPanel x:Name="LevelGrid" Margin="4" />
+            </ScrollViewer>
+
+            <!-- Detail panel (right) -->
+            <Border Grid.Row="1" Grid.Column="1"
+                    Background="#EE1a1a2e" CornerRadius="6"
+                    Padding="14" Margin="4,4,8,8">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="DetailLevelNum" Text="Level 1"
+                               Foreground="White" FontSize="22" FontWeight="Bold" />
+                    <Separator Background="#444" Height="1" />
+                    <TextBlock x:Name="DetailWaves" Text="Waves: -"
+                               Foreground="#AAA" FontSize="12" />
+                    <TextBlock x:Name="DetailEnemies" Text="Enemies: -"
+                               Foreground="#AAA" FontSize="12" />
+                    <TextBlock x:Name="DetailPath" Text="Path: -"
+                               Foreground="#AAA" FontSize="12" />
+                    <TextBlock x:Name="DetailStatus" Text=""
+                               Foreground="#888" FontSize="11"
+                               TextWrapping="Wrap" />
+
+                    <Button x:Name="LevelStartBtn" Click="OnLevelStartClick"
+                            Background="#CC3a8a3a" Foreground="White"
+                            FontSize="16" FontWeight="Bold"
+                            Padding="20,12" CornerRadius="8"
+                            HorizontalAlignment="Stretch"
+                            IsVisible="False">
+                        ▶ Start Game
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ============================================ -->
+        <!-- GAME HUD (shown during gameplay)             -->
+        <!-- ============================================ -->
+        <Grid x:Name="GameHudPanel" IsVisible="False" Margin="8" ZIndex="5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -26,18 +96,6 @@
             <!-- Top HUD -->
             <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                         Orientation="Horizontal" Spacing="12">
-                <!-- Map selector (visible in pure game mode) -->
-                <Border x:Name="MapSelectorPanel" Background="#CC1a1a2e"
-                        CornerRadius="6" Padding="8,5" IsVisible="False">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="Map:" Foreground="#AAA" FontSize="13"
-                                   VerticalAlignment="Center" />
-                        <ComboBox x:Name="MapSelectCombo" Width="160"
-                                  FontSize="13"
-                                  SelectionChanged="OnMapSelectChanged">
-                        </ComboBox>
-                    </StackPanel>
-                </Border>
                 <Border Background="#CC1a1a2e" CornerRadius="6" Padding="10,5">
                     <TextBlock x:Name="GoldText" Text="Gold: 200"
                                Foreground="#FFD700" FontSize="16" FontWeight="Bold" />
@@ -56,7 +114,7 @@
                 </Border>
             </StackPanel>
 
-            <!-- Right-side tower panel -->
+            <!-- Right tower panel -->
             <StackPanel Grid.Row="1" Grid.Column="1"
                         VerticalAlignment="Center"
                         Margin="0,0,4,0" Spacing="8">
@@ -109,29 +167,18 @@
                     </Button>
                 </StackPanel>
 
-                <Button x:Name="StartBtn" Click="OnStartGame"
-                        Background="#CC4a4a8a" Foreground="White"
-                        FontSize="13" FontWeight="Bold"
-                        Padding="14,8" CornerRadius="6" Width="180">
-                    ▶ Start Game
-                </Button>
-                <Button x:Name="ResetBtn" Click="OnReset"
+                <Button x:Name="ResetBtn" Click="OnBackToLevelSelect"
                         Background="#CC6a4a4a" Foreground="White"
                         FontSize="13" FontWeight="Bold"
                         Padding="14,8" CornerRadius="6" Width="180">
-                    ↺ Reset
-                </Button>
-                <!-- Dynamic nav button: "Main Menu" in pure mode, "Back to Editor" when editor-launched -->
-                <Button x:Name="NavBackBtn" Click="OnNavBack"
-                        Background="#CC4a6a8a" Foreground="White"
-                        FontSize="13" FontWeight="Bold"
-                        Padding="14,8" CornerRadius="6" Width="180">
-                    🏠 Main Menu
+                    ↺ Back to Level Select
                 </Button>
             </StackPanel>
         </Grid>
 
-        <!-- Game Over Overlay -->
+        <!-- ============================================ -->
+        <!-- GAME OVER OVERLAY                            -->
+        <!-- ============================================ -->
         <Panel x:Name="GameOverPanel" IsVisible="False"
                Background="#BB000000" ZIndex="100">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
@@ -145,13 +192,20 @@
                             Background="#CC2d5a27" Foreground="White"
                             FontSize="15" FontWeight="Bold"
                             Padding="20,10" CornerRadius="6">
-                        🔄 Play Again
+                        🔄 Retry
                     </Button>
-                    <Button x:Name="GameOverMenuBtn" Click="OnNavBack"
+                    <Button x:Name="GameOverMenuBtn" Click="OnBackToLevelSelect"
                             Background="#CC4a6a8a" Foreground="White"
                             FontSize="15" FontWeight="Bold"
                             Padding="20,10" CornerRadius="6">
-                        🏠 Main Menu
+                        📋 Level Select
+                    </Button>
+                    <Button x:Name="GameOverNextBtn" Click="OnNextLevelClick"
+                            Background="#CC3a7a3a" Foreground="White"
+                            FontSize="15" FontWeight="Bold"
+                            Padding="20,10" CornerRadius="6"
+                            IsVisible="False">
+                        ⏭ Next Level
                     </Button>
                 </StackPanel>
             </StackPanel>
