@@ -13,12 +13,15 @@ using DrawingColor = System.Drawing.Color;
 
 namespace TowerDefense;
 
+public enum PlacementMode { Start, Waypoint, End }
+
 public partial class MapEditorView : UserControl
 {
     // ==================== State ====================
     private MapData _mapData = MapData.CreateDefault();
     private string? _currentFilePath;
     private string _mapsDir = string.Empty;
+    private PlacementMode _placementMode = PlacementMode.Waypoint;
 
     // ==================== Scene ====================
     private Node? _groundNode;
@@ -127,6 +130,14 @@ public partial class MapEditorView : UserControl
     private void OnEditorSceneInit(object? sender, InitializedRoutedEventArgs e)
     {
         var view = (sender as Aura3DView)!;
+
+        // Discard all stale node references from any previous scene
+        _groundNode = null;
+        _entryMarkerNode = null;
+        _exitMarkerNode = null;
+        _pathNodes.Clear();
+        _gridDotNodes.Clear();
+        _waypointMarkerNodes.Clear();
         view.MainCamera.Position = new Vector3(
             _mapData.GridCols / 2f,
             Math.Max(_mapData.GridCols, _mapData.GridRows) * 1.3f,
@@ -280,7 +291,7 @@ public partial class MapEditorView : UserControl
 
     private void BuildWaypointMarkers(Aura3DView view)
     {
-        var wps = _mapData.PathWaypoints;
+        var wps = _mapData.PathWaypoints; // intermediate waypoints only
         for (int i = 0; i < wps.Count; i++)
         {
             var color = GetWaypointColor(i, wps.Count);
@@ -314,34 +325,83 @@ public partial class MapEditorView : UserControl
 
     private void BuildMarkers(Aura3DView view)
     {
-        var wps = _mapData.PathWaypoints;
-        if (wps.Count == 0) return;
-
-        // Entry marker
-        var entryWp = wps[0];
-        var entryPos = CellToWorld(entryWp.Col, entryWp.Row) + new Vector3(-0.5f, 0.06f, 0);
-        _entryMarkerNode = new Mesh
+        // Entry marker at StartCell
+        if (_mapData.StartCell != null)
         {
-            Geometry = _boxGeo!,
-            Material = CreateMaterial(DrawingColor.LimeGreen),
-            Name = "EntryMarker",
-        };
-        _entryMarkerNode.Scale = new Vector3(0.2f, 0.08f, 0.8f);
-        _entryMarkerNode.Position = entryPos;
-        view.AddNode(_entryMarkerNode);
+            var s = _mapData.StartCell;
+            var entryPos = CellToWorld(s.Col, s.Row) + new Vector3(-0.5f, 0.06f, 0);
+            _entryMarkerNode = new Mesh
+            {
+                Geometry = _boxGeo!,
+                Material = CreateMaterial(DrawingColor.LimeGreen),
+                Name = "EntryMarker",
+            };
+            _entryMarkerNode.Scale = new Vector3(0.2f, 0.08f, 0.8f);
+            _entryMarkerNode.Position = entryPos;
+            view.AddNode(_entryMarkerNode);
+        }
 
-        // Exit marker
-        var exitWp = wps[^1];
-        var exitPos = CellToWorld(exitWp.Col, exitWp.Row) + new Vector3(0.5f, 0.06f, 0);
-        _exitMarkerNode = new Mesh
+        // Exit marker at EndCell
+        if (_mapData.EndCell != null)
         {
-            Geometry = _boxGeo!,
-            Material = CreateMaterial(DrawingColor.Red),
-            Name = "ExitMarker",
-        };
-        _exitMarkerNode.Scale = new Vector3(0.2f, 0.08f, 0.8f);
-        _exitMarkerNode.Position = exitPos;
-        view.AddNode(_exitMarkerNode);
+            var e = _mapData.EndCell;
+            var exitPos = CellToWorld(e.Col, e.Row) + new Vector3(0.5f, 0.06f, 0);
+            _exitMarkerNode = new Mesh
+            {
+                Geometry = _boxGeo!,
+                Material = CreateMaterial(DrawingColor.Red),
+                Name = "ExitMarker",
+            };
+            _exitMarkerNode.Scale = new Vector3(0.2f, 0.08f, 0.8f);
+            _exitMarkerNode.Position = exitPos;
+            view.AddNode(_exitMarkerNode);
+        }
+    }
+
+    // ==================== Placement Mode ====================
+
+    private void OnSetStartMode(object? sender, RoutedEventArgs e)
+    {
+        _placementMode = PlacementMode.Start;
+        UpdatePlacementModeButtons();
+        GridStatusText.Text = "Mode: START — Click a cell to set it as the path entry point";
+    }
+
+    private void OnSetWaypointMode(object? sender, RoutedEventArgs e)
+    {
+        _placementMode = PlacementMode.Waypoint;
+        UpdatePlacementModeButtons();
+        GridStatusText.Text = "Mode: WAYPOINT — Click a cell to add a waypoint along the path";
+    }
+
+    private void OnSetEndMode(object? sender, RoutedEventArgs e)
+    {
+        _placementMode = PlacementMode.End;
+        UpdatePlacementModeButtons();
+        GridStatusText.Text = "Mode: END — Click a cell to set it as the path exit point";
+    }
+
+    private void UpdatePlacementModeButtons()
+    {
+        var dimBg = "#CC3a3a4a";
+        var activeBorder = new Avalonia.Thickness(2);
+
+        SetStartBtn.BorderThickness = _placementMode == PlacementMode.Start ? activeBorder : default;
+        SetStartBtn.BorderBrush = _placementMode == PlacementMode.Start ? Avalonia.Media.Brushes.LimeGreen : null;
+
+        AddWaypointBtn.BorderThickness = _placementMode == PlacementMode.Waypoint ? activeBorder : default;
+        AddWaypointBtn.BorderBrush = _placementMode == PlacementMode.Waypoint ? Avalonia.Media.Brushes.CornflowerBlue : null;
+
+        SetEndBtn.BorderThickness = _placementMode == PlacementMode.End ? activeBorder : default;
+        SetEndBtn.BorderBrush = _placementMode == PlacementMode.End ? Avalonia.Media.Brushes.Red : null;
+
+        // Dim background of inactive buttons
+        SetStartBtn.Background = Avalonia.Media.Brush.Parse(
+            _placementMode == PlacementMode.Start ? "#CC2d6a2d" : dimBg);
+        AddWaypointBtn.Background = Avalonia.Media.Brush.Parse(
+            _placementMode == PlacementMode.Waypoint ? "#CC4a6a8a" : dimBg);
+        SetEndBtn.Background = Avalonia.Media.Brush.Parse(
+            _placementMode == PlacementMode.End ? "#CC6a2a2a" : dimBg);
     }
 
     // ==================== Pointer Input ====================
@@ -369,49 +429,75 @@ public partial class MapEditorView : UserControl
 
         var nodeName = args.Node.Name ?? "";
 
-        // Check if clicked a waypoint marker — select it
+        // Clicked a waypoint marker — select it in the list
         if (nodeName.StartsWith("Waypoint_"))
         {
-            if (int.TryParse(nodeName.Replace("Waypoint_", ""), out int index))
+            if (int.TryParse(nodeName.Replace("Waypoint_", ""), out int index)
+                && index < _mapData.PathWaypoints.Count)
             {
                 WaypointList.SelectedIndex = index;
-                GridStatusText.Text = $"Selected waypoint {index} @ ({_mapData.PathWaypoints[index].Col}, {_mapData.PathWaypoints[index].Row}). Press Delete to remove.";
+                GridStatusText.Text = $"Selected waypoint {index} @ ({_mapData.PathWaypoints[index].Col}, {_mapData.PathWaypoints[index].Row})";
             }
             return;
         }
 
-        // Check if clicked a grid cell or path tile
-        var worldPos = args.WorldPosition;
-        var grid = WorldToCell(worldPos);
-        if (grid == null) return;
-
-        var (col, row) = grid.Value;
-
-        // Check if clicking on an existing waypoint to select it
-        int existingIndex = FindWaypointAt(col, row);
-        if (existingIndex >= 0)
+        // Clicked entry/exit markers — show status
+        if (nodeName == "EntryMarker")
         {
-            WaypointList.SelectedIndex = existingIndex;
-            GridStatusText.Text = $"Selected waypoint {existingIndex} @ ({col}, {row})";
+            var s = _mapData.StartCell;
+            GridStatusText.Text = s != null ? $"START @ ({s.Col}, {s.Row})" : "No start set.";
+            return;
+        }
+        if (nodeName == "ExitMarker")
+        {
+            var e = _mapData.EndCell;
+            GridStatusText.Text = e != null ? $"END @ ({e.Col}, {e.Row})" : "No end set.";
             return;
         }
 
-        // Add new waypoint: find best insertion point
-        int insertAt = FindBestInsertionPoint(col, row);
-        var wp = new WaypointCell(col, row);
+        var worldPos = args.WorldPosition;
+        var grid = WorldToCell(worldPos);
+        if (grid == null) return;
+        var (col, row) = grid.Value;
 
-        if (insertAt < 0)
+        switch (_placementMode)
         {
-            _mapData.PathWaypoints.Add(wp);
-        }
-        else
-        {
-            _mapData.PathWaypoints.Insert(insertAt, wp);
-        }
+            case PlacementMode.Start:
+                _mapData.StartCell = new WaypointCell(col, row);
+                RefreshWaypointList();
+                RebuildMapScene();
+                GridStatusText.Text = $"Set START @ ({col}, {row})";
+                break;
 
-        RefreshWaypointList();
-        RebuildMapScene();
-        GridStatusText.Text = $"Added waypoint @ ({col}, {row})";
+            case PlacementMode.End:
+                _mapData.EndCell = new WaypointCell(col, row);
+                RefreshWaypointList();
+                RebuildMapScene();
+                GridStatusText.Text = $"Set END @ ({col}, {row})";
+                break;
+
+            default: // Waypoint
+                // Don't allow placing waypoints on start/end cells
+                if (IsStartCell(col, row) || IsEndCell(col, row))
+                {
+                    GridStatusText.Text = $"Cell ({col}, {row}) is start/end. Switch mode to change it.";
+                    return;
+                }
+                int existing = FindWaypointAt(col, row);
+                if (existing >= 0)
+                {
+                    WaypointList.SelectedIndex = existing;
+                    GridStatusText.Text = $"Selected waypoint {existing} @ ({col}, {row})";
+                    return;
+                }
+                // Always append — use ↑↓ buttons to reorder
+                _mapData.PathWaypoints.Add(new WaypointCell(col, row));
+                RefreshWaypointList();
+                WaypointList.SelectedIndex = _mapData.PathWaypoints.Count + 1; // +2 offset, last waypoint
+                RebuildMapScene();
+                GridStatusText.Text = $"Added waypoint @ ({col}, {row}). Use ↑↓ to reorder.";
+                break;
+        }
     }
 
     private void HandleRightClick(Avalonia.Point pos)
@@ -424,6 +510,23 @@ public partial class MapEditorView : UserControl
         if (grid == null) return;
 
         var (col, row) = grid.Value;
+
+        if (IsStartCell(col, row))
+        {
+            _mapData.StartCell = null;
+            RefreshWaypointList();
+            RebuildMapScene();
+            GridStatusText.Text = $"Removed START @ ({col}, {row})";
+            return;
+        }
+        if (IsEndCell(col, row))
+        {
+            _mapData.EndCell = null;
+            RefreshWaypointList();
+            RebuildMapScene();
+            GridStatusText.Text = $"Removed END @ ({col}, {row})";
+            return;
+        }
         int index = FindWaypointAt(col, row);
         if (index >= 0)
         {
@@ -436,9 +539,29 @@ public partial class MapEditorView : UserControl
 
     // ==================== Path Calculation ====================
 
+    private bool IsStartCell(int col, int row)
+    {
+        return _mapData.StartCell?.Col == col && _mapData.StartCell?.Row == row;
+    }
+
+    private bool IsEndCell(int col, int row)
+    {
+        return _mapData.EndCell?.Col == col && _mapData.EndCell?.Row == row;
+    }
+
+    /// <summary>Build the full ordered path: StartCell → waypoints → EndCell.</summary>
+    private List<WaypointCell> BuildFullPathList()
+    {
+        var list = new List<WaypointCell>();
+        if (_mapData.StartCell != null) list.Add(_mapData.StartCell);
+        list.AddRange(_mapData.PathWaypoints);
+        if (_mapData.EndCell != null) list.Add(_mapData.EndCell);
+        return list;
+    }
+
     private bool IsPathCell(int col, int row)
     {
-        var wps = _mapData.PathWaypoints;
+        var wps = BuildFullPathList();
         for (int w = 1; w < wps.Count; w++)
         {
             var from = wps[w - 1];
@@ -463,46 +586,10 @@ public partial class MapEditorView : UserControl
         return wps.Count > 0 && wps.Any(w => w.Col == col && w.Row == row);
     }
 
+    /// <summary>Finds an intermediate waypoint at the given cell (excludes start/end).</summary>
     private int FindWaypointAt(int col, int row)
     {
         return _mapData.PathWaypoints.FindIndex(w => w.Col == col && w.Row == row);
-    }
-
-    private int FindBestInsertionPoint(int col, int row)
-    {
-        // Simple heuristic: insert at the end (user can reorder by deleting and re-adding)
-        // Actually, let's find the closest segment and insert there
-        var wps = _mapData.PathWaypoints;
-        if (wps.Count < 2) return -1;
-
-        float bestDist = float.MaxValue;
-        int bestIdx = -1;
-
-        for (int i = 1; i < wps.Count; i++)
-        {
-            var from = wps[i - 1];
-            var to = wps[i];
-
-            // Check if (col,row) lies near the segment between from and to
-            float dist = DistanceToSegment(col, row, from.Col, from.Row, to.Col, to.Row);
-            if (dist < bestDist)
-            {
-                bestDist = dist;
-                bestIdx = i;
-            }
-        }
-
-        return bestDist < 3f ? bestIdx : -1; // insert at end if far from any segment
-    }
-
-    private static float DistanceToSegment(float px, float py, float ax, float ay, float bx, float by)
-    {
-        float abx = bx - ax, aby = by - ay;
-        float apx = px - ax, apy = py - ay;
-        float t = Math.Clamp((apx * abx + apy * aby) / Math.Max(0.001f, abx * abx + aby * aby), 0, 1);
-        float dx = px - (ax + t * abx);
-        float dy = py - (ay + t * aby);
-        return MathF.Sqrt(dx * dx + dy * dy);
     }
 
     // ==================== Grid Helpers ====================
@@ -525,20 +612,34 @@ public partial class MapEditorView : UserControl
 
     private void RefreshWaypointList()
     {
+        WaypointList.SelectedIndex = -1;
         WaypointList.Items.Clear();
+
+        // Show start/end status at top
+        var startStr = _mapData.StartCell != null
+            ? $"START: ({_mapData.StartCell.Col}, {_mapData.StartCell.Row})"
+            : "START: (not set)";
+        var endStr = _mapData.EndCell != null
+            ? $"END: ({_mapData.EndCell.Col}, {_mapData.EndCell.Row})"
+            : "END: (not set)";
+        WaypointList.Items.Add(startStr);
+        WaypointList.Items.Add(endStr);
+
+        // Show intermediate waypoints
         for (int i = 0; i < _mapData.PathWaypoints.Count; i++)
         {
             var wp = _mapData.PathWaypoints[i];
-            WaypointList.Items.Add($"{i}: ({wp.Col}, {wp.Row})");
+            WaypointList.Items.Add($"  {i}: ({wp.Col}, {wp.Row})");
         }
         WaypointCount.Text = $"({_mapData.PathWaypoints.Count})";
     }
 
     private void OnDeleteWaypoint(object? sender, RoutedEventArgs e)
     {
-        if (WaypointList.SelectedIndex >= 0)
+        var idx = WaypointList.SelectedIndex - 2; // skip start/end header rows
+        if (idx >= 0 && idx < _mapData.PathWaypoints.Count)
         {
-            _mapData.PathWaypoints.RemoveAt(WaypointList.SelectedIndex);
+            _mapData.PathWaypoints.RemoveAt(idx);
             RefreshWaypointList();
             RebuildMapScene();
             GridStatusText.Text = "Waypoint deleted.";
@@ -553,9 +654,38 @@ public partial class MapEditorView : UserControl
         GridStatusText.Text = "All waypoints cleared.";
     }
 
+    private void OnMoveWaypointUp(object? sender, RoutedEventArgs e)
+    {
+        var idx = WaypointList.SelectedIndex - 2; // skip start/end header rows
+        if (idx <= 0 || idx >= _mapData.PathWaypoints.Count) return;
+
+        var wps = _mapData.PathWaypoints;
+        (wps[idx - 1], wps[idx]) = (wps[idx], wps[idx - 1]);
+
+        RefreshWaypointList();
+        RebuildMapScene();
+        WaypointList.SelectedIndex = idx + 1; // +2 offset, -1 for up = +1
+        GridStatusText.Text = $"Moved waypoint {idx} up → position {idx - 1}";
+    }
+
+    private void OnMoveWaypointDown(object? sender, RoutedEventArgs e)
+    {
+        var idx = WaypointList.SelectedIndex - 2; // skip start/end header rows
+        if (idx < 0 || idx >= _mapData.PathWaypoints.Count - 1) return;
+
+        var wps = _mapData.PathWaypoints;
+        (wps[idx], wps[idx + 1]) = (wps[idx + 1], wps[idx]);
+
+        RefreshWaypointList();
+        RebuildMapScene();
+        WaypointList.SelectedIndex = idx + 3; // +2 offset, +1 for down = +3
+        GridStatusText.Text = $"Moved waypoint {idx} down → position {idx + 1}";
+    }
+
     // ==================== Wave Management ====================
 
     private bool _refreshingWaves;
+    private bool _refreshingEntry;
 
     private void RefreshWaveList()
     {
@@ -583,20 +713,54 @@ public partial class MapEditorView : UserControl
     {
         if (_refreshingWaves) return;
 
-        EntryList.Items.Clear();
-        if (WaveList.SelectedIndex < 0 && _mapData.Waves.Count > 0)
-            WaveList.SelectedIndex = 0;
-
-        if (WaveList.SelectedIndex >= 0 && WaveList.SelectedIndex < _mapData.Waves.Count)
+        _refreshingEntry = true;
+        try
         {
-            var wave = _mapData.Waves[WaveList.SelectedIndex];
-            WaveDelayInput.Value = (decimal)wave.DelayBeforeWave;
-            foreach (var entry in wave.Entries)
+            EntryList.SelectedIndex = -1;
+            EntryList.Items.Clear();
+            if (WaveList.SelectedIndex < 0 && _mapData.Waves.Count > 0)
+                WaveList.SelectedIndex = 0;
+
+            if (WaveList.SelectedIndex >= 0 && WaveList.SelectedIndex < _mapData.Waves.Count)
             {
-                EntryList.Items.Add($"{entry.EnemyType} ×{entry.Count} ({entry.SpawnInterval:F1}s)");
+                var wave = _mapData.Waves[WaveList.SelectedIndex];
+                WaveDelayInput.Value = (decimal)wave.DelayBeforeWave;
+                foreach (var entry in wave.Entries)
+                {
+                    EntryList.Items.Add($"{entry.EnemyType} ×{entry.Count} ({entry.SpawnInterval:F1}s)");
+                }
+
+                // Sync entry edit controls to selected entry
+                SyncEntryControls();
+            }
+            WaveEditPanel.IsVisible = WaveList.SelectedIndex >= 0;
+        }
+        finally
+        {
+            _refreshingEntry = false;
+        }
+    }
+
+    private void SyncEntryControls()
+    {
+        if (WaveList.SelectedIndex < 0) return;
+        var wave = _mapData.Waves[WaveList.SelectedIndex];
+        if (EntryList.SelectedIndex >= 0 && EntryList.SelectedIndex < wave.Entries.Count)
+        {
+            // Prevent cascading ValueChanged/SelectionChanged events during sync
+            _refreshingEntry = true;
+            try
+            {
+                var entry = wave.Entries[EntryList.SelectedIndex];
+                EntryCountInput.Value = entry.Count;
+                EntryIntervalInput.Value = (decimal)entry.SpawnInterval;
+                EnemyTypeCombo.SelectedItem = entry.EnemyType;
+            }
+            finally
+            {
+                _refreshingEntry = false;
             }
         }
-        WaveEditPanel.IsVisible = WaveList.SelectedIndex >= 0;
     }
 
     private void OnWaveListSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -665,6 +829,52 @@ public partial class MapEditorView : UserControl
         }
     }
 
+    private void OnEntryListSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_refreshingEntry) return;
+        SyncEntryControls();
+    }
+
+    private void OnEntryCountChanged(object? sender, NumericUpDownValueChangedEventArgs e)
+    {
+        if (_refreshingEntry) return;
+        if (WaveList.SelectedIndex < 0) return;
+        var wave = _mapData.Waves[WaveList.SelectedIndex];
+        if (EntryList.SelectedIndex >= 0 && EntryList.SelectedIndex < wave.Entries.Count)
+        {
+            wave.Entries[EntryList.SelectedIndex] = wave.Entries[EntryList.SelectedIndex] with { Count = (int)e.NewValue };
+            RefreshEntryList();
+            RefreshWaveList();
+        }
+    }
+
+    private void OnEntryIntervalChanged(object? sender, NumericUpDownValueChangedEventArgs e)
+    {
+        if (_refreshingEntry) return;
+        if (WaveList.SelectedIndex < 0) return;
+        var wave = _mapData.Waves[WaveList.SelectedIndex];
+        if (EntryList.SelectedIndex >= 0 && EntryList.SelectedIndex < wave.Entries.Count)
+        {
+            wave.Entries[EntryList.SelectedIndex] = wave.Entries[EntryList.SelectedIndex] with { SpawnInterval = (float)e.NewValue };
+            RefreshEntryList();
+            RefreshWaveList();
+        }
+    }
+
+    private void OnEntryEnemyTypeChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_refreshingEntry) return;
+        if (WaveList.SelectedIndex < 0) return;
+        var enemyType = (string)(EnemyTypeCombo.SelectedItem ?? "Basic");
+        var wave = _mapData.Waves[WaveList.SelectedIndex];
+        if (EntryList.SelectedIndex >= 0 && EntryList.SelectedIndex < wave.Entries.Count)
+        {
+            wave.Entries[EntryList.SelectedIndex] = wave.Entries[EntryList.SelectedIndex] with { EnemyType = enemyType };
+            RefreshEntryList();
+            RefreshWaveList();
+        }
+    }
+
     // ==================== Grid Size ====================
 
     private void OnGridSizeChanged(object? sender, NumericUpDownValueChangedEventArgs e)
@@ -699,6 +909,15 @@ public partial class MapEditorView : UserControl
         }
     }
 
+    /// <summary>Validates the map and returns an error message, or null if complete.</summary>
+    private string? ValidateMap()
+    {
+        if (_mapData.StartCell == null) return "Missing START point. Select Start mode and click a cell.";
+        if (_mapData.EndCell == null) return "Missing END point. Select End mode and click a cell.";
+        if (_mapData.Waves.Count == 0) return "Add at least one wave.";
+        return null;
+    }
+
     private void OnNewMap(object? sender, RoutedEventArgs e)
     {
         _mapData = new MapData
@@ -711,14 +930,20 @@ public partial class MapEditorView : UserControl
         _currentFilePath = null;
         SyncUIFromMap();
         RebuildMapScene();
-        GridStatusText.Text = "New map created. Add waypoints to define the path.";
+        GridStatusText.Text = "New map created. Set START, END, and waypoints to define the path.";
     }
 
     private void OnSaveMap(object? sender, RoutedEventArgs e)
     {
+        var error = ValidateMap();
+        if (error != null)
+        {
+            GridStatusText.Text = $"Cannot save: {error}";
+            return;
+        }
+
         if (_currentFilePath == null)
         {
-            // Prompt for name
             var name = PromptMapName();
             if (string.IsNullOrWhiteSpace(name)) return;
 
@@ -738,6 +963,13 @@ public partial class MapEditorView : UserControl
 
     private void OnSaveAsMap(object? sender, RoutedEventArgs e)
     {
+        var error = ValidateMap();
+        if (error != null)
+        {
+            GridStatusText.Text = $"Cannot save: {error}";
+            return;
+        }
+
         var name = PromptMapName();
         if (string.IsNullOrWhiteSpace(name)) return;
 
@@ -751,9 +983,6 @@ public partial class MapEditorView : UserControl
 
     private string? PromptMapName()
     {
-        // Simple approach: generate a name based on timestamp
-        // In production you'd use a dialog, but for this simple editor we auto-name
-        // Actually, let's just ask for a name via a simple approach
         return $"map_{DateTime.Now:yyyyMMdd_HHmmss}";
     }
 
@@ -761,6 +990,12 @@ public partial class MapEditorView : UserControl
 
     private void OnTestMap(object? sender, RoutedEventArgs e)
     {
+        var error = ValidateMap();
+        if (error != null)
+        {
+            GridStatusText.Text = $"Cannot test: {error}";
+            return;
+        }
         OnPlayMap?.Invoke(_mapData);
     }
 

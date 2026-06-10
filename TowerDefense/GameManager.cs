@@ -110,8 +110,13 @@ public class GameManager
         GridRows = map.GridRows;
         CellSize = map.CellSize;
 
-        // Copy waypoints
-        _pathWaypointCells = new List<WaypointCell>(map.PathWaypoints);
+        // Build full path: StartCell → intermediate waypoints → EndCell
+        _pathWaypointCells = new List<WaypointCell>();
+        if (map.StartCell != null)
+            _pathWaypointCells.Add(map.StartCell);
+        _pathWaypointCells.AddRange(map.PathWaypoints);
+        if (map.EndCell != null)
+            _pathWaypointCells.Add(map.EndCell);
 
         // Reallocate grid arrays
         PathCells = new bool[GridCols, GridRows];

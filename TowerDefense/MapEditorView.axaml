@@ -70,6 +70,24 @@
                     <TextBlock x:Name="WaypointCount" Foreground="#888" FontSize="10"
                                VerticalAlignment="Center" Text="(8)" />
                 </StackPanel>
+                <!-- Placement mode toggle -->
+                <StackPanel Orientation="Horizontal" Spacing="3">
+                    <Button x:Name="SetStartBtn" Click="OnSetStartMode"
+                            Background="#CC2d6a2d" Foreground="White" FontSize="10"
+                            Padding="6,3" CornerRadius="4">
+                        🟢 Start
+                    </Button>
+                    <Button x:Name="AddWaypointBtn" Click="OnSetWaypointMode"
+                            Background="#CC4a6a8a" Foreground="White" FontSize="10"
+                            Padding="6,3" CornerRadius="4">
+                        📍 Waypoint
+                    </Button>
+                    <Button x:Name="SetEndBtn" Click="OnSetEndMode"
+                            Background="#CC4a4a2a" Foreground="White" FontSize="10"
+                            Padding="6,3" CornerRadius="4">
+                        🔴 End
+                    </Button>
+                </StackPanel>
                 <ListBox x:Name="WaypointList" Height="120"
                          SelectionMode="Single">
                     <ListBox.ItemTemplate>
@@ -88,6 +106,18 @@
                             Background="#CC4a4a2a" Foreground="White" FontSize="11"
                             Padding="8,4" CornerRadius="4">
                         Clear All
+                    </Button>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <Button x:Name="MoveUpBtn" Click="OnMoveWaypointUp"
+                            Background="#CC4a5a6a" Foreground="White" FontSize="11"
+                            Padding="8,4" CornerRadius="4">
+                        ↑ Move Up
+                    </Button>
+                    <Button x:Name="MoveDownBtn" Click="OnMoveWaypointDown"
+                            Background="#CC4a5a6a" Foreground="White" FontSize="11"
+                            Padding="8,4" CornerRadius="4">
+                        ↓ Move Down
                     </Button>
                 </StackPanel>
 
@@ -136,16 +166,33 @@
                                        VerticalAlignment="Center" />
                         </StackPanel>
                         <TextBlock Text="Entries:" Foreground="#AAA" FontSize="10" />
-                        <ListBox x:Name="EntryList" Height="80">
+                        <ListBox x:Name="EntryList" Height="80"
+                                 SelectionChanged="OnEntryListSelectionChanged">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}" FontSize="10" Foreground="White" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
+                        <!-- Edit selected entry -->
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <StackPanel Spacing="1">
+                                <TextBlock Text="Count" Foreground="#888" FontSize="9" />
+                                <NumericUpDown x:Name="EntryCountInput" Minimum="1" Maximum="50"
+                                               Value="3" Increment="1" Width="55"
+                                               ValueChanged="OnEntryCountChanged" />
+                            </StackPanel>
+                            <StackPanel Spacing="1">
+                                <TextBlock Text="Interval" Foreground="#888" FontSize="9" />
+                                <NumericUpDown x:Name="EntryIntervalInput" Minimum="0.2" Maximum="10"
+                                               Value="1.0" Increment="0.1" Width="55" FormatString="F1"
+                                               ValueChanged="OnEntryIntervalChanged" />
+                                <TextBlock Text="s" Foreground="#666" FontSize="8" />
+                            </StackPanel>
+                        </StackPanel>
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <ComboBox x:Name="EnemyTypeCombo" Width="80" FontSize="10"
-                                      SelectedIndex="0" />
+                                      SelectionChanged="OnEntryEnemyTypeChanged" />
                             <Button x:Name="AddEntryBtn" Click="OnAddEntry"
                                     Background="#CC2d5a6a" Foreground="White" FontSize="10"
                                     Padding="6,2" CornerRadius="4">

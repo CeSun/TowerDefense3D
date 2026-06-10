@@ -14,8 +14,13 @@ public class MapData
     public int GridCols { get; set; } = 20;
     public int GridRows { get; set; } = 12;
     public float CellSize { get; set; } = 1f;
+    public WaypointCell? StartCell { get; set; }
+    public WaypointCell? EndCell { get; set; }
     public List<WaypointCell> PathWaypoints { get; set; } = new();
     public List<WaveConfigData> Waves { get; set; } = new();
+
+    /// <summary>True when StartCell, EndCell, and at least one wave are configured.</summary>
+    public bool IsComplete => StartCell != null && EndCell != null && Waves.Count > 0;
 
     // ==================== Serialization ====================
 
@@ -62,10 +67,12 @@ public class MapData
             GridCols = 20,
             GridRows = 12,
             CellSize = 1f,
+            StartCell = new WaypointCell(0, 6),
+            EndCell = new WaypointCell(19, 6),
             PathWaypoints = new List<WaypointCell>
             {
-                new(-1, 6), new(3, 6), new(3, 2), new(9, 2),
-                new(9, 10), new(15, 10), new(15, 6), new(20, 6),
+                new(3, 6), new(3, 2), new(9, 2),
+                new(9, 10), new(15, 10), new(15, 6),
             },
             Waves = new List<WaveConfigData>
             {
