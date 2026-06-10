@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aura3D.Avalonia" Version="0.0.5-alpha.0.20" />
+    <PackageReference Include="Aura3D.Avalonia" Version="0.0.5-alpha.0.24" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.0" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.0" />
     <PackageReference Include="Avalonia" Version="12.0.0" />

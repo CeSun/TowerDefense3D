@@ -291,13 +291,13 @@ public partial class GameView : UserControl
             : CreateColorMaterial(Lighten(def.Color, 0.4f));
 
         // Common base
-        var baseMesh = new Mesh { Geometry = _boxGeo!.Clone(), Material = darkMat };
+        var baseMesh = new Mesh { Geometry = _boxGeo!, Material = darkMat };
         baseMesh.Scale = new Vector3(0.55f, 0.1f, 0.55f);
         baseMesh.Position = new Vector3(0, 0.1f, 0);
         node.AddChild(baseMesh, AttachToParentRule.KeepLocal);
 
         // Common body cylinder
-        var bodyMesh = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = mat };
+        var bodyMesh = new Mesh { Geometry = _cylinderGeo!, Material = mat };
         bodyMesh.Scale = new Vector3(0.3f, 0.4f, 0.3f);
         bodyMesh.Position = new Vector3(0, 0.5f, 0);
         node.AddChild(bodyMesh, AttachToParentRule.KeepLocal);
@@ -306,7 +306,7 @@ public partial class GameView : UserControl
         {
             case TowerType.Arrow:
                 {
-                    var topMesh = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
+                    var topMesh = new Mesh { Geometry = _cylinderGeo!, Material = darkMat };
                     topMesh.Scale = new Vector3(0.08f, 0.25f, 0.08f);
                     topMesh.Position = new Vector3(0, 1.0f, 0);
                     node.AddChild(topMesh, AttachToParentRule.KeepLocal);
@@ -314,12 +314,12 @@ public partial class GameView : UserControl
                 }
             case TowerType.Sniper:
                 {
-                    var barrel = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
+                    var barrel = new Mesh { Geometry = _cylinderGeo!, Material = darkMat };
                     barrel.Scale = new Vector3(0.1f, 0.5f, 0.1f);
                     barrel.Position = new Vector3(0, 1.1f, 0);
                     node.AddChild(barrel, AttachToParentRule.KeepLocal);
 
-                    var ring = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = lightMat };
+                    var ring = new Mesh { Geometry = _cylinderGeo!, Material = lightMat };
                     ring.Scale = new Vector3(0.18f, 0.06f, 0.18f);
                     ring.Position = new Vector3(0, 1.35f, 0);
                     node.AddChild(ring, AttachToParentRule.KeepLocal);
@@ -332,7 +332,7 @@ public partial class GameView : UserControl
                     foreach (var ang in angles)
                     {
                         var rad = ang * MathF.PI / 180f;
-                        var barrel = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
+                        var barrel = new Mesh { Geometry = _cylinderGeo!, Material = darkMat };
                         barrel.Scale = new Vector3(0.07f, 0.22f, 0.07f);
                         barrel.Position = new Vector3(
                             MathF.Sin(rad) * radius,
@@ -346,12 +346,12 @@ public partial class GameView : UserControl
                 }
             case TowerType.Poison:
                 {
-                    var poisonBall = new Mesh { Geometry = _sphereGeo!.Clone(), Material = lightMat };
+                    var poisonBall = new Mesh { Geometry = _sphereGeo!, Material = lightMat };
                     poisonBall.Scale = new Vector3(0.28f, 0.28f, 0.28f);
                     poisonBall.Position = new Vector3(0, 0.95f, 0);
                     node.AddChild(poisonBall, AttachToParentRule.KeepLocal);
 
-                    var spike = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = darkMat };
+                    var spike = new Mesh { Geometry = _cylinderGeo!, Material = darkMat };
                     spike.Scale = new Vector3(0.05f, 0.18f, 0.05f);
                     spike.Position = new Vector3(0, 1.2f, 0);
                     node.AddChild(spike, AttachToParentRule.KeepLocal);
@@ -359,12 +359,12 @@ public partial class GameView : UserControl
                 }
             case TowerType.Sun:
                 {
-                    var sunCore = new Mesh { Geometry = _sphereGeo!.Clone(), Material = lightMat };
+                    var sunCore = new Mesh { Geometry = _sphereGeo!, Material = lightMat };
                     sunCore.Scale = new Vector3(0.35f, 0.35f, 0.35f);
                     sunCore.Position = new Vector3(0, 0.95f, 0);
                     node.AddChild(sunCore, AttachToParentRule.KeepLocal);
 
-                    var glowRing = new Mesh { Geometry = _cylinderGeo!.Clone(), Material = mat };
+                    var glowRing = new Mesh { Geometry = _cylinderGeo!, Material = mat };
                     glowRing.Scale = new Vector3(0.42f, 0.04f, 0.42f);
                     glowRing.Position = new Vector3(0, 0.8f, 0);
                     node.AddChild(glowRing, AttachToParentRule.KeepLocal);
@@ -372,7 +372,7 @@ public partial class GameView : UserControl
                 }
             default:
                 {
-                    var topMesh = new Mesh { Geometry = _sphereGeo!.Clone(), Material = mat };
+                    var topMesh = new Mesh { Geometry = _sphereGeo!, Material = mat };
                     topMesh.Scale = new Vector3(0.22f, 0.22f, 0.22f);
                     topMesh.Position = new Vector3(0, 0.95f, 0);
                     node.AddChild(topMesh, AttachToParentRule.KeepLocal);
@@ -411,7 +411,7 @@ public partial class GameView : UserControl
 
         var enemyMesh = new Mesh
         {
-            Geometry = _sphereGeo!.Clone(),
+            Geometry = _sphereGeo!,
             Material = CreateColorMaterial(enemy.Def.Color),
         };
         enemyMesh.Scale = new Vector3(enemy.Def.Radius * 2);
@@ -469,7 +469,7 @@ public partial class GameView : UserControl
 
         var projMesh = new Mesh
         {
-            Geometry = _sphereGeo!.Clone(),
+            Geometry = _sphereGeo!,
             Material = CreateColorMaterial(proj.Color),
         };
         projMesh.Scale = new Vector3(0.16f);

@@ -286,10 +286,10 @@ public partial class MapEditorView : UserControl
             var color = GetWaypointColor(i, wps.Count);
             var node = new Node { Name = $"Waypoint_{i}" };
 
-            // Flat base disc using BoxGeometry (avoids CylinderGeometry clone issues)
+            // Flat base disc
             var disc = new Mesh
             {
-                Geometry = new BoxGeometry(),
+                Geometry = _boxGeo!,
                 Material = CreateMaterial(color),
             };
             disc.Scale = new Vector3(0.5f, 0.03f, 0.5f);
@@ -298,7 +298,7 @@ public partial class MapEditorView : UserControl
             // Center sphere for visibility
             var sphere = new Mesh
             {
-                Geometry = new SphereGeometry(),
+                Geometry = _sphereGeo!,
                 Material = CreateMaterial(color),
             };
             sphere.Scale = new Vector3(0.20f);
