@@ -120,7 +120,6 @@ public partial class MapEditorView : UserControl
     {
         GridColsInput.Value = _mapData.GridCols;
         GridRowsInput.Value = _mapData.GridRows;
-        RefreshWaypointList();
         RefreshWaveList();
         RefreshEntryList();
     }
@@ -435,7 +434,6 @@ public partial class MapEditorView : UserControl
             if (int.TryParse(nodeName.Replace("Waypoint_", ""), out int index)
                 && index < _mapData.PathWaypoints.Count)
             {
-                WaypointList.SelectedIndex = index;
                 GridStatusText.Text = $"Selected waypoint {index} @ ({_mapData.PathWaypoints[index].Col}, {_mapData.PathWaypoints[index].Row})";
             }
             return;
@@ -464,14 +462,12 @@ public partial class MapEditorView : UserControl
         {
             case PlacementMode.Start:
                 _mapData.StartCell = new WaypointCell(col, row);
-                RefreshWaypointList();
                 RebuildMapScene();
                 GridStatusText.Text = $"Set START @ ({col}, {row})";
                 break;
 
             case PlacementMode.End:
                 _mapData.EndCell = new WaypointCell(col, row);
-                RefreshWaypointList();
                 RebuildMapScene();
                 GridStatusText.Text = $"Set END @ ({col}, {row})";
                 break;
@@ -486,16 +482,12 @@ public partial class MapEditorView : UserControl
                 int existing = FindWaypointAt(col, row);
                 if (existing >= 0)
                 {
-                    WaypointList.SelectedIndex = existing;
                     GridStatusText.Text = $"Selected waypoint {existing} @ ({col}, {row})";
                     return;
                 }
-                // Always append — use ↑↓ buttons to reorder
                 _mapData.PathWaypoints.Add(new WaypointCell(col, row));
-                RefreshWaypointList();
-                WaypointList.SelectedIndex = _mapData.PathWaypoints.Count + 1; // +2 offset, last waypoint
                 RebuildMapScene();
-                GridStatusText.Text = $"Added waypoint @ ({col}, {row}). Use ↑↓ to reorder.";
+                GridStatusText.Text = $"Added waypoint @ ({col}, {row}). Right click to remove.";
                 break;
         }
     }
@@ -514,7 +506,6 @@ public partial class MapEditorView : UserControl
         if (IsStartCell(col, row))
         {
             _mapData.StartCell = null;
-            RefreshWaypointList();
             RebuildMapScene();
             GridStatusText.Text = $"Removed START @ ({col}, {row})";
             return;
@@ -522,7 +513,6 @@ public partial class MapEditorView : UserControl
         if (IsEndCell(col, row))
         {
             _mapData.EndCell = null;
-            RefreshWaypointList();
             RebuildMapScene();
             GridStatusText.Text = $"Removed END @ ({col}, {row})";
             return;
@@ -531,7 +521,6 @@ public partial class MapEditorView : UserControl
         if (index >= 0)
         {
             _mapData.PathWaypoints.RemoveAt(index);
-            RefreshWaypointList();
             RebuildMapScene();
             GridStatusText.Text = $"Removed waypoint @ ({col}, {row})";
         }
@@ -608,79 +597,6 @@ public partial class MapEditorView : UserControl
         return (col, row);
     }
 
-    // ==================== Waypoint List Management ====================
-
-    private void RefreshWaypointList()
-    {
-        WaypointList.SelectedIndex = -1;
-        WaypointList.Items.Clear();
-
-        // Show start/end status at top
-        var startStr = _mapData.StartCell != null
-            ? $"START: ({_mapData.StartCell.Col}, {_mapData.StartCell.Row})"
-            : "START: (not set)";
-        var endStr = _mapData.EndCell != null
-            ? $"END: ({_mapData.EndCell.Col}, {_mapData.EndCell.Row})"
-            : "END: (not set)";
-        WaypointList.Items.Add(startStr);
-        WaypointList.Items.Add(endStr);
-
-        // Show intermediate waypoints
-        for (int i = 0; i < _mapData.PathWaypoints.Count; i++)
-        {
-            var wp = _mapData.PathWaypoints[i];
-            WaypointList.Items.Add($"  {i}: ({wp.Col}, {wp.Row})");
-        }
-        WaypointCount.Text = $"({_mapData.PathWaypoints.Count})";
-    }
-
-    private void OnDeleteWaypoint(object? sender, RoutedEventArgs e)
-    {
-        var idx = WaypointList.SelectedIndex - 2; // skip start/end header rows
-        if (idx >= 0 && idx < _mapData.PathWaypoints.Count)
-        {
-            _mapData.PathWaypoints.RemoveAt(idx);
-            RefreshWaypointList();
-            RebuildMapScene();
-            GridStatusText.Text = "Waypoint deleted.";
-        }
-    }
-
-    private void OnClearWaypoints(object? sender, RoutedEventArgs e)
-    {
-        _mapData.PathWaypoints.Clear();
-        RefreshWaypointList();
-        RebuildMapScene();
-        GridStatusText.Text = "All waypoints cleared.";
-    }
-
-    private void OnMoveWaypointUp(object? sender, RoutedEventArgs e)
-    {
-        var idx = WaypointList.SelectedIndex - 2; // skip start/end header rows
-        if (idx <= 0 || idx >= _mapData.PathWaypoints.Count) return;
-
-        var wps = _mapData.PathWaypoints;
-        (wps[idx - 1], wps[idx]) = (wps[idx], wps[idx - 1]);
-
-        RefreshWaypointList();
-        RebuildMapScene();
-        WaypointList.SelectedIndex = idx + 1; // +2 offset, -1 for up = +1
-        GridStatusText.Text = $"Moved waypoint {idx} up → position {idx - 1}";
-    }
-
-    private void OnMoveWaypointDown(object? sender, RoutedEventArgs e)
-    {
-        var idx = WaypointList.SelectedIndex - 2; // skip start/end header rows
-        if (idx < 0 || idx >= _mapData.PathWaypoints.Count - 1) return;
-
-        var wps = _mapData.PathWaypoints;
-        (wps[idx], wps[idx + 1]) = (wps[idx + 1], wps[idx]);
-
-        RefreshWaypointList();
-        RebuildMapScene();
-        WaypointList.SelectedIndex = idx + 3; // +2 offset, +1 for down = +3
-        GridStatusText.Text = $"Moved waypoint {idx} down → position {idx + 1}";
-    }
 
     // ==================== Wave Management ====================
 
@@ -887,7 +803,6 @@ public partial class MapEditorView : UserControl
         // Remove waypoints that are now out of bounds
         _mapData.PathWaypoints.RemoveAll(w => w.Col >= _mapData.GridCols || w.Row >= _mapData.GridRows);
 
-        RefreshWaypointList();
         RebuildMapScene();
     }
 

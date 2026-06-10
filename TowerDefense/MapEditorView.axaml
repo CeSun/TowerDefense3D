@@ -47,15 +47,19 @@
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <StackPanel Spacing="2">
                         <TextBlock Text="Cols" Foreground="#AAA" FontSize="10" />
-                        <NumericUpDown x:Name="GridColsInput" Minimum="5" Maximum="50"
-                                       Value="20" Increment="1"
-                                       ValueChanged="OnGridSizeChanged" Width="70" />
+                        <TextBox x:Name="GridColsInput" Text="20"
+                                 LostFocus="OnGridSizeChanged" Width="60"
+                                 Background="#333" Foreground="White" FontSize="11"
+                                 BorderBrush="#555" BorderThickness="1"
+                                 Padding="4,2" />
                     </StackPanel>
                     <StackPanel Spacing="2">
                         <TextBlock Text="Rows" Foreground="#AAA" FontSize="10" />
-                        <NumericUpDown x:Name="GridRowsInput" Minimum="5" Maximum="50"
-                                       Value="12" Increment="1"
-                                       ValueChanged="OnGridSizeChanged" Width="70" />
+                        <TextBox x:Name="GridRowsInput" Text="12"
+                                 LostFocus="OnGridSizeChanged" Width="60"
+                                 Background="#333" Foreground="White" FontSize="11"
+                                 BorderBrush="#555" BorderThickness="1"
+                                 Padding="4,2" />
                     </StackPanel>
                 </StackPanel>
                 <TextBlock x:Name="GridStatusText" Foreground="#888" FontSize="10"
@@ -64,12 +68,7 @@
                 <Separator Background="#444" Height="1" />
 
                 <!-- Waypoints -->
-                <StackPanel Orientation="Horizontal" Spacing="4">
-                    <TextBlock Text="WAYPOINTS" Foreground="#AAA" FontSize="11" FontWeight="Bold"
-                               VerticalAlignment="Center" />
-                    <TextBlock x:Name="WaypointCount" Foreground="#888" FontSize="10"
-                               VerticalAlignment="Center" Text="(8)" />
-                </StackPanel>
+                <TextBlock Text="WAYPOINTS" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <!-- Placement mode toggle -->
                 <StackPanel Orientation="Horizontal" Spacing="3">
                     <Button x:Name="SetStartBtn" Click="OnSetStartMode"
@@ -88,38 +87,8 @@
                         🔴 End
                     </Button>
                 </StackPanel>
-                <ListBox x:Name="WaypointList" Height="120"
-                         SelectionMode="Single">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding}" FontSize="11" Foreground="White" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                <StackPanel Orientation="Horizontal" Spacing="4">
-                    <Button x:Name="DeleteWaypointBtn" Click="OnDeleteWaypoint"
-                            Background="#CC6a2a2a" Foreground="White" FontSize="11"
-                            Padding="8,4" CornerRadius="4">
-                        ✕ Delete Selected
-                    </Button>
-                    <Button x:Name="ClearWaypointsBtn" Click="OnClearWaypoints"
-                            Background="#CC4a4a2a" Foreground="White" FontSize="11"
-                            Padding="8,4" CornerRadius="4">
-                        Clear All
-                    </Button>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Spacing="4">
-                    <Button x:Name="MoveUpBtn" Click="OnMoveWaypointUp"
-                            Background="#CC4a5a6a" Foreground="White" FontSize="11"
-                            Padding="8,4" CornerRadius="4">
-                        ↑ Move Up
-                    </Button>
-                    <Button x:Name="MoveDownBtn" Click="OnMoveWaypointDown"
-                            Background="#CC4a5a6a" Foreground="White" FontSize="11"
-                            Padding="8,4" CornerRadius="4">
-                        ↓ Move Down
-                    </Button>
-                </StackPanel>
+                <TextBlock Text="🖱 Left click: place | Right click: remove"
+                           Foreground="#AAA" FontSize="10" Margin="0,2,0,0" />
 
                 <Separator Background="#444" Height="1" />
 
