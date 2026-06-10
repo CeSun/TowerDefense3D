@@ -120,6 +120,42 @@ public class WaveConfigData
 
 public record WaveEntryData(string EnemyType, int Count, float SpawnInterval);
 
+// ==================== Save Data ====================
+
+/// <summary>
+/// Minimal player-progress save file stored alongside map files.
+/// </summary>
+public record SaveData(int HighestUnlockedLevel = 1)
+{
+    private const string FileName = "_save.json";
+
+    public static string GetSavePath(string mapsDir) => Path.Combine(mapsDir, FileName);
+
+    public static SaveData Load(string mapsDir)
+    {
+        var path = GetSavePath(mapsDir);
+        if (!File.Exists(path))
+            return new SaveData();
+        try
+        {
+            var json = File.ReadAllText(path);
+            return JsonSerializer.Deserialize(json, MapDataJsonContext.Default.SaveData) ?? new SaveData();
+        }
+        catch
+        {
+            return new SaveData();
+        }
+    }
+
+    public void Save(string mapsDir)
+    {
+        var path = GetSavePath(mapsDir);
+        var json = JsonSerializer.Serialize(this, MapDataJsonContext.Default.SaveData);
+        Directory.CreateDirectory(mapsDir);
+        File.WriteAllText(path, json);
+    }
+}
+
 // ==================== AOT-Compatible JSON Source Generation ====================
 
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, WriteIndented = true)]
@@ -130,6 +166,7 @@ public record WaveEntryData(string EnemyType, int Count, float SpawnInterval);
 [JsonSerializable(typeof(List<WaypointCell>))]
 [JsonSerializable(typeof(List<WaveConfigData>))]
 [JsonSerializable(typeof(List<WaveEntryData>))]
+[JsonSerializable(typeof(SaveData))]
 public partial class MapDataJsonContext : JsonSerializerContext
 {
 }

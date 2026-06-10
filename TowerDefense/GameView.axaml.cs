@@ -49,6 +49,7 @@ public partial class GameView : UserControl
     private string _mapsDir = string.Empty;
     private int _highestUnlockedLevel = 1;
     private int _selectedLevelNum;
+    private bool _editorTestMode;
     private readonly Dictionary<int, Button> _levelCards = new();
 
     // Callback
@@ -79,6 +80,8 @@ public partial class GameView : UserControl
     public void SetMapsDirectory(string mapsDir)
     {
         _mapsDir = mapsDir;
+        var save = SaveData.Load(_mapsDir);
+        _highestUnlockedLevel = save.HighestUnlockedLevel;
         BuildLevelGrid();
     }
 
@@ -89,9 +92,7 @@ public partial class GameView : UserControl
     {
         if (int.TryParse(name, out int num))
         {
-            // Make sure the editor's level is unlocked for testing
-            if (num > _highestUnlockedLevel)
-                _highestUnlockedLevel = num;
+            _editorTestMode = true;
             BuildLevelGrid();
             SelectLevel(num);
         }
@@ -122,7 +123,7 @@ public partial class GameView : UserControl
         var numbers = GetLevelNumbers();
         foreach (var num in numbers)
         {
-            bool unlocked = num <= _highestUnlockedLevel;
+            bool unlocked = num <= _highestUnlockedLevel || _editorTestMode;
             var card = new Button
             {
                 Width = 110, Height = 90,
@@ -175,7 +176,7 @@ public partial class GameView : UserControl
         foreach (var (n, card) in _levelCards)
         {
             bool selected = n == _selectedLevelNum;
-            bool unlocked = n <= _highestUnlockedLevel;
+            bool unlocked = n <= _highestUnlockedLevel || _editorTestMode;
 
             if (selected)
             {
@@ -226,11 +227,18 @@ public partial class GameView : UserControl
         int waypointCount = (map.StartCell != null ? 1 : 0) + map.PathWaypoints.Count + (map.EndCell != null ? 1 : 0);
         DetailPath.Text = $"Grid: {map.GridCols}×{map.GridRows} | Waypoints: {waypointCount}";
 
-        bool unlocked = num <= _highestUnlockedLevel;
+        bool unlocked = num <= _highestUnlockedLevel || _editorTestMode;
         if (!unlocked)
         {
             DetailStatus.Text = $"🔒 Locked — beat Level {_highestUnlockedLevel} first";
             LevelStartBtn.IsVisible = false;
+        }
+        else if (_editorTestMode && num > _highestUnlockedLevel)
+        {
+            DetailStatus.Text = map.IsComplete
+                ? "🧪 Editor test — playable for testing only"
+                : "🧪 Editor test — ⚠️ Incomplete";
+            LevelStartBtn.IsVisible = true;
         }
         else
         {
@@ -245,7 +253,7 @@ public partial class GameView : UserControl
     private void OnLevelStartClick(object? sender, RoutedEventArgs e)
     {
         if (_selectedLevelNum <= 0) return;
-        if (_selectedLevelNum > _highestUnlockedLevel) return;
+        if (_selectedLevelNum > _highestUnlockedLevel && !_editorTestMode) return;
 
         var filePath = Path.Combine(_mapsDir, _selectedLevelNum + ".json");
         if (!File.Exists(filePath)) return;
@@ -281,6 +289,7 @@ public partial class GameView : UserControl
 
     private void ReturnToLevelSelect()
     {
+        _editorTestMode = false;
         GameHudPanel.IsVisible = false;
         GameOverPanel.IsVisible = false;
         _gameOverShown = false;
@@ -988,6 +997,7 @@ public partial class GameView : UserControl
 
     private void OnMainMenuClick(object? sender, RoutedEventArgs e)
     {
+        _editorTestMode = false;
         ClearAllGameNodes();
         _sceneInitialized = false;
         _pathNodes.Clear();
@@ -1074,6 +1084,7 @@ public partial class GameView : UserControl
             if (_selectedLevelNum >= _highestUnlockedLevel)
             {
                 _highestUnlockedLevel = _selectedLevelNum + 1;
+                new SaveData(_highestUnlockedLevel).Save(_mapsDir);
                 GameOverSubtext.Text += $"\nLevel {_highestUnlockedLevel} unlocked!";
             }
 

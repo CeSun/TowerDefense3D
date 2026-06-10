@@ -149,7 +149,8 @@ public partial class MainView : UserControl
     private int CountMaps()
     {
         if (!Directory.Exists(_mapsDir)) return 0;
-        return Directory.GetFiles(_mapsDir, "*.json").Length;
+        return Directory.GetFiles(_mapsDir, "*.json")
+            .Count(f => int.TryParse(Path.GetFileNameWithoutExtension(f), out _));
     }
 
     // ==================== Navigation ====================
