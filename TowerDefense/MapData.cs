@@ -20,6 +20,7 @@ public class MapData
     public List<WaveConfigData> Waves { get; set; } = new();
 
     /// <summary>True when StartCell, EndCell, and at least one wave are configured.</summary>
+    [JsonIgnore]
     public bool IsComplete => StartCell != null && EndCell != null && Waves.Count > 0;
 
     // ==================== Serialization ====================
@@ -28,7 +29,7 @@ public class MapData
     {
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver(),
+        TypeInfoResolver = MapDataJsonContext.Default,
     };
 
     public string ToJson()
@@ -38,7 +39,7 @@ public class MapData
 
     public static MapData? FromJson(string json)
     {
-        return JsonSerializer.Deserialize<MapData>(json, JsonOptions);
+        return JsonSerializer.Deserialize(json, MapDataJsonContext.Default.MapData);
     }
 
     public void SaveToFile(string filePath)
@@ -118,3 +119,17 @@ public class WaveConfigData
 }
 
 public record WaveEntryData(string EnemyType, int Count, float SpawnInterval);
+
+// ==================== AOT-Compatible JSON Source Generation ====================
+
+[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, WriteIndented = true)]
+[JsonSerializable(typeof(MapData))]
+[JsonSerializable(typeof(WaypointCell))]
+[JsonSerializable(typeof(WaveConfigData))]
+[JsonSerializable(typeof(WaveEntryData))]
+[JsonSerializable(typeof(List<WaypointCell>))]
+[JsonSerializable(typeof(List<WaveConfigData>))]
+[JsonSerializable(typeof(List<WaveEntryData>))]
+public partial class MapDataJsonContext : JsonSerializerContext
+{
+}
