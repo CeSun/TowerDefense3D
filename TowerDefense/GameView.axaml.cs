@@ -52,8 +52,9 @@ public partial class GameView : UserControl
     private bool _editorTestMode;
     private readonly Dictionary<int, Button> _levelCards = new();
 
-    // Callback
+    // Callbacks
     public Action? OnMainMenu { get; set; }
+    public Action? OnBackToEditor { get; set; }
 
     public GameView()
     {
@@ -250,6 +251,34 @@ public partial class GameView : UserControl
         LoadMap(map);
     }
 
+    /// <summary>
+    /// Skip level select and jump directly into gameplay (used by editor Test Map).
+    /// </summary>
+    public void StartTestPlay(MapData map)
+    {
+        _editorTestMode = true;
+        LevelSelectPanel.IsVisible = false;
+        GameHudPanel.IsVisible = true;
+        GameOverPanel.IsVisible = false;
+        _gameOverShown = false;
+
+        ClearAllGameNodes();
+        _gm.LoadMap(map);
+        if (_sceneInitialized)
+        {
+            ClearMapScene();
+            BuildMapScene(AuraView);
+        }
+        _gm.Reset();
+        _gm.StartGame();
+
+        TowerBtnPanel.IsVisible = true;
+        ClearPlacement();
+        ResetBtn.Content = "↩ Back to Editor";
+        GameOverMenuBtn.Content = "↩ Back to Editor";
+        StatusText.Text = "Editor Test — Select a tower and place it!";
+    }
+
     private void OnLevelStartClick(object? sender, RoutedEventArgs e)
     {
         if (_selectedLevelNum <= 0) return;
@@ -265,6 +294,8 @@ public partial class GameView : UserControl
         GameHudPanel.IsVisible = true;
         GameOverPanel.IsVisible = false;
         _gameOverShown = false;
+        ResetBtn.Content = "↺ Back to Level Select";
+        GameOverMenuBtn.Content = "📋 Level Select";
 
         // Load and start
         ClearAllGameNodes();
@@ -289,6 +320,13 @@ public partial class GameView : UserControl
 
     private void ReturnToLevelSelect()
     {
+        if (_editorTestMode)
+        {
+            _editorTestMode = false;
+            OnBackToEditor?.Invoke();
+            return;
+        }
+
         _editorTestMode = false;
         GameHudPanel.IsVisible = false;
         GameOverPanel.IsVisible = false;
@@ -1073,6 +1111,29 @@ public partial class GameView : UserControl
         _gameOverShown = true;
         GameOverPanel.IsVisible = true;
         GameOverNextBtn.IsVisible = false;
+
+        if (_editorTestMode)
+        {
+            // Editor test: only show Back to Editor, no Retry/Next
+            GameOverReplayBtn.IsVisible = false;
+            GameOverNextBtn.IsVisible = false;
+
+            if (_gm.IsVictory)
+            {
+                GameOverTitle.Text = "🏆 VICTORY!";
+                GameOverTitle.Foreground = Avalonia.Media.Brushes.Gold;
+                GameOverSubtext.Text = $"Editor test passed! Final gold: {_gm.Gold}";
+            }
+            else
+            {
+                GameOverTitle.Text = "💀 DEFEATED";
+                GameOverTitle.Foreground = Avalonia.Media.Brushes.Red;
+                GameOverSubtext.Text = $"The enemy broke through! Reached wave {_gm.CurrentWave}/{_gm.TotalWaves}";
+            }
+            return;
+        }
+
+        GameOverReplayBtn.IsVisible = true;
 
         if (_gm.IsVictory)
         {

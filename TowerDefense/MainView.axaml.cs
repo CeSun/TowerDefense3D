@@ -11,6 +11,7 @@ public partial class MainView : UserControl
 {
     private MenuView? _menuView;
     private GameView? _gameView;
+    private MapListControl? _mapListView;
     private MapEditorView? _editorView;
     private MapData _currentMapData = null!;
     private string _mapsDir = string.Empty;
@@ -196,20 +197,54 @@ public partial class MainView : UserControl
 
     private void ShowEditor()
     {
+        // Show map list first
+        if (_mapListView == null)
+        {
+            _mapListView = new MapListControl();
+            _mapListView.OnMainMenu = () => ShowMenu();
+            _mapListView.OnEditMap = (map, filePath) => OpenMapInEditor(map, filePath);
+            _mapListView.Initialize(_mapsDir);
+        }
+        else
+        {
+            _mapListView.Refresh();
+        }
+
+        ContentArea.Content = _mapListView;
+    }
+
+    private void OpenMapInEditor(MapData map, string filePath)
+    {
+        _currentMapData = map;
+
         if (_editorView == null)
         {
             _editorView = new MapEditorView();
+            _editorView.OnBack = () => ShowEditor();
             _editorView.OnPlayMap = OnPlayMap;
-            _editorView.OnMainMenu = () => ShowMenu();
-            _editorView.Initialize(_mapsDir);
         }
 
+        _editorView.LoadForEdit(map, filePath);
         ContentArea.Content = _editorView;
     }
 
     private void OnPlayMap(MapData map)
     {
         _currentMapData = map;
-        ShowGameFromEditor(map);
+
+        if (_gameView == null)
+        {
+            _gameView = new GameView();
+            _gameView.OnMainMenu = () => ShowMenu();
+        }
+        _gameView.OnBackToEditor = () =>
+        {
+            if (_editorView != null)
+                ContentArea.Content = _editorView;
+        };
+
+        _gameView.SetMapsDirectory(_mapsDir);
+        _gameView.StartTestPlay(map);
+        ContentArea.Content = _gameView;
     }
 }
