@@ -178,6 +178,7 @@ public partial class MainView : UserControl
         }
 
         _gameView.SetMapsDirectory(_mapsDir);
+        _gameView.EnsureLevelSelectState();
         ContentArea.Content = _gameView;
     }
 
@@ -190,6 +191,7 @@ public partial class MainView : UserControl
         }
 
         _gameView.SetMapsDirectory(_mapsDir);
+        _gameView.EnsureLevelSelectState();
         _gameView.SetSelectedLevel(map.Name);
 
         ContentArea.Content = _gameView;

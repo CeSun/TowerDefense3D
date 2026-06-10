@@ -24,26 +24,26 @@
                     Background="#CC0d0d1a" Padding="12,8" Margin="8,8,8,0"
                     CornerRadius="6">
                 <DockPanel>
+                    <Button x:Name="BackBtn" Click="OnMainMenuClick"
+                            DockPanel.Dock="Left"
+                            Background="#CC4a6a8a" Foreground="White"
+                            FontSize="12" FontWeight="Bold"
+                            Padding="10,6" CornerRadius="4"
+                            Margin="0,0,12,0">
+                        ↩ Back
+                    </Button>
                     <TextBlock DockPanel.Dock="Left" Text="EDIT MAPS" Foreground="White"
                                FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
                     <TextBlock x:Name="MapListStatus" DockPanel.Dock="Left" Foreground="#AAA" FontSize="13"
                                VerticalAlignment="Center" Margin="16,0,0,0"
                                Text="Select a map to edit, or create a new one" />
-                    <StackPanel Orientation="Horizontal" Spacing="8"
-                                HorizontalAlignment="Right">
-                        <Button x:Name="MenuBtn" Click="OnMainMenuClick"
-                                Background="#CC4a6a8a" Foreground="White"
-                                FontSize="12" FontWeight="Bold"
-                                Padding="12,6" CornerRadius="4">
-                            🏠 Main Menu
-                        </Button>
-                        <Button x:Name="NewMapBtn" Click="OnNewMap"
-                                Background="#CC2d6a4a" Foreground="White"
-                                FontSize="12" FontWeight="Bold"
-                                Padding="12,6" CornerRadius="4">
-                            🆕 New Map
-                        </Button>
-                    </StackPanel>
+                    <Button x:Name="NewMapBtn" Click="OnNewMap"
+                            Background="#CC2d6a4a" Foreground="White"
+                            FontSize="12" FontWeight="Bold"
+                            Padding="12,6" CornerRadius="4"
+                            HorizontalAlignment="Right">
+                        🆕 New Map
+                    </Button>
                 </DockPanel>
             </Border>
 

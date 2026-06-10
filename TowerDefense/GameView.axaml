@@ -30,18 +30,17 @@
                     Background="#CC0d0d1a" Padding="12,8" Margin="8,8,8,0"
                     CornerRadius="6">
                 <StackPanel Orientation="Horizontal" Spacing="16">
+                    <Button x:Name="LevelSelectBackBtn" Click="OnMainMenuClick"
+                            Background="#CC4a6a8a" Foreground="White"
+                            FontSize="12" FontWeight="Bold"
+                            Padding="10,6" CornerRadius="4">
+                        ↩ Back
+                    </Button>
                     <TextBlock Text="SELECT LEVEL" Foreground="White"
                                FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
                     <TextBlock x:Name="LevelSelectStatus" Foreground="#AAA" FontSize="13"
                                VerticalAlignment="Center"
                                Text="Choose a level to begin" />
-                    <Button x:Name="LevelSelectMenuBtn" Click="OnMainMenuClick"
-                            Background="#CC4a6a8a" Foreground="White"
-                            FontSize="12" FontWeight="Bold"
-                            Padding="12,6" CornerRadius="4"
-                            HorizontalAlignment="Right">
-                        🏠 Main Menu
-                    </Button>
                 </StackPanel>
             </Border>
 
@@ -96,6 +95,12 @@
             <!-- Top HUD -->
             <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                         Orientation="Horizontal" Spacing="12">
+                <Button x:Name="GameBackBtn" Click="OnUnifiedBack"
+                        Background="#CC4a6a8a" Foreground="White"
+                        FontSize="12" FontWeight="Bold"
+                        Padding="10,6" CornerRadius="4">
+                    ↩ Back
+                </Button>
                 <Border Background="#CC1a1a2e" CornerRadius="6" Padding="10,5">
                     <TextBlock x:Name="GoldText" Text="Gold: 200"
                                Foreground="#FFD700" FontSize="16" FontWeight="Bold" />
@@ -167,11 +172,11 @@
                     </Button>
                 </StackPanel>
 
-                <Button x:Name="ResetBtn" Click="OnBackToLevelSelect"
+                <Button x:Name="ResetBtn" Click="OnReset"
                         Background="#CC6a4a4a" Foreground="White"
                         FontSize="13" FontWeight="Bold"
                         Padding="14,8" CornerRadius="6" Width="180">
-                    ↺ Back to Level Select
+                    🔄 Restart
                 </Button>
             </StackPanel>
         </Grid>
@@ -181,6 +186,14 @@
         <!-- ============================================ -->
         <Panel x:Name="GameOverPanel" IsVisible="False"
                Background="#BB000000" ZIndex="100">
+            <!-- Back button: top-left -->
+            <Button x:Name="GameOverBackBtn" Click="OnBackToLevelSelect"
+                    Background="#CC4a6a8a" Foreground="White"
+                    FontSize="12" FontWeight="Bold"
+                    Padding="10,6" CornerRadius="4"
+                    Margin="12" VerticalAlignment="Top" HorizontalAlignment="Left">
+                ↩ Back
+            </Button>
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
                 <TextBlock x:Name="GameOverTitle" FontSize="48" FontWeight="Bold"
                            HorizontalAlignment="Center" />

@@ -46,6 +46,7 @@ public partial class GameView : UserControl
     // ==================== UI State ====================
     private bool _gameOverShown;
     private bool _sceneInitialized;
+    private bool _isActive = true; // false when view is detached; skips game updates
     private string _mapsDir = string.Empty;
     private int _highestUnlockedLevel = 1;
     private int _selectedLevelNum;
@@ -252,6 +253,24 @@ public partial class GameView : UserControl
     }
 
     /// <summary>
+    /// Reset the view to a clean level-select state (no running game, no editor test mode).
+    /// Called when navigating to GameView from the main menu.
+    /// </summary>
+    public void EnsureLevelSelectState()
+    {
+        _editorTestMode = false;
+        _gameOverShown = false;
+        GameHudPanel.IsVisible = false;
+        GameOverPanel.IsVisible = false;
+        LevelSelectPanel.IsVisible = true;
+        TowerBtnPanel.IsVisible = false;
+        ClearAllGameNodes();
+        _gm.Reset();
+        ClearPlacement();
+        LevelSelectStatus.Text = "Choose a level to begin";
+    }
+
+    /// <summary>
     /// Skip level select and jump directly into gameplay (used by editor Test Map).
     /// </summary>
     public void StartTestPlay(MapData map)
@@ -274,8 +293,6 @@ public partial class GameView : UserControl
 
         TowerBtnPanel.IsVisible = true;
         ClearPlacement();
-        ResetBtn.Content = "↩ Back to Editor";
-        GameOverMenuBtn.Content = "↩ Back to Editor";
         StatusText.Text = "Editor Test — Select a tower and place it!";
     }
 
@@ -294,8 +311,6 @@ public partial class GameView : UserControl
         GameHudPanel.IsVisible = true;
         GameOverPanel.IsVisible = false;
         _gameOverShown = false;
-        ResetBtn.Content = "↺ Back to Level Select";
-        GameOverMenuBtn.Content = "📋 Level Select";
 
         // Load and start
         ClearAllGameNodes();
@@ -323,6 +338,11 @@ public partial class GameView : UserControl
         if (_editorTestMode)
         {
             _editorTestMode = false;
+            ClearAllGameNodes();
+            _gm.Reset();
+            GameHudPanel.IsVisible = false;
+            GameOverPanel.IsVisible = false;
+            _gameOverShown = false;
             OnBackToEditor?.Invoke();
             return;
         }
@@ -794,11 +814,31 @@ public partial class GameView : UserControl
 
     // ==================== Frame Update ====================
 
+    /// <summary>Stop game updates when removed from visual tree.</summary>
+    protected override void OnDetachedFromVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        _isActive = false;
+    }
+
+    /// <summary>Resume rendering when re-attached.</summary>
+    protected override void OnAttachedToVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        _isActive = true;
+        if (_sceneInitialized)
+            AuraView.RequestNextFrameRendering();
+    }
+
     private void OnSceneUpdated(object? sender, UpdateRoutedEventArgs args)
     {
+        if (!_isActive)
+            return; // Detached from visual tree — don't drive game logic.
+
         var view = (sender as Aura3DView)!;
 
-        _gm.Update(args.DeltaTime);
+        if (_gm.HasStarted)
+            _gm.Update(args.DeltaTime);
 
         // Sync enemy positions
         foreach (var enemy in _gm.Enemies)
@@ -1033,6 +1073,27 @@ public partial class GameView : UserControl
 
     // ==================== Game Controls ====================
 
+    /// <summary>
+    /// Back button during gameplay. Returns to level select, or to editor if in test mode.
+    /// </summary>
+    private void OnUnifiedBack(object? sender, RoutedEventArgs e)
+    {
+        if (_editorTestMode)
+        {
+            _editorTestMode = false;
+            ClearAllGameNodes();
+            _gm.Reset();
+            GameHudPanel.IsVisible = false;
+            GameOverPanel.IsVisible = false;
+            _gameOverShown = false;
+            OnBackToEditor?.Invoke();
+        }
+        else
+        {
+            ReturnToLevelSelect();
+        }
+    }
+
     private void OnMainMenuClick(object? sender, RoutedEventArgs e)
     {
         _editorTestMode = false;
@@ -1052,6 +1113,7 @@ public partial class GameView : UserControl
         _gm.StartGame();
         GameOverPanel.IsVisible = false;
         _gameOverShown = false;
+        GameHudPanel.IsVisible = true;
         TowerBtnPanel.IsVisible = true;
         ClearPlacement();
         StatusText.Text = $"Level {_selectedLevelNum} — Select a tower and place it!";

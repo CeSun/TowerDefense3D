@@ -15,16 +15,19 @@
                        SceneUpdated="OnEditorSceneUpdated"
                        ObjectPicked="OnEditorObjectPicked" />
 
+        <!-- Back button: top-left within the 3D view column -->
+        <Button Grid.Column="0" x:Name="BackBtn" Click="OnBackClick"
+                Background="#CC4a6a8a" Foreground="White"
+                FontSize="12" FontWeight="Bold"
+                Padding="10,6" CornerRadius="4"
+                Margin="12" VerticalAlignment="Top" HorizontalAlignment="Left"
+                ZIndex="10">
+            ↩ Back
+        </Button>
+
         <!-- Editor Sidebar -->
         <ScrollViewer Grid.Column="1" Background="#EE1a1a2e">
             <StackPanel Spacing="8" Margin="8">
-                <!-- Navigation -->
-                <Button x:Name="BackBtn" Click="OnBackClick"
-                        Background="#CC4a6a8a" Foreground="White" FontSize="12"
-                        Padding="10,5" CornerRadius="4">
-                    ↩ Back
-                </Button>
-
                 <!-- Save -->
                 <Button x:Name="SaveBtn" Click="OnSaveMap"
                         Background="#CC2d6a4a" Foreground="White" FontSize="11"
