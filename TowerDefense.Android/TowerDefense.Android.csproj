@@ -12,6 +12,10 @@
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <UseMonoRuntime>false</UseMonoRuntime>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia.Android" Version="12.0.0" />
     <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.15" />

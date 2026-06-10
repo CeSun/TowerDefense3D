@@ -21,6 +21,7 @@
                     Background="#CC2d5a27" Foreground="White"
                     FontSize="22" FontWeight="Bold"
                     Padding="40,18" CornerRadius="12" Width="320"
+                    HorizontalAlignment="Center"
                     HorizontalContentAlignment="Center"
                     Cursor="Hand">
                 ▶  Play Game
@@ -31,6 +32,7 @@
                     Background="#CC4a6a8a" Foreground="White"
                     FontSize="22" FontWeight="Bold"
                     Padding="40,18" CornerRadius="12" Width="320"
+                    HorizontalAlignment="Center"
                     HorizontalContentAlignment="Center"
                     Cursor="Hand">
                 🗺  Map Editor

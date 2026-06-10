@@ -5,8 +5,5 @@
         Title="Aura3D — Tower Defense"
         Width="1280" Height="800"
         WindowState="Maximized">
-    <Grid>
-        <!-- Content Area — navigated between Menu / Editor / Game views -->
-        <ContentControl Grid.Row="0" x:Name="ContentArea" />
-    </Grid>
+    <local:MainView />
 </Window>

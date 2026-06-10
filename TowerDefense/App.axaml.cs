@@ -19,7 +19,7 @@ public partial class App : Application
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
         {
-            singleView.MainView = new GameView();
+            singleView.MainView = new MainView();
         }
 
         base.OnFrameworkInitializationCompleted();
