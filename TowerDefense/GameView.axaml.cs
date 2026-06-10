@@ -90,6 +90,11 @@ public partial class GameView : UserControl
         var view = (sender as Aura3DView)!;
         view.AutoRequestNextFrameRendering = false;
 
+        // Clear stale node references from any previous scene
+        _pathNodes.Clear();
+        _mapNodes.Clear();
+        _groundNode = null;
+
         // Camera setup — top-down angled view
         view.MainCamera.Position = new Vector3(10, 16, 20);
         view.MainCamera.RotationDegrees = new Vector3(-55, 0, 0);
@@ -146,32 +151,37 @@ public partial class GameView : UserControl
         // Remove ground
         if (_groundNode != null)
         {
-            view.Remove(_groundNode);
+            TryRemoveNode(view, _groundNode);
             _groundNode = null;
         }
 
         // Remove path nodes
         foreach (var node in _pathNodes)
-            view.Remove(node);
+            TryRemoveNode(view, node);
         _pathNodes.Clear();
 
         // Remove other map nodes (grid dots, markers)
         foreach (var node in _mapNodes)
-            view.Remove(node);
+            TryRemoveNode(view, node);
         _mapNodes.Clear();
 
         // Clear game object nodes
-        foreach (var (_, node) in _enemyNodes) view.Remove(node);
+        foreach (var (_, node) in _enemyNodes) TryRemoveNode(view, node);
         foreach (var (_, hp) in _enemyHpBars) HpBarCanvas.Children.Remove(hp);
         foreach (var (_, bg) in _enemyHpBgs) HpBarCanvas.Children.Remove(bg);
-        foreach (var (_, node) in _towerNodes) view.Remove(node);
-        foreach (var (_, node) in _projectileNodes) view.Remove(node);
+        foreach (var (_, node) in _towerNodes) TryRemoveNode(view, node);
+        foreach (var (_, node) in _projectileNodes) TryRemoveNode(view, node);
 
         _enemyNodes.Clear();
         _enemyHpBars.Clear();
         _enemyHpBgs.Clear();
         _towerNodes.Clear();
         _projectileNodes.Clear();
+    }
+
+    private static void TryRemoveNode(Aura3DView view, Node node)
+    {
+        try { view.Remove(node); } catch (InvalidOperationException) { /* already removed */ }
     }
 
     private void BuildMapScene(Aura3DView view)
@@ -795,6 +805,12 @@ public partial class GameView : UserControl
         _towerNodes.Clear();
         _projectileNodes.Clear();
         RemoveGhost();
+
+        // Reset scene state so the next LoadMap won't try to remove stale nodes
+        _sceneInitialized = false;
+        _pathNodes.Clear();
+        _mapNodes.Clear();
+        _groundNode = null;
     }
 
     private void OnGameReset()

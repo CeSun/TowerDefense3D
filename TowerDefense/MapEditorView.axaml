@@ -47,19 +47,41 @@
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <StackPanel Spacing="2">
                         <TextBlock Text="Cols" Foreground="#AAA" FontSize="10" />
-                        <TextBox x:Name="GridColsInput" Text="20"
-                                 LostFocus="OnGridSizeChanged" Width="60"
-                                 Background="#333" Foreground="White" FontSize="11"
-                                 BorderBrush="#555" BorderThickness="1"
-                                 Padding="4,2" />
+                        <StackPanel Orientation="Horizontal" Spacing="2">
+                            <TextBox x:Name="GridColsInput" Text="20"
+                                     KeyDown="OnGridKeyDown" Width="44"
+                                     Background="#333" Foreground="White" FontSize="11"
+                                     BorderBrush="#555" BorderThickness="1"
+                                     Padding="4,2"
+                                     VerticalContentAlignment="Center" />
+                            <StackPanel Spacing="1">
+                                <Button x:Name="GridColsUpBtn" Click="OnGridColsUp"
+                                        Background="#CC4a6a8a" Foreground="White" FontSize="8"
+                                        Padding="4,1" CornerRadius="2">▲</Button>
+                                <Button x:Name="GridColsDownBtn" Click="OnGridColsDown"
+                                        Background="#CC4a6a8a" Foreground="White" FontSize="8"
+                                        Padding="4,1" CornerRadius="2">▼</Button>
+                            </StackPanel>
+                        </StackPanel>
                     </StackPanel>
                     <StackPanel Spacing="2">
                         <TextBlock Text="Rows" Foreground="#AAA" FontSize="10" />
-                        <TextBox x:Name="GridRowsInput" Text="12"
-                                 LostFocus="OnGridSizeChanged" Width="60"
-                                 Background="#333" Foreground="White" FontSize="11"
-                                 BorderBrush="#555" BorderThickness="1"
-                                 Padding="4,2" />
+                        <StackPanel Orientation="Horizontal" Spacing="2">
+                            <TextBox x:Name="GridRowsInput" Text="12"
+                                     KeyDown="OnGridKeyDown" Width="44"
+                                     Background="#333" Foreground="White" FontSize="11"
+                                     BorderBrush="#555" BorderThickness="1"
+                                     Padding="4,2"
+                                     VerticalContentAlignment="Center" />
+                            <StackPanel Spacing="1">
+                                <Button x:Name="GridRowsUpBtn" Click="OnGridRowsUp"
+                                        Background="#CC4a6a8a" Foreground="White" FontSize="8"
+                                        Padding="4,1" CornerRadius="2">▲</Button>
+                                <Button x:Name="GridRowsDownBtn" Click="OnGridRowsDown"
+                                        Background="#CC4a6a8a" Foreground="White" FontSize="8"
+                                        Padding="4,1" CornerRadius="2">▼</Button>
+                            </StackPanel>
+                        </StackPanel>
                     </StackPanel>
                 </StackPanel>
                 <TextBlock x:Name="GridStatusText" Foreground="#888" FontSize="10"
@@ -99,7 +121,7 @@
                     <TextBlock x:Name="WaveCountText" Foreground="#888" FontSize="10"
                                VerticalAlignment="Center" Text="(5)" />
                 </StackPanel>
-                <ListBox x:Name="WaveList" Height="140"
+                <ListBox x:Name="WaveList" Height="100"
                          SelectionMode="Single"
                          SelectionChanged="OnWaveListSelectionChanged">
                     <ListBox.ItemTemplate>
@@ -124,18 +146,31 @@
                 <!-- Edit Selected Wave -->
                 <TextBlock Text="EDIT WAVE" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <Border x:Name="WaveEditPanel" Background="#22FFFFFF" CornerRadius="4" Padding="6">
-                    <StackPanel Spacing="6">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="Delay:" Foreground="#AAA" FontSize="11"
+                    <StackPanel Spacing="4">
+                        <!-- Delay -->
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="Delay:" Foreground="#AAA" FontSize="10"
                                        VerticalAlignment="Center" />
-                            <NumericUpDown x:Name="WaveDelayInput" Minimum="0" Maximum="60"
-                                           Value="5" Increment="0.5" Width="70" FormatString="F1"
-                                           ValueChanged="OnWaveDelayChanged" />
+                            <TextBox x:Name="WaveDelayInput" Text="5.0"
+                                     KeyDown="OnWaveDelayKeyDown" Width="44"
+                                     Background="#333" Foreground="White" FontSize="10"
+                                     BorderBrush="#555" BorderThickness="1"
+                                     Padding="4,2" VerticalContentAlignment="Center" />
+                            <StackPanel Spacing="1">
+                                <Button x:Name="WaveDelayUpBtn" Click="OnWaveDelayUp"
+                                        Background="#CC4a6a8a" Foreground="White" FontSize="7"
+                                        Padding="4,1" CornerRadius="2">▲</Button>
+                                <Button x:Name="WaveDelayDownBtn" Click="OnWaveDelayDown"
+                                        Background="#CC4a6a8a" Foreground="White" FontSize="7"
+                                        Padding="4,1" CornerRadius="2">▼</Button>
+                            </StackPanel>
                             <TextBlock Text="s" Foreground="#888" FontSize="10"
                                        VerticalAlignment="Center" />
                         </StackPanel>
+
+                        <!-- Entries -->
                         <TextBlock Text="Entries:" Foreground="#AAA" FontSize="10" />
-                        <ListBox x:Name="EntryList" Height="80"
+                        <ListBox x:Name="EntryList" Height="70"
                                  SelectionChanged="OnEntryListSelectionChanged">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -143,35 +178,63 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                        <!-- Edit selected entry -->
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <StackPanel Spacing="1">
-                                <TextBlock Text="Count" Foreground="#888" FontSize="9" />
-                                <NumericUpDown x:Name="EntryCountInput" Minimum="1" Maximum="50"
-                                               Value="3" Increment="1" Width="55"
-                                               ValueChanged="OnEntryCountChanged" />
+
+                        <!-- Entry editor -->
+                        <StackPanel Spacing="3">
+                            <!-- Enemy type -->
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="Type:" Foreground="#888" FontSize="9"
+                                           VerticalAlignment="Center" Width="36" />
+                                <ComboBox x:Name="EnemyTypeCombo" Width="80" FontSize="10"
+                                          SelectionChanged="OnEntryEnemyTypeChanged" />
                             </StackPanel>
-                            <StackPanel Spacing="1">
-                                <TextBlock Text="Interval" Foreground="#888" FontSize="9" />
-                                <NumericUpDown x:Name="EntryIntervalInput" Minimum="0.2" Maximum="10"
-                                               Value="1.0" Increment="0.1" Width="55" FormatString="F1"
-                                               ValueChanged="OnEntryIntervalChanged" />
-                                <TextBlock Text="s" Foreground="#666" FontSize="8" />
+                            <!-- Count -->
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="Count:" Foreground="#888" FontSize="9"
+                                           VerticalAlignment="Center" Width="36" />
+                                <TextBox x:Name="EntryCountInput" Text="3"
+                                         KeyDown="OnEntryCountKeyDown" Width="44"
+                                         Background="#333" Foreground="White" FontSize="10"
+                                         BorderBrush="#555" BorderThickness="1"
+                                         Padding="4,2" VerticalContentAlignment="Center" />
+                                <StackPanel Spacing="1">
+                                    <Button x:Name="EntryCountUpBtn" Click="OnEntryCountUp"
+                                            Background="#CC4a6a8a" Foreground="White" FontSize="7"
+                                            Padding="4,1" CornerRadius="2">▲</Button>
+                                    <Button x:Name="EntryCountDownBtn" Click="OnEntryCountDown"
+                                            Background="#CC4a6a8a" Foreground="White" FontSize="7"
+                                            Padding="4,1" CornerRadius="2">▼</Button>
+                                </StackPanel>
                             </StackPanel>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <ComboBox x:Name="EnemyTypeCombo" Width="80" FontSize="10"
-                                      SelectionChanged="OnEntryEnemyTypeChanged" />
-                            <Button x:Name="AddEntryBtn" Click="OnAddEntry"
-                                    Background="#CC2d5a6a" Foreground="White" FontSize="10"
-                                    Padding="6,2" CornerRadius="4">
-                                ＋ Entry
-                            </Button>
-                            <Button x:Name="DeleteEntryBtn" Click="OnDeleteEntry"
-                                    Background="#CC6a2a2a" Foreground="White" FontSize="10"
-                                    Padding="6,2" CornerRadius="4">
-                                ✕
-                            </Button>
+                            <!-- Interval -->
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="Interval:" Foreground="#888" FontSize="9"
+                                           VerticalAlignment="Center" Width="36" />
+                                <TextBox x:Name="EntryIntervalInput" Text="1.0"
+                                         KeyDown="OnEntryIntervalKeyDown" Width="44"
+                                         Background="#333" Foreground="White" FontSize="10"
+                                         BorderBrush="#555" BorderThickness="1"
+                                         Padding="4,2" VerticalContentAlignment="Center" />
+                                <StackPanel Spacing="1">
+                                    <Button x:Name="EntryIntervalUpBtn" Click="OnEntryIntervalUp"
+                                            Background="#CC4a6a8a" Foreground="White" FontSize="7"
+                                            Padding="4,1" CornerRadius="2">▲</Button>
+                                    <Button x:Name="EntryIntervalDownBtn" Click="OnEntryIntervalDown"
+                                            Background="#CC4a6a8a" Foreground="White" FontSize="7"
+                                            Padding="4,1" CornerRadius="2">▼</Button>
+                                </StackPanel>
+                                <TextBlock Text="s" Foreground="#888" FontSize="9"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                            <!-- Add / Delete -->
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Button x:Name="AddEntryBtn" Click="OnAddEntry"
+                                        Background="#CC2d5a6a" Foreground="White" FontSize="10"
+                                        Padding="6,2" CornerRadius="4">＋ Add Entry</Button>
+                                <Button x:Name="DeleteEntryBtn" Click="OnDeleteEntry"
+                                        Background="#CC6a2a2a" Foreground="White" FontSize="10"
+                                        Padding="6,2" CornerRadius="4">✕ Delete</Button>
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
                 </Border>

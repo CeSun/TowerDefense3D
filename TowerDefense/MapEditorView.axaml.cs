@@ -118,8 +118,8 @@ public partial class MapEditorView : UserControl
 
     private void SyncUIFromMap()
     {
-        GridColsInput.Value = _mapData.GridCols;
-        GridRowsInput.Value = _mapData.GridRows;
+        GridColsInput.Text = _mapData.GridCols.ToString();
+        GridRowsInput.Text = _mapData.GridRows.ToString();
         RefreshWaveList();
         RefreshEntryList();
     }
@@ -608,8 +608,7 @@ public partial class MapEditorView : UserControl
         _refreshingWaves = true;
         try
         {
-            // Deselect before clearing to avoid Avalonia hitting a stale index
-            WaveList.SelectedIndex = -1;
+            var savedIndex = WaveList.SelectedIndex;
             WaveList.Items.Clear();
             for (int i = 0; i < _mapData.Waves.Count; i++)
             {
@@ -618,6 +617,12 @@ public partial class MapEditorView : UserControl
                 WaveList.Items.Add(summary);
             }
             WaveCountText.Text = $"({_mapData.Waves.Count})";
+
+            // Restore selection
+            if (savedIndex >= 0 && savedIndex < _mapData.Waves.Count)
+                WaveList.SelectedIndex = savedIndex;
+            else if (_mapData.Waves.Count > 0)
+                WaveList.SelectedIndex = 0;
         }
         finally
         {
@@ -632,7 +637,7 @@ public partial class MapEditorView : UserControl
         _refreshingEntry = true;
         try
         {
-            EntryList.SelectedIndex = -1;
+            var savedIndex = EntryList.SelectedIndex;
             EntryList.Items.Clear();
             if (WaveList.SelectedIndex < 0 && _mapData.Waves.Count > 0)
                 WaveList.SelectedIndex = 0;
@@ -640,11 +645,17 @@ public partial class MapEditorView : UserControl
             if (WaveList.SelectedIndex >= 0 && WaveList.SelectedIndex < _mapData.Waves.Count)
             {
                 var wave = _mapData.Waves[WaveList.SelectedIndex];
-                WaveDelayInput.Value = (decimal)wave.DelayBeforeWave;
+                WaveDelayInput.Text = wave.DelayBeforeWave.ToString("F1");
                 foreach (var entry in wave.Entries)
                 {
                     EntryList.Items.Add($"{entry.EnemyType} ×{entry.Count} ({entry.SpawnInterval:F1}s)");
                 }
+
+                // Restore selection or auto-select first entry
+                if (savedIndex >= 0 && savedIndex < wave.Entries.Count)
+                    EntryList.SelectedIndex = savedIndex;
+                else if (wave.Entries.Count > 0)
+                    EntryList.SelectedIndex = 0;
 
                 // Sync entry edit controls to selected entry
                 SyncEntryControls();
@@ -668,8 +679,8 @@ public partial class MapEditorView : UserControl
             try
             {
                 var entry = wave.Entries[EntryList.SelectedIndex];
-                EntryCountInput.Value = entry.Count;
-                EntryIntervalInput.Value = (decimal)entry.SpawnInterval;
+                EntryCountInput.Text = entry.Count.ToString();
+                EntryIntervalInput.Text = entry.SpawnInterval.ToString("F1");
                 EnemyTypeCombo.SelectedItem = entry.EnemyType;
             }
             finally
@@ -706,11 +717,31 @@ public partial class MapEditorView : UserControl
         }
     }
 
-    private void OnWaveDelayChanged(object? sender, NumericUpDownValueChangedEventArgs e)
+    private void OnWaveDelayKeyDown(object? sender, KeyEventArgs e)
     {
-        if (WaveList.SelectedIndex >= 0 && WaveList.SelectedIndex < _mapData.Waves.Count)
+        if (e.Key == Key.Enter) ApplyWaveDelay();
+    }
+    private void OnWaveDelayUp(object? sender, RoutedEventArgs e) => AdjustWaveDelay(+0.5f);
+    private void OnWaveDelayDown(object? sender, RoutedEventArgs e) => AdjustWaveDelay(-0.5f);
+
+    private void AdjustWaveDelay(float delta)
+    {
+        if (float.TryParse(WaveDelayInput.Text, out float val))
         {
-            _mapData.Waves[WaveList.SelectedIndex].DelayBeforeWave = (float)e.NewValue;
+            val = Math.Clamp(val + delta, 0, 60);
+            WaveDelayInput.Text = val.ToString("F1");
+        }
+        ApplyWaveDelay();
+    }
+
+    private void ApplyWaveDelay()
+    {
+        if (WaveList.SelectedIndex < 0 || WaveList.SelectedIndex >= _mapData.Waves.Count) return;
+        if (float.TryParse(WaveDelayInput.Text, out float val))
+        {
+            val = Math.Clamp(val, 0, 60);
+            WaveDelayInput.Text = val.ToString("F1");
+            _mapData.Waves[WaveList.SelectedIndex].DelayBeforeWave = val;
             RefreshWaveList();
         }
     }
@@ -729,20 +760,13 @@ public partial class MapEditorView : UserControl
     private void OnDeleteEntry(object? sender, RoutedEventArgs e)
     {
         if (WaveList.SelectedIndex < 0) return;
-        if (EntryList.SelectedIndex < 0) return;
 
         var wave = _mapData.Waves[WaveList.SelectedIndex];
-        if (wave.Entries.Count > 1 || _mapData.Waves.Count > 1)
-        {
-            if (wave.Entries.Count > 0)
-            {
-                wave.Entries.RemoveAt(EntryList.SelectedIndex);
-                if (EntryList.SelectedIndex >= wave.Entries.Count)
-                    EntryList.SelectedIndex = wave.Entries.Count - 1;
-                RefreshEntryList();
-                RefreshWaveList();
-            }
-        }
+        if (EntryList.SelectedIndex < 0 || EntryList.SelectedIndex >= wave.Entries.Count) return;
+
+        wave.Entries.RemoveAt(EntryList.SelectedIndex);
+        RefreshEntryList();
+        RefreshWaveList();
     }
 
     private void OnEntryListSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -751,29 +775,75 @@ public partial class MapEditorView : UserControl
         SyncEntryControls();
     }
 
-    private void OnEntryCountChanged(object? sender, NumericUpDownValueChangedEventArgs e)
+    private void OnEntryCountKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter) ApplyEntryCount();
+    }
+    private void OnEntryCountUp(object? sender, RoutedEventArgs e) => AdjustEntryCount(+1);
+    private void OnEntryCountDown(object? sender, RoutedEventArgs e) => AdjustEntryCount(-1);
+
+    private void AdjustEntryCount(int delta)
+    {
+        if (_refreshingEntry) return;
+        if (int.TryParse(EntryCountInput.Text, out int val))
+        {
+            val = Math.Clamp(val + delta, 1, 50);
+            EntryCountInput.Text = val.ToString();
+        }
+        ApplyEntryCount();
+    }
+
+    private void ApplyEntryCount()
     {
         if (_refreshingEntry) return;
         if (WaveList.SelectedIndex < 0) return;
         var wave = _mapData.Waves[WaveList.SelectedIndex];
         if (EntryList.SelectedIndex >= 0 && EntryList.SelectedIndex < wave.Entries.Count)
         {
-            wave.Entries[EntryList.SelectedIndex] = wave.Entries[EntryList.SelectedIndex] with { Count = (int)e.NewValue };
-            RefreshEntryList();
-            RefreshWaveList();
+            if (int.TryParse(EntryCountInput.Text, out int val))
+            {
+                val = Math.Clamp(val, 1, 50);
+                EntryCountInput.Text = val.ToString();
+                wave.Entries[EntryList.SelectedIndex] = wave.Entries[EntryList.SelectedIndex] with { Count = val };
+                RefreshEntryList();
+                RefreshWaveList();
+            }
         }
     }
 
-    private void OnEntryIntervalChanged(object? sender, NumericUpDownValueChangedEventArgs e)
+    private void OnEntryIntervalKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter) ApplyEntryInterval();
+    }
+    private void OnEntryIntervalUp(object? sender, RoutedEventArgs e) => AdjustEntryInterval(+0.1f);
+    private void OnEntryIntervalDown(object? sender, RoutedEventArgs e) => AdjustEntryInterval(-0.1f);
+
+    private void AdjustEntryInterval(float delta)
+    {
+        if (_refreshingEntry) return;
+        if (float.TryParse(EntryIntervalInput.Text, out float val))
+        {
+            val = Math.Clamp(val + delta, 0.2f, 10f);
+            EntryIntervalInput.Text = val.ToString("F1");
+        }
+        ApplyEntryInterval();
+    }
+
+    private void ApplyEntryInterval()
     {
         if (_refreshingEntry) return;
         if (WaveList.SelectedIndex < 0) return;
         var wave = _mapData.Waves[WaveList.SelectedIndex];
         if (EntryList.SelectedIndex >= 0 && EntryList.SelectedIndex < wave.Entries.Count)
         {
-            wave.Entries[EntryList.SelectedIndex] = wave.Entries[EntryList.SelectedIndex] with { SpawnInterval = (float)e.NewValue };
-            RefreshEntryList();
-            RefreshWaveList();
+            if (float.TryParse(EntryIntervalInput.Text, out float val))
+            {
+                val = Math.Clamp(val, 0.2f, 10f);
+                EntryIntervalInput.Text = val.ToString("F1");
+                wave.Entries[EntryList.SelectedIndex] = wave.Entries[EntryList.SelectedIndex] with { SpawnInterval = val };
+                RefreshEntryList();
+                RefreshWaveList();
+            }
         }
     }
 
@@ -793,12 +863,43 @@ public partial class MapEditorView : UserControl
 
     // ==================== Grid Size ====================
 
-    private void OnGridSizeChanged(object? sender, NumericUpDownValueChangedEventArgs e)
+    private void OnGridKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+            ApplyGridSize();
+    }
+
+    private void OnGridColsUp(object? sender, RoutedEventArgs e) => AdjustGridSize(GridColsInput, +1);
+    private void OnGridColsDown(object? sender, RoutedEventArgs e) => AdjustGridSize(GridColsInput, -1);
+    private void OnGridRowsUp(object? sender, RoutedEventArgs e) => AdjustGridSize(GridRowsInput, +1);
+    private void OnGridRowsDown(object? sender, RoutedEventArgs e) => AdjustGridSize(GridRowsInput, -1);
+
+    private void AdjustGridSize(TextBox input, int delta)
     {
         if (!_sceneReady) return;
+        if (int.TryParse(input.Text, out int val))
+        {
+            val = Math.Clamp(val + delta, 5, 50);
+            input.Text = val.ToString();
+        }
+        ApplyGridSize();
+    }
 
-        _mapData.GridCols = (int)GridColsInput.Value;
-        _mapData.GridRows = (int)GridRowsInput.Value;
+    private void ApplyGridSize()
+    {
+        if (!int.TryParse(GridColsInput.Text, out int cols) || cols < 5) cols = 5;
+        if (cols > 50) cols = 50;
+        if (!int.TryParse(GridRowsInput.Text, out int rows) || rows < 5) rows = 5;
+        if (rows > 50) rows = 50;
+
+        // Clamp text back to valid values
+        GridColsInput.Text = cols.ToString();
+        GridRowsInput.Text = rows.ToString();
+
+        if (cols == _mapData.GridCols && rows == _mapData.GridRows) return;
+
+        _mapData.GridCols = cols;
+        _mapData.GridRows = rows;
 
         // Remove waypoints that are now out of bounds
         _mapData.PathWaypoints.RemoveAll(w => w.Col >= _mapData.GridCols || w.Row >= _mapData.GridRows);
