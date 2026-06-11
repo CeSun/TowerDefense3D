@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:a="https://github.com/CeSun/Aura3D"
+             xmlns:loc="clr-namespace:TowerDefense"
              x:Class="TowerDefense.MonsterEditorView">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -20,16 +21,15 @@
                 FontSize="12" FontWeight="Bold"
                 Padding="10,6" CornerRadius="4"
                 Margin="12" VerticalAlignment="Top" HorizontalAlignment="Left"
-                ZIndex="10">
-            ↩ Back
-        </Button>
+                ZIndex="10"
+                Content="{loc:Loc Game.Back}" />
 
         <!-- Editor Sidebar -->
         <ScrollViewer Grid.Column="1" Background="#EE1a1a2e">
             <StackPanel Spacing="8" Margin="8">
 
                 <!-- Monster List -->
-                <TextBlock Text="CUSTOM MONSTERS" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc MonsterEditor.Title}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <ComboBox x:Name="MonsterListCombo"
                               Width="170"
@@ -38,20 +38,18 @@
                               SelectionChanged="OnMonsterSelected" />
                     <Button x:Name="NewBtn" Click="OnNewMonster"
                             Background="#CC4a6a8a" Foreground="White" FontSize="11"
-                            Padding="6,4" CornerRadius="4">
-                        ＋ New
-                    </Button>
+                            Padding="6,4" CornerRadius="4"
+                            Content="{loc:Loc MonsterEditor.New}" />
                 </StackPanel>
                 <Button x:Name="DeleteBtn" Click="OnDeleteMonster"
                         Background="#CC6a3a3a" Foreground="White" FontSize="11"
-                        Padding="8,4" CornerRadius="4">
-                    🗑 Delete
-                </Button>
+                        Padding="8,4" CornerRadius="4"
+                        Content="{loc:Loc MonsterEditor.Delete}" />
 
                 <Separator Background="#444" Height="1" />
 
                 <!-- Name -->
-                <TextBlock Text="NAME" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc MonsterEditor.Name}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <TextBox x:Name="NameInput" Text="New Enemy"
                          KeyDown="OnPropertyKeyDown"
                          Background="#333" Foreground="White" FontSize="13"
@@ -61,7 +59,7 @@
                 <Separator Background="#444" Height="1" />
 
                 <!-- HP -->
-                <TextBlock Text="MAX HP" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc MonsterEditor.MaxHP}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="HPSlider" Minimum="10" Maximum="1000" Value="100"
                             Width="180" PropertyChanged="OnSliderChanged" />
@@ -73,7 +71,7 @@
                 </StackPanel>
 
                 <!-- Speed -->
-                <TextBlock Text="SPEED" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc MonsterEditor.Speed}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="SpeedSlider" Minimum="0.5" Maximum="10" Value="1.8"
                             Width="180"
@@ -87,7 +85,7 @@
                 </StackPanel>
 
                 <!-- Gold Reward -->
-                <TextBlock Text="GOLD REWARD" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc MonsterEditor.GoldReward}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="GoldSlider" Minimum="1" Maximum="500" Value="10"
                             Width="180"
@@ -100,7 +98,7 @@
                 </StackPanel>
 
                 <!-- Radius -->
-                <TextBlock Text="SIZE (RADIUS)" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc MonsterEditor.SizeRadius}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="RadiusSlider" Minimum="0.1" Maximum="1.0" Value="0.25"
                             Width="180"
@@ -116,7 +114,7 @@
                 <Separator Background="#444" Height="1" />
 
                 <!-- Color -->
-                <TextBlock Text="COLOR" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc MonsterEditor.Color}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
 
                 <!-- Color preview square -->
                 <Border x:Name="ColorPreview" Width="80" Height="40"
@@ -167,7 +165,7 @@
                 </StackPanel>
 
                 <!-- Preset colors -->
-                <TextBlock Text="PRESETS" Foreground="#888" FontSize="10" />
+                <TextBlock Text="{loc:Loc MonsterEditor.Presets}" Foreground="#888" FontSize="10" />
                 <WrapPanel>
                     <Button Click="OnPresetColorClick" Tag="#DC143C"
                             Width="28" Height="28" CornerRadius="4" Margin="2"
@@ -224,9 +222,8 @@
                 <!-- Save -->
                 <Button x:Name="SaveBtn" Click="OnSaveMonster"
                         Background="#CC2d6a4a" Foreground="White" FontSize="13" FontWeight="Bold"
-                        Padding="8,10" CornerRadius="6">
-                    💾 Save Monster
-                </Button>
+                        Padding="8,10" CornerRadius="6"
+                        Content="{loc:Loc MonsterEditor.Save}" />
 
                 <TextBlock x:Name="StatusLabel" Text=""
                            Foreground="#AAA" FontSize="11"

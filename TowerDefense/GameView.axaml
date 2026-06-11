@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:a="https://github.com/CeSun/Aura3D"
+             xmlns:loc="clr-namespace:TowerDefense"
              x:Class="TowerDefense.GameView">
     <Grid>
         <!-- 3D View fills entire area as background -->
@@ -33,14 +34,13 @@
                     <Button x:Name="LevelSelectBackBtn" Click="OnMainMenuClick"
                             Background="#CC4a6a8a" Foreground="White"
                             FontSize="12" FontWeight="Bold"
-                            Padding="10,6" CornerRadius="4">
-                        ↩ Back
-                    </Button>
-                    <TextBlock Text="SELECT LEVEL" Foreground="White"
+                            Padding="10,6" CornerRadius="4"
+                            Content="{loc:Loc Game.Back}" />
+                    <TextBlock Text="{loc:Loc Game.SelectLevel}" Foreground="White"
                                FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
                     <TextBlock x:Name="LevelSelectStatus" Foreground="#AAA" FontSize="13"
                                VerticalAlignment="Center"
-                               Text="Choose a level to begin" />
+                               Text="{loc:Loc Game.ChooseLevel}" />
                 </StackPanel>
             </Border>
 
@@ -72,9 +72,8 @@
                             FontSize="16" FontWeight="Bold"
                             Padding="20,12" CornerRadius="8"
                             HorizontalAlignment="Stretch"
-                            IsVisible="False">
-                        ▶ Start Game
-                    </Button>
+                            IsVisible="False"
+                            Content="{loc:Loc Game.StartGame}" />
                 </StackPanel>
             </Border>
         </Grid>
@@ -98,9 +97,8 @@
                 <Button x:Name="GameBackBtn" Click="OnUnifiedBack"
                         Background="#CC4a6a8a" Foreground="White"
                         FontSize="12" FontWeight="Bold"
-                        Padding="10,6" CornerRadius="4">
-                    ↩ Back
-                </Button>
+                        Padding="10,6" CornerRadius="4"
+                        Content="{loc:Loc Game.Back}" />
                 <Border Background="#CC1a1a2e" CornerRadius="6" Padding="10,5">
                     <TextBlock x:Name="GoldText" Text="Gold: 200"
                                Foreground="#FFD700" FontSize="16" FontWeight="Bold" />
@@ -125,7 +123,7 @@
                         Margin="0,0,4,0" Spacing="8">
 
                 <StackPanel x:Name="TowerBtnPanel" IsVisible="False" Spacing="8">
-                    <TextBlock Text="TOWERS" Foreground="#AAA" FontSize="11" FontWeight="Bold"
+                    <TextBlock Text="{loc:Loc Game.Towers}" Foreground="#AAA" FontSize="11" FontWeight="Bold"
                                HorizontalAlignment="Center" />
                     <!-- Tower buttons are generated dynamically from TowerDefinition.All -->
                 </StackPanel>
@@ -133,9 +131,8 @@
                 <Button x:Name="ResetBtn" Click="OnReset"
                         Background="#CC6a4a4a" Foreground="White"
                         FontSize="13" FontWeight="Bold"
-                        Padding="14,8" CornerRadius="6" Width="180">
-                    🔄 Restart
-                </Button>
+                        Padding="14,8" CornerRadius="6" Width="180"
+                        Content="{loc:Loc Game.Restart}" />
             </StackPanel>
         </Grid>
 
@@ -149,9 +146,8 @@
                     Background="#CC4a6a8a" Foreground="White"
                     FontSize="12" FontWeight="Bold"
                     Padding="10,6" CornerRadius="4"
-                    Margin="12" VerticalAlignment="Top" HorizontalAlignment="Left">
-                ↩ Back
-            </Button>
+                    Margin="12" VerticalAlignment="Top" HorizontalAlignment="Left"
+                    Content="{loc:Loc Game.Back}" />
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
                 <TextBlock x:Name="GameOverTitle" FontSize="48" FontWeight="Bold"
                            HorizontalAlignment="Center" />
@@ -162,22 +158,19 @@
                     <Button x:Name="GameOverReplayBtn" Click="OnReset"
                             Background="#CC2d5a27" Foreground="White"
                             FontSize="15" FontWeight="Bold"
-                            Padding="20,10" CornerRadius="6">
-                        🔄 Retry
-                    </Button>
+                            Padding="20,10" CornerRadius="6"
+                            Content="{loc:Loc Game.Retry}" />
                     <Button x:Name="GameOverMenuBtn" Click="OnBackToLevelSelect"
                             Background="#CC4a6a8a" Foreground="White"
                             FontSize="15" FontWeight="Bold"
-                            Padding="20,10" CornerRadius="6">
-                        📋 Level Select
-                    </Button>
+                            Padding="20,10" CornerRadius="6"
+                            Content="{loc:Loc Game.LevelSelect}" />
                     <Button x:Name="GameOverNextBtn" Click="OnNextLevelClick"
                             Background="#CC3a7a3a" Foreground="White"
                             FontSize="15" FontWeight="Bold"
                             Padding="20,10" CornerRadius="6"
-                            IsVisible="False">
-                        ⏭ Next Level
-                    </Button>
+                            IsVisible="False"
+                            Content="{loc:Loc Game.NextLevel}" />
                 </StackPanel>
             </StackPanel>
         </Panel>

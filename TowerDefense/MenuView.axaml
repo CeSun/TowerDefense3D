@@ -1,14 +1,15 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:TowerDefense"
              x:Class="TowerDefense.MenuView">
     <Grid Background="#FF1a1a2e">
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="24">
             <!-- Title -->
-            <TextBlock Text="🏰 Tower Defense 3D"
+            <TextBlock Text="{loc:Loc Menu.Title}"
                        FontSize="48" FontWeight="Bold"
                        Foreground="#FFD700"
                        HorizontalAlignment="Center" />
-            <TextBlock Text="Aura3D"
+            <TextBlock Text="{loc:Loc Menu.Subtitle}"
                        FontSize="16"
                        Foreground="#888"
                        HorizontalAlignment="Center"
@@ -23,9 +24,8 @@
                     Padding="40,18" CornerRadius="12" Width="320"
                     HorizontalAlignment="Center"
                     HorizontalContentAlignment="Center"
-                    Cursor="Hand">
-                ▶  Play Game
-            </Button>
+                    Cursor="Hand"
+                    Content="{loc:Loc Menu.PlayGame}" />
 
             <!-- Map Editor Button -->
             <Button x:Name="EditorBtn" Click="OnOpenEditorClick"
@@ -34,9 +34,8 @@
                     Padding="40,18" CornerRadius="12" Width="320"
                     HorizontalAlignment="Center"
                     HorizontalContentAlignment="Center"
-                    Cursor="Hand">
-                🗺  Map Editor
-            </Button>
+                    Cursor="Hand"
+                    Content="{loc:Loc Menu.MapEditor}" />
 
             <!-- Monster Editor Button -->
             <Button x:Name="MonsterEditorBtn" Click="OnOpenMonsterEditorClick"
@@ -45,9 +44,8 @@
                     Padding="40,18" CornerRadius="12" Width="320"
                     HorizontalAlignment="Center"
                     HorizontalContentAlignment="Center"
-                    Cursor="Hand">
-                👾  Monster Editor
-            </Button>
+                    Cursor="Hand"
+                    Content="{loc:Loc Menu.MonsterEditor}" />
 
             <!-- Tower Editor Button -->
             <Button x:Name="TowerEditorBtn" Click="OnOpenTowerEditorClick"
@@ -56,9 +54,8 @@
                     Padding="40,18" CornerRadius="12" Width="320"
                     HorizontalAlignment="Center"
                     HorizontalContentAlignment="Center"
-                    Cursor="Hand">
-                🗼  Tower Editor
-            </Button>
+                    Cursor="Hand"
+                    Content="{loc:Loc Menu.TowerEditor}" />
 
             <!-- Map count hint -->
             <TextBlock x:Name="MapCountLabel" Text=""
@@ -74,9 +71,25 @@
                     Padding="16,10" CornerRadius="8" Width="320"
                     HorizontalAlignment="Center"
                     HorizontalContentAlignment="Center"
-                    Cursor="Hand">
-                🔄  Reset
-            </Button>
+                    Cursor="Hand"
+                    Content="{loc:Loc Menu.Reset}" />
+
+            <!-- Language Switcher -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12"
+                        Margin="0,8,0,0">
+                <Button x:Name="LangEnBtn" Click="OnSwitchToEnglish"
+                        Background="#CC3a5a8a" Foreground="White"
+                        FontSize="12" FontWeight="Bold"
+                        Padding="12,6" CornerRadius="6"
+                        Cursor="Hand"
+                        Content="{loc:Loc Menu.LanguageEn}" />
+                <Button x:Name="LangZhBtn" Click="OnSwitchToChinese"
+                        Background="#CC5a3a3a" Foreground="White"
+                        FontSize="12" FontWeight="Bold"
+                        Padding="12,6" CornerRadius="6"
+                        Cursor="Hand"
+                        Content="{loc:Loc Menu.LanguageZh}" />
+            </StackPanel>
         </StackPanel>
     </Grid>
 </UserControl>

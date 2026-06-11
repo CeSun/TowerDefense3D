@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:a="https://github.com/CeSun/Aura3D"
+             xmlns:loc="clr-namespace:TowerDefense"
              x:Class="TowerDefense.MapEditorView">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -21,9 +22,8 @@
                 FontSize="12" FontWeight="Bold"
                 Padding="10,6" CornerRadius="4"
                 Margin="12" VerticalAlignment="Top" HorizontalAlignment="Left"
-                ZIndex="10">
-            ↩ Back
-        </Button>
+                ZIndex="10"
+                Content="{loc:Loc Game.Back}" />
 
         <!-- Editor Sidebar -->
         <ScrollViewer Grid.Column="1" Background="#EE1a1a2e">
@@ -31,17 +31,16 @@
                 <!-- Save -->
                 <Button x:Name="SaveBtn" Click="OnSaveMap"
                         Background="#CC2d6a4a" Foreground="White" FontSize="11"
-                        Padding="8,4" CornerRadius="4">
-                    💾 Save
-                </Button>
+                        Padding="8,4" CornerRadius="4"
+                        Content="{loc:Loc MapEditor.Save}" />
 
                 <Separator Background="#444" Height="1" />
 
                 <!-- Grid Settings -->
-                <TextBlock Text="GRID" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc MapEditor.Grid}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <StackPanel Spacing="2">
-                        <TextBlock Text="Cols" Foreground="#AAA" FontSize="10" />
+                        <TextBlock Text="{loc:Loc MapEditor.Cols}" Foreground="#AAA" FontSize="10" />
                         <StackPanel Orientation="Horizontal" Spacing="2">
                             <TextBox x:Name="GridColsInput" Text="20"
                                      KeyDown="OnGridKeyDown" Width="44"
@@ -59,7 +58,7 @@
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Spacing="2">
-                        <TextBlock Text="Rows" Foreground="#AAA" FontSize="10" />
+                        <TextBlock Text="{loc:Loc MapEditor.Rows}" Foreground="#AAA" FontSize="10" />
                         <StackPanel Orientation="Horizontal" Spacing="2">
                             <TextBox x:Name="GridRowsInput" Text="12"
                                      KeyDown="OnGridKeyDown" Width="44"
@@ -78,24 +77,27 @@
                     </StackPanel>
                 </StackPanel>
                 <TextBlock x:Name="GridStatusText" Foreground="#888" FontSize="10"
-                           Text="Left click: add waypoint | Right click: delete" />
+                           Text="{loc:Loc MapEditor.GridHint}" />
 
                 <Separator Background="#444" Height="1" />
 
                 <!-- Waypoints -->
-                <TextBlock Text="WAYPOINTS" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc MapEditor.Waypoints}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="3">
                     <Button x:Name="SetStartBtn" Click="OnSetStartMode"
                             Background="#CC2d6a2d" Foreground="White" FontSize="10"
-                            Padding="6,3" CornerRadius="4">🟢 Start</Button>
+                            Padding="6,3" CornerRadius="4"
+                            Content="{loc:Loc MapEditor.Start}" />
                     <Button x:Name="AddWaypointBtn" Click="OnSetWaypointMode"
                             Background="#CC4a6a8a" Foreground="White" FontSize="10"
-                            Padding="6,3" CornerRadius="4">📍 Waypoint</Button>
+                            Padding="6,3" CornerRadius="4"
+                            Content="{loc:Loc MapEditor.Waypoint}" />
                     <Button x:Name="SetEndBtn" Click="OnSetEndMode"
                             Background="#CC4a4a2a" Foreground="White" FontSize="10"
-                            Padding="6,3" CornerRadius="4">🔴 End</Button>
+                            Padding="6,3" CornerRadius="4"
+                            Content="{loc:Loc MapEditor.End}" />
                 </StackPanel>
-                <TextBlock Text="🖱 Left click: place | Right click: remove"
+                <TextBlock Text="{loc:Loc MapEditor.ClickHint}"
                            Foreground="#AAA" FontSize="10" Margin="0,2,0,0" />
 
                 <Separator Background="#444" Height="1" />

@@ -285,19 +285,19 @@ public partial class MapEditorView : UserControl
     {
         _placementMode = PlacementMode.Start;
         UpdatePlacementModeButtons();
-        GridStatusText.Text = "Mode: START — Click a cell to set it as the path entry point";
+        GridStatusText.Text = Loc.Get("MapEditor.ModeStart");
     }
     private void OnSetWaypointMode(object? sender, RoutedEventArgs e)
     {
         _placementMode = PlacementMode.Waypoint;
         UpdatePlacementModeButtons();
-        GridStatusText.Text = "Mode: WAYPOINT — Click a cell to add a waypoint along the path";
+        GridStatusText.Text = Loc.Get("MapEditor.ModeWaypoint");
     }
     private void OnSetEndMode(object? sender, RoutedEventArgs e)
     {
         _placementMode = PlacementMode.End;
         UpdatePlacementModeButtons();
-        GridStatusText.Text = "Mode: END — Click a cell to set it as the path exit point";
+        GridStatusText.Text = Loc.Get("MapEditor.ModeEnd");
     }
 
     private void UpdatePlacementModeButtons()
@@ -338,7 +338,7 @@ public partial class MapEditorView : UserControl
         {
             if (int.TryParse(nodeName.Replace("Waypoint_", ""), out int index)
                 && index < _mapData.PathWaypoints.Count)
-                GridStatusText.Text = $"Selected waypoint {index} @ ({_mapData.PathWaypoints[index].Col}, {_mapData.PathWaypoints[index].Row})";
+                GridStatusText.Text = Loc.Get("MapEditor.SelectedWaypoint", index, _mapData.PathWaypoints[index].Col, _mapData.PathWaypoints[index].Row);
             return;
         }
         if (nodeName == "EntryMarker") { var s = _mapData.StartCell; GridStatusText.Text = s != null ? $"START @ ({s.Col}, {s.Row})" : "No start set."; return; }
@@ -354,20 +354,20 @@ public partial class MapEditorView : UserControl
             case PlacementMode.Start:
                 _mapData.StartCell = new WaypointCell(col, row);
                 RebuildMapScene();
-                GridStatusText.Text = $"Set START @ ({col}, {row})";
+                GridStatusText.Text = Loc.Get("MapEditor.SetStart", col, row);
                 break;
             case PlacementMode.End:
                 _mapData.EndCell = new WaypointCell(col, row);
                 RebuildMapScene();
-                GridStatusText.Text = $"Set END @ ({col}, {row})";
+                GridStatusText.Text = Loc.Get("MapEditor.SetEnd", col, row);
                 break;
             default:
                 if (IsStartCell(col, row) || IsEndCell(col, row))
-                { GridStatusText.Text = $"Cell ({col}, {row}) is start/end. Switch mode to change it."; return; }
-                if (FindWaypointAt(col, row) >= 0) { GridStatusText.Text = $"Selected waypoint @ ({col}, {row})"; return; }
+                { GridStatusText.Text = Loc.Get("MapEditor.CannotChangeStartEnd", col, row); return; }
+                if (FindWaypointAt(col, row) >= 0) { GridStatusText.Text = Loc.Get("MapEditor.SelectedWaypointAt", col, row); return; }
                 _mapData.PathWaypoints.Add(new WaypointCell(col, row));
                 RebuildMapScene();
-                GridStatusText.Text = $"Added waypoint @ ({col}, {row}). Right click to remove.";
+                GridStatusText.Text = Loc.Get("MapEditor.AddedWaypoint", col, row);
                 break;
         }
     }
@@ -380,10 +380,10 @@ public partial class MapEditorView : UserControl
         if (grid == null) return;
         var (col, row) = grid.Value;
 
-        if (IsStartCell(col, row)) { _mapData.StartCell = null; RebuildMapScene(); GridStatusText.Text = $"Removed START @ ({col}, {row})"; return; }
-        if (IsEndCell(col, row)) { _mapData.EndCell = null; RebuildMapScene(); GridStatusText.Text = $"Removed END @ ({col}, {row})"; return; }
+        if (IsStartCell(col, row)) { _mapData.StartCell = null; RebuildMapScene(); GridStatusText.Text = Loc.Get("MapEditor.RemovedStart", col, row); return; }
+        if (IsEndCell(col, row)) { _mapData.EndCell = null; RebuildMapScene(); GridStatusText.Text = Loc.Get("MapEditor.RemovedEnd", col, row); return; }
         int index = FindWaypointAt(col, row);
-        if (index >= 0) { _mapData.PathWaypoints.RemoveAt(index); RebuildMapScene(); GridStatusText.Text = $"Removed waypoint @ ({col}, {row})"; }
+        if (index >= 0) { _mapData.PathWaypoints.RemoveAt(index); RebuildMapScene(); GridStatusText.Text = Loc.Get("MapEditor.RemovedWaypoint", col, row); }
     }
 
     // ==================== Path Calculation ====================
@@ -612,14 +612,14 @@ public partial class MapEditorView : UserControl
     private void OnSaveMap(object? sender, RoutedEventArgs e)
     {
         var error = ValidateMap();
-        if (error != null) { GridStatusText.Text = $"Cannot save: {error}"; return; }
+        if (error != null) { GridStatusText.Text = Loc.Get("MapEditor.CannotSave", error); return; }
         if (_currentFilePath == null)
         {
-            GridStatusText.Text = "Cannot save: no file path.";
+            GridStatusText.Text = Loc.Get("MapEditor.NoFilePath");
             return;
         }
         _mapData.SaveToFile(_currentFilePath);
-        GridStatusText.Text = $"Saved: {_currentFilePath}";
+        GridStatusText.Text = Loc.Get("MapEditor.Saved", _currentFilePath);
     }
 
     // ==================== Test Map ====================
@@ -627,7 +627,7 @@ public partial class MapEditorView : UserControl
     private void OnTestMap(object? sender, RoutedEventArgs e)
     {
         var error = ValidateMap();
-        if (error != null) { GridStatusText.Text = $"Cannot test: {error}"; return; }
+        if (error != null) { GridStatusText.Text = Loc.Get("MapEditor.CannotTest", error); return; }
         OnPlayMap?.Invoke(_mapData);
     }
 

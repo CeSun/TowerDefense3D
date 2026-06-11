@@ -24,8 +24,8 @@ public partial class MenuView : UserControl
     public int MapCount
     {
         set => MapCountLabel.Text = value > 0
-            ? $"{value} map{(value > 1 ? "s" : "")} available"
-            : "No maps found — create one in the Editor first";
+            ? string.Format(Loc.Get("Menu.MapCount"), value)
+            : Loc.Get("Menu.NoMaps");
     }
 
     public MenuView()
@@ -56,5 +56,15 @@ public partial class MenuView : UserControl
     private void OnResetDataClick(object? sender, RoutedEventArgs e)
     {
         OnResetData?.Invoke();
+    }
+
+    private void OnSwitchToEnglish(object? sender, RoutedEventArgs e)
+    {
+        Loc.Switch("en");
+    }
+
+    private void OnSwitchToChinese(object? sender, RoutedEventArgs e)
+    {
+        Loc.Switch("zh-CN");
     }
 }

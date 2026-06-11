@@ -159,7 +159,7 @@ public partial class GameView : UserControl
 
         // Reset selection
         _selectedLevelNum = 0;
-        DetailLevelNum.Text = "Select a Level";
+        DetailLevelNum.Text = Loc.Get("Game.SelectALevel");
         DetailWaves.Text = "";
         DetailEnemies.Text = "";
         DetailPath.Text = "";
@@ -207,8 +207,8 @@ public partial class GameView : UserControl
         var filePath = Path.Combine(_mapsDir, num + ".json");
         if (!File.Exists(filePath))
         {
-            DetailLevelNum.Text = $"Level {num}";
-            DetailWaves.Text = "File not found";
+            DetailLevelNum.Text = Loc.Get("Game.Level", num);
+            DetailWaves.Text = Loc.Get("Game.FileNotFound");
             DetailStatus.Text = "";
             LevelStartBtn.IsVisible = false;
             return;
@@ -217,23 +217,23 @@ public partial class GameView : UserControl
         var map = MapData.LoadFromFile(filePath);
         if (map == null)
         {
-            DetailLevelNum.Text = $"Level {num}";
-            DetailWaves.Text = "Failed to load";
+            DetailLevelNum.Text = Loc.Get("Game.Level", num);
+            DetailWaves.Text = Loc.Get("Game.FailedToLoad");
             LevelStartBtn.IsVisible = false;
             return;
         }
 
-        DetailLevelNum.Text = $"Level {num}";
-        DetailWaves.Text = $"Waves: {map.Waves.Count}";
+        DetailLevelNum.Text = Loc.Get("Game.Level", num);
+        DetailWaves.Text = Loc.Get("Game.Waves", map.Waves.Count);
         int totalEnemies = map.Waves.Sum(w => w.Entries.Sum(e => e.Count));
-        DetailEnemies.Text = $"Total Enemies: {totalEnemies}";
+        DetailEnemies.Text = Loc.Get("Game.TotalEnemies", totalEnemies);
         int waypointCount = (map.StartCell != null ? 1 : 0) + map.PathWaypoints.Count + (map.EndCell != null ? 1 : 0);
-        DetailPath.Text = $"Grid: {map.GridCols}×{map.GridRows} | Waypoints: {waypointCount}";
+        DetailPath.Text = Loc.Get("Game.PathInfo", map.GridCols, map.GridRows, waypointCount);
 
         bool unlocked = num <= _highestUnlockedLevel || _editorTestMode;
         if (!unlocked)
         {
-            DetailStatus.Text = $"🔒 Locked — beat Level {_highestUnlockedLevel} first";
+            DetailStatus.Text = Loc.Get("Game.Locked", _highestUnlockedLevel);
             LevelStartBtn.IsVisible = false;
         }
         else if (_editorTestMode && num > _highestUnlockedLevel)
@@ -268,7 +268,7 @@ public partial class GameView : UserControl
         ClearAllGameNodes();
         _gm.Reset();
         ClearPlacement();
-        LevelSelectStatus.Text = "Choose a level to begin";
+        LevelSelectStatus.Text = Loc.Get("Game.ChooseLevel");
     }
 
     /// <summary>
@@ -295,7 +295,7 @@ public partial class GameView : UserControl
         TowerBtnPanel.IsVisible = true;
         BuildTowerButtons();
         ClearPlacement();
-        StatusText.Text = "Editor Test — Select a tower and place it!";
+        StatusText.Text = Loc.Get("Game.EditorTestPlace");
     }
 
     private void OnLevelStartClick(object? sender, RoutedEventArgs e)
@@ -328,7 +328,7 @@ public partial class GameView : UserControl
         TowerBtnPanel.IsVisible = true;
         BuildTowerButtons();
         ClearPlacement();
-        StatusText.Text = $"Level {_selectedLevelNum} — Select a tower and place it!";
+        StatusText.Text = Loc.Get("Game.LevelPlace", _selectedLevelNum);
     }
 
     private void OnBackToLevelSelect(object? sender, RoutedEventArgs e)
@@ -362,7 +362,7 @@ public partial class GameView : UserControl
 
         // Refresh grid (may have new unlocks)
         BuildLevelGrid();
-        LevelSelectStatus.Text = "Choose a level to begin";
+        LevelSelectStatus.Text = Loc.Get("Game.ChooseLevel");
     }
 
     // ==================== Map Loading ====================
@@ -735,12 +735,12 @@ public partial class GameView : UserControl
     {
         Dispatcher.UIThread.Post(() =>
         {
-            GoldText.Text = $"Gold: {_gm.Gold}";
-            LivesText.Text = $"Lives: {_gm.Lives}";
+            GoldText.Text = Loc.Get("Game.Gold", _gm.Gold);
+            LivesText.Text = Loc.Get("Game.Lives", _gm.Lives);
             WaveText.Text = _gm.HasStarted
-                ? $"Wave: {_gm.CurrentWave}/{_gm.TotalWaves}"
-                : "Wave: -";
-            StatusText.Text = $"Enemies: {_gm.Enemies.Count} | Towers: {_gm.Towers.Count}";
+                ? Loc.Get("Game.Wave", _gm.CurrentWave, _gm.TotalWaves)
+                : Loc.Get("Game.WaveDash");
+            StatusText.Text = Loc.Get("Game.EnemiesTowers", _gm.Enemies.Count, _gm.Towers.Count);
 
             if (_gm.IsGameOver && !_gameOverShown)
             {
@@ -844,7 +844,7 @@ public partial class GameView : UserControl
 
         if (grid == null)
         {
-            StatusText.Text = $"{dbg} — out of map bounds";
+            StatusText.Text = Loc.Get("Game.OutOfBounds", dbg);
             return;
         }
 
@@ -852,21 +852,21 @@ public partial class GameView : UserControl
 
         if (_gm.TryPlaceTower(col, row, _selectedTowerName))
         {
-            StatusText.Text = $"Placed {_selectedTowerName} at ({col},{row}) | Gold: {_gm.Gold}";
+            StatusText.Text = Loc.Get("Game.PlacedTower", _selectedTowerName, col, row, _gm.Gold);
             ClearPlacement();
         }
         else if (_gm.PathCells[col, row])
         {
-            StatusText.Text = $"{dbg} → Cell ({col},{row}) is on path!";
+            StatusText.Text = Loc.Get("Game.OnPath", dbg, col, row);
         }
         else if (_gm.OccupiedCells[col, row])
         {
-            StatusText.Text = $"{dbg} → Cell ({col},{row}) occupied!";
+            StatusText.Text = Loc.Get("Game.Occupied", dbg, col, row);
         }
         else
         {
             var def = TowerDefinition.Resolve(_selectedTowerName);
-            StatusText.Text = $"Not enough gold! Need {def.Cost}";
+            StatusText.Text = Loc.Get("Game.NotEnoughGold", def.Cost);
             ClearPlacement();
         }
     }
@@ -937,7 +937,7 @@ public partial class GameView : UserControl
             : def.SlowAmount > 0 ? "Slows enemies"
             : def.SplashRadius > 0 ? "Splash damage"
             : "Basic tower";
-        StatusText.Text = $"Selected: {name} ({def.Cost}g) — {desc}";
+        StatusText.Text = Loc.Get("Game.SelectedTower", name, def.Cost, desc);
     }
 
     private void ClearPlacement()
@@ -1059,7 +1059,7 @@ public partial class GameView : UserControl
         TowerBtnPanel.IsVisible = true;
         BuildTowerButtons();
         ClearPlacement();
-        StatusText.Text = $"Level {_selectedLevelNum} — Select a tower and place it!";
+        StatusText.Text = Loc.Get("Game.LevelPlace", _selectedLevelNum);
     }
 
     private void ClearAllGameNodes()
@@ -1109,15 +1109,15 @@ public partial class GameView : UserControl
 
             if (_gm.IsVictory)
             {
-                GameOverTitle.Text = "🏆 VICTORY!";
+                GameOverTitle.Text = Loc.Get("Game.VictoryTitle");
                 GameOverTitle.Foreground = Avalonia.Media.Brushes.Gold;
-                GameOverSubtext.Text = $"Editor test passed! Final gold: {_gm.Gold}";
+                GameOverSubtext.Text = Loc.Get("Game.EditorTestPassed", _gm.Gold);
             }
             else
             {
-                GameOverTitle.Text = "💀 DEFEATED";
+                GameOverTitle.Text = Loc.Get("Game.DefeatTitle");
                 GameOverTitle.Foreground = Avalonia.Media.Brushes.Red;
-                GameOverSubtext.Text = $"The enemy broke through! Reached wave {_gm.CurrentWave}/{_gm.TotalWaves}";
+                GameOverSubtext.Text = Loc.Get("Game.DefeatSubtext", _gm.CurrentWave, _gm.TotalWaves);
             }
             return;
         }
@@ -1126,9 +1126,9 @@ public partial class GameView : UserControl
 
         if (_gm.IsVictory)
         {
-            GameOverTitle.Text = "🏆 VICTORY!";
+            GameOverTitle.Text = Loc.Get("Game.VictoryTitle");
             GameOverTitle.Foreground = Avalonia.Media.Brushes.Gold;
-            GameOverSubtext.Text = $"All waves defeated! Final gold: {_gm.Gold}";
+            GameOverSubtext.Text = Loc.Get("Game.VictorySubtext", _gm.Gold);
 
             // Unlock next level
             if (_selectedLevelNum >= _highestUnlockedLevel)
@@ -1145,9 +1145,9 @@ public partial class GameView : UserControl
         }
         else
         {
-            GameOverTitle.Text = "💀 DEFEATED";
+            GameOverTitle.Text = Loc.Get("Game.DefeatTitle");
             GameOverTitle.Foreground = Avalonia.Media.Brushes.Red;
-            GameOverSubtext.Text = $"The enemy broke through! Reached wave {_gm.CurrentWave}/{_gm.TotalWaves}";
+            GameOverSubtext.Text = Loc.Get("Game.DefeatSubtext", _gm.CurrentWave, _gm.TotalWaves);
         }
     }
 
@@ -1177,7 +1177,7 @@ public partial class GameView : UserControl
         TowerBtnPanel.IsVisible = true;
         BuildTowerButtons();
         ClearPlacement();
-        StatusText.Text = $"Level {next} — Select a tower and place it!";
+        StatusText.Text = Loc.Get("Game.LevelPlace", next);
     }
 
     // ==================== Helpers ====================

@@ -262,10 +262,10 @@ public partial class MonsterEditorView : UserControl
     {
         var data = GatherMonsterData();
         SummaryName.Text = data.Name;
-        SummaryHP.Text = $"HP: {data.MaxHP:F0}";
-        SummarySpeed.Text = $"Speed: {data.Speed:F1}";
-        SummaryGold.Text = $"Gold: {data.GoldReward}";
-        SummaryRadius.Text = $"Size: {data.Radius:F2}";
+        SummaryHP.Text = Loc.Get("MonsterEditor.HP", $"{data.MaxHP:F0}");
+        SummarySpeed.Text = Loc.Get("MonsterEditor.SpeedSummary", $"{data.Speed:F1}");
+        SummaryGold.Text = Loc.Get("MonsterEditor.GoldSummary", data.GoldReward);
+        SummaryRadius.Text = Loc.Get("MonsterEditor.SizeSummary", $"{data.Radius:F2}");
     }
 
     // ==================== Save ====================

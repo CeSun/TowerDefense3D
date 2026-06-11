@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- ==================== 主菜单 ==================== -->
+  <data name="Menu.Title" xml:space="preserve">
+    <value>🏰 塔防 3D</value>
+  </data>
+  <data name="Menu.Subtitle" xml:space="preserve">
+    <value>Aura3D</value>
+  </data>
+  <data name="Menu.PlayGame" xml:space="preserve">
+    <value>▶  开始游戏</value>
+  </data>
+  <data name="Menu.MapEditor" xml:space="preserve">
+    <value>🗺  地图编辑器</value>
+  </data>
+  <data name="Menu.MonsterEditor" xml:space="preserve">
+    <value>👾  怪物编辑器</value>
+  </data>
+  <data name="Menu.TowerEditor" xml:space="preserve">
+    <value>🗼  防御塔编辑器</value>
+  </data>
+  <data name="Menu.Reset" xml:space="preserve">
+    <value>🔄  重置</value>
+  </data>
+  <data name="Menu.LanguageEn" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Menu.LanguageZh" xml:space="preserve">
+    <value>中文</value>
+  </data>
+  <data name="Menu.MapCount" xml:space="preserve">
+    <value>{0} 张地图可用</value>
+  </data>
+  <data name="Menu.NoMaps" xml:space="preserve">
+    <value>未找到地图 — 请先在编辑器中创建</value>
+  </data>
+
+  <!-- ==================== 游戏 ==================== -->
+  <data name="Game.Back" xml:space="preserve">
+    <value>↩ 返回</value>
+  </data>
+  <data name="Game.SelectLevel" xml:space="preserve">
+    <value>选择关卡</value>
+  </data>
+  <data name="Game.ChooseLevel" xml:space="preserve">
+    <value>选择一个关卡开始</value>
+  </data>
+  <data name="Game.StartGame" xml:space="preserve">
+    <value>▶ 开始游戏</value>
+  </data>
+  <data name="Game.Level" xml:space="preserve">
+    <value>第 {0} 关</value>
+  </data>
+  <data name="Game.SelectALevel" xml:space="preserve">
+    <value>选择一个关卡</value>
+  </data>
+  <data name="Game.Waves" xml:space="preserve">
+    <value>波次: {0}</value>
+  </data>
+  <data name="Game.TotalEnemies" xml:space="preserve">
+    <value>敌人总数: {0}</value>
+  </data>
+  <data name="Game.GridInfo" xml:space="preserve">
+    <value>网格: {0}×{1}</value>
+  </data>
+  <data name="Game.Waypoints" xml:space="preserve">
+    <value>路径点: {0}</value>
+  </data>
+  <data name="Game.PathInfo" xml:space="preserve">
+    <value>网格: {0}×{1} | 路径点: {2}</value>
+  </data>
+  <data name="Game.Locked" xml:space="preserve">
+    <value>🔒 已锁定 — 需要先通过第 {0} 关</value>
+  </data>
+  <data name="Game.FileNotFound" xml:space="preserve">
+    <value>文件未找到</value>
+  </data>
+  <data name="Game.FailedToLoad" xml:space="preserve">
+    <value>加载失败</value>
+  </data>
+  <data name="Game.Towers" xml:space="preserve">
+    <value>防御塔</value>
+  </data>
+  <data name="Game.Restart" xml:space="preserve">
+    <value>🔄 重新开始</value>
+  </data>
+  <data name="Game.Retry" xml:space="preserve">
+    <value>🔄 重试</value>
+  </data>
+  <data name="Game.LevelSelect" xml:space="preserve">
+    <value>📋 关卡选择</value>
+  </data>
+  <data name="Game.NextLevel" xml:space="preserve">
+    <value>⏭ 下一关</value>
+  </data>
+  <data name="Game.VictoryTitle" xml:space="preserve">
+    <value>🏆 胜利!</value>
+  </data>
+  <data name="Game.DefeatTitle" xml:space="preserve">
+    <value>💀 失败</value>
+  </data>
+  <data name="Game.VictorySubtext" xml:space="preserve">
+    <value>击败了所有波次! 最终金币: {0}</value>
+  </data>
+  <data name="Game.EditorTestPassed" xml:space="preserve">
+    <value>编辑器测试通过! 最终金币: {0}</value>
+  </data>
+  <data name="Game.DefeatSubtext" xml:space="preserve">
+    <value>敌人突破了防线! 到达第 {0}/{1} 波</value>
+  </data>
+  <data name="Game.Gold" xml:space="preserve">
+    <value>金币: {0}</value>
+  </data>
+  <data name="Game.Lives" xml:space="preserve">
+    <value>生命: {0}</value>
+  </data>
+  <data name="Game.Wave" xml:space="preserve">
+    <value>波次: {0}/{1}</value>
+  </data>
+  <data name="Game.WaveDash" xml:space="preserve">
+    <value>波次: -</value>
+  </data>
+  <data name="Game.PlaceTower" xml:space="preserve">
+    <value>选择一个防御塔并将其放置在绿色格子上</value>
+  </data>
+  <data name="Game.EditorTestPlace" xml:space="preserve">
+    <value>编辑器测试 — 选择一个防御塔并放置!</value>
+  </data>
+  <data name="Game.LevelPlace" xml:space="preserve">
+    <value>第 {0} 关 — 选择一个防御塔并放置!</value>
+  </data>
+  <data name="Game.EnemiesTowers" xml:space="preserve">
+    <value>敌人: {0} | 防御塔: {1}</value>
+  </data>
+  <data name="Game.SelectedTower" xml:space="preserve">
+    <value>已选择: {0} ({1}金) — {2}</value>
+  </data>
+  <data name="Game.PlacedTower" xml:space="preserve">
+    <value>在 ({1},{2}) 放置了 {0} | 金币: {3}</value>
+  </data>
+  <data name="Game.OutOfBounds" xml:space="preserve">
+    <value>{0} — 超出地图边界</value>
+  </data>
+  <data name="Game.OnPath" xml:space="preserve">
+    <value>{0} → 格子 ({1},{2}) 在路径上!</value>
+  </data>
+  <data name="Game.Occupied" xml:space="preserve">
+    <value>{0} → 格子 ({1},{2}) 已被占用!</value>
+  </data>
+  <data name="Game.NotEnoughGold" xml:space="preserve">
+    <value>金币不足! 需要 {0} 金币</value>
+  </data>
+
+  <!-- ==================== 地图列表 ==================== -->
+  <data name="MapList.Title" xml:space="preserve">
+    <value>编辑地图</value>
+  </data>
+  <data name="MapList.SelectHint" xml:space="preserve">
+    <value>选择一个地图进行编辑，或创建新地图</value>
+  </data>
+  <data name="MapList.NewMap" xml:space="preserve">
+    <value>🆕 新建地图</value>
+  </data>
+  <data name="MapList.SelectAMap" xml:space="preserve">
+    <value>选择一个地图</value>
+  </data>
+  <data name="MapList.Grid" xml:space="preserve">
+    <value>网格: {0} × {1}</value>
+  </data>
+  <data name="MapList.Waves" xml:space="preserve">
+    <value>波次: {0}</value>
+  </data>
+  <data name="MapList.Enemies" xml:space="preserve">
+    <value>敌人: {0}</value>
+  </data>
+  <data name="MapList.Path" xml:space="preserve">
+    <value>路径点: {0}</value>
+  </data>
+  <data name="MapList.GridDash" xml:space="preserve">
+    <value>网格: -</value>
+  </data>
+  <data name="MapList.WavesDash" xml:space="preserve">
+    <value>波次: -</value>
+  </data>
+  <data name="MapList.EnemiesDash" xml:space="preserve">
+    <value>敌人: -</value>
+  </data>
+  <data name="MapList.PathDash" xml:space="preserve">
+    <value>路径: -</value>
+  </data>
+  <data name="MapList.EditMap" xml:space="preserve">
+    <value>✏ 编辑地图</value>
+  </data>
+  <data name="MapList.DeleteMap" xml:space="preserve">
+    <value>🗑 删除地图</value>
+  </data>
+  <data name="MapList.CannotDeleteLast" xml:space="preserve">
+    <value>无法删除最后一个关卡。</value>
+  </data>
+  <data name="MapList.Deleted" xml:space="preserve">
+    <value>关卡已删除。</value>
+  </data>
+  <data name="MapList.WaypointCount" xml:space="preserve">
+    <value>路径点: {0}</value>
+  </data>
+
+  <!-- ==================== 地图编辑器 ==================== -->
+  <data name="MapEditor.Save" xml:space="preserve">
+    <value>💾 保存</value>
+  </data>
+  <data name="MapEditor.Grid" xml:space="preserve">
+    <value>网格</value>
+  </data>
+  <data name="MapEditor.Cols" xml:space="preserve">
+    <value>列</value>
+  </data>
+  <data name="MapEditor.Rows" xml:space="preserve">
+    <value>行</value>
+  </data>
+  <data name="MapEditor.Waypoints" xml:space="preserve">
+    <value>路径点</value>
+  </data>
+  <data name="MapEditor.Start" xml:space="preserve">
+    <value>🟢 起点</value>
+  </data>
+  <data name="MapEditor.Waypoint" xml:space="preserve">
+    <value>📍 路径点</value>
+  </data>
+  <data name="MapEditor.End" xml:space="preserve">
+    <value>🔴 终点</value>
+  </data>
+  <data name="MapEditor.ClickHint" xml:space="preserve">
+    <value>🖱 左键点击: 放置 | 右键点击: 移除</value>
+  </data>
+  <data name="MapEditor.GridHint" xml:space="preserve">
+    <value>左键点击: 添加路径点 | 右键点击: 删除</value>
+  </data>
+  <data name="MapEditor.Waves" xml:space="preserve">
+    <value>波次 ({0})</value>
+  </data>
+  <data name="MapEditor.AddWave" xml:space="preserve">
+    <value>＋ 添加波次</value>
+  </data>
+  <data name="MapEditor.WaveLabel" xml:space="preserve">
+    <value>第 {0} 波</value>
+  </data>
+  <data name="MapEditor.EnemyType" xml:space="preserve">
+    <value>类型: {0}</value>
+  </data>
+  <data name="MapEditor.EnemyCount" xml:space="preserve">
+    <value>数量: {0}</value>
+  </data>
+  <data name="MapEditor.Interval" xml:space="preserve">
+    <value>间隔: {0}秒</value>
+  </data>
+  <data name="MapEditor.RemoveWave" xml:space="preserve">
+    <value>✕ 移除波次</value>
+  </data>
+  <data name="MapEditor.AddEnemy" xml:space="preserve">
+    <value>＋ 添加敌人</value>
+  </data>
+  <data name="MapEditor.Name" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="MapEditor.Test" xml:space="preserve">
+    <value>▶ 测试</value>
+  </data>
+  <data name="MapEditor.ModeStart" xml:space="preserve">
+    <value>模式: 起点 — 点击一个格子将其设置为路径入口</value>
+  </data>
+  <data name="MapEditor.ModeWaypoint" xml:space="preserve">
+    <value>模式: 路径点 — 点击一个格子添加路径点</value>
+  </data>
+  <data name="MapEditor.ModeEnd" xml:space="preserve">
+    <value>模式: 终点 — 点击一个格子将其设置为路径出口</value>
+  </data>
+  <data name="MapEditor.SelectedWaypoint" xml:space="preserve">
+    <value>已选择路径点 {0} @ ({1}, {2})</value>
+  </data>
+  <data name="MapEditor.SetStart" xml:space="preserve">
+    <value>设置起点 @ ({0}, {1})</value>
+  </data>
+  <data name="MapEditor.SetEnd" xml:space="preserve">
+    <value>设置终点 @ ({0}, {1})</value>
+  </data>
+  <data name="MapEditor.CannotChangeStartEnd" xml:space="preserve">
+    <value>格子 ({0}, {1}) 是起点/终点。切换模式以更改。</value>
+  </data>
+  <data name="MapEditor.SelectedWaypointAt" xml:space="preserve">
+    <value>已选择路径点 @ ({0}, {1})</value>
+  </data>
+  <data name="MapEditor.AddedWaypoint" xml:space="preserve">
+    <value>添加了路径点 @ ({0}, {1})。右键点击可移除。</value>
+  </data>
+  <data name="MapEditor.RemovedStart" xml:space="preserve">
+    <value>移除了起点 @ ({0}, {1})</value>
+  </data>
+  <data name="MapEditor.RemovedEnd" xml:space="preserve">
+    <value>移除了终点 @ ({0}, {1})</value>
+  </data>
+  <data name="MapEditor.RemovedWaypoint" xml:space="preserve">
+    <value>移除了路径点 @ ({0}, {1})</value>
+  </data>
+  <data name="MapEditor.CannotSave" xml:space="preserve">
+    <value>无法保存: {0}</value>
+  </data>
+  <data name="MapEditor.NoFilePath" xml:space="preserve">
+    <value>无法保存: 没有文件路径。</value>
+  </data>
+  <data name="MapEditor.Saved" xml:space="preserve">
+    <value>已保存: {0}</value>
+  </data>
+  <data name="MapEditor.CannotTest" xml:space="preserve">
+    <value>无法测试: {0}</value>
+  </data>
+
+  <!-- ==================== 怪物编辑器 ==================== -->
+  <data name="MonsterEditor.Title" xml:space="preserve">
+    <value>自定义怪物</value>
+  </data>
+  <data name="MonsterEditor.New" xml:space="preserve">
+    <value>＋ 新建</value>
+  </data>
+  <data name="MonsterEditor.Delete" xml:space="preserve">
+    <value>🗑 删除</value>
+  </data>
+  <data name="MonsterEditor.Name" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="MonsterEditor.MaxHP" xml:space="preserve">
+    <value>最大生命值</value>
+  </data>
+  <data name="MonsterEditor.Speed" xml:space="preserve">
+    <value>速度</value>
+  </data>
+  <data name="MonsterEditor.GoldReward" xml:space="preserve">
+    <value>金币奖励</value>
+  </data>
+  <data name="MonsterEditor.SizeRadius" xml:space="preserve">
+    <value>大小 (半径)</value>
+  </data>
+  <data name="MonsterEditor.Color" xml:space="preserve">
+    <value>颜色</value>
+  </data>
+  <data name="MonsterEditor.Presets" xml:space="preserve">
+    <value>预设</value>
+  </data>
+  <data name="MonsterEditor.Save" xml:space="preserve">
+    <value>💾 保存怪物</value>
+  </data>
+  <data name="MonsterEditor.HP" xml:space="preserve">
+    <value>生命值: {0}</value>
+  </data>
+  <data name="MonsterEditor.SpeedSummary" xml:space="preserve">
+    <value>速度: {0}</value>
+  </data>
+  <data name="MonsterEditor.GoldSummary" xml:space="preserve">
+    <value>金币: {0}</value>
+  </data>
+  <data name="MonsterEditor.SizeSummary" xml:space="preserve">
+    <value>大小: {0}</value>
+  </data>
+
+  <!-- ==================== 防御塔编辑器 ==================== -->
+  <data name="TowerEditor.Shapes" xml:space="preserve">
+    <value>形状</value>
+  </data>
+  <data name="TowerEditor.AddBox" xml:space="preserve">
+    <value>📦 + 方块</value>
+  </data>
+  <data name="TowerEditor.AddCylinder" xml:space="preserve">
+    <value>🥫 + 圆柱</value>
+  </data>
+  <data name="TowerEditor.AddSphere" xml:space="preserve">
+    <value>🔵 + 球体</value>
+  </data>
+  <data name="TowerEditor.Towers" xml:space="preserve">
+    <value>防御塔</value>
+  </data>
+  <data name="TowerEditor.New" xml:space="preserve">
+    <value>＋ 新建</value>
+  </data>
+  <data name="TowerEditor.Delete" xml:space="preserve">
+    <value>🗑 删除</value>
+  </data>
+  <data name="TowerEditor.Name" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="TowerEditor.SelectedShape" xml:space="preserve">
+    <value>已选形状</value>
+  </data>
+  <data name="TowerEditor.None" xml:space="preserve">
+    <value>无</value>
+  </data>
+  <data name="TowerEditor.Save" xml:space="preserve">
+    <value>💾 保存防御塔</value>
+  </data>
+  <data name="TowerEditor.Cost" xml:space="preserve">
+    <value>费用</value>
+  </data>
+  <data name="TowerEditor.Range" xml:space="preserve">
+    <value>射程</value>
+  </data>
+  <data name="TowerEditor.Damage" xml:space="preserve">
+    <value>伤害</value>
+  </data>
+  <data name="TowerEditor.Cooldown" xml:space="preserve">
+    <value>冷却</value>
+  </data>
+  <data name="TowerEditor.ProjectileSpeed" xml:space="preserve">
+    <value>弹丸速度</value>
+  </data>
+  <data name="TowerEditor.Color" xml:space="preserve">
+    <value>颜色</value>
+  </data>
+  <data name="TowerEditor.ShapeColor" xml:space="preserve">
+    <value>形状颜色</value>
+  </data>
+  <data name="TowerEditor.ProjectileColor" xml:space="preserve">
+    <value>弹丸颜色</value>
+  </data>
+  <data name="TowerEditor.Special" xml:space="preserve">
+    <value>特殊</value>
+  </data>
+</root>

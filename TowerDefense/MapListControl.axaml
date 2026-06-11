@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:a="https://github.com/CeSun/Aura3D"
+             xmlns:loc="clr-namespace:TowerDefense"
              x:Class="TowerDefense.MapListControl">
     <Grid>
         <!-- 3D Preview fills entire screen -->
@@ -29,21 +30,19 @@
                             Background="#CC4a6a8a" Foreground="White"
                             FontSize="12" FontWeight="Bold"
                             Padding="10,6" CornerRadius="4"
-                            Margin="0,0,12,0">
-                        ↩ Back
-                    </Button>
-                    <TextBlock DockPanel.Dock="Left" Text="EDIT MAPS" Foreground="White"
+                            Margin="0,0,12,0"
+                            Content="{loc:Loc Game.Back}" />
+                    <TextBlock DockPanel.Dock="Left" Text="{loc:Loc MapList.Title}" Foreground="White"
                                FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
                     <TextBlock x:Name="MapListStatus" DockPanel.Dock="Left" Foreground="#AAA" FontSize="13"
                                VerticalAlignment="Center" Margin="16,0,0,0"
-                               Text="Select a map to edit, or create a new one" />
+                               Text="{loc:Loc MapList.SelectHint}" />
                     <Button x:Name="NewMapBtn" Click="OnNewMap"
                             Background="#CC2d6a4a" Foreground="White"
                             FontSize="12" FontWeight="Bold"
                             Padding="12,6" CornerRadius="4"
-                            HorizontalAlignment="Right">
-                        🆕 New Map
-                    </Button>
+                            HorizontalAlignment="Right"
+                            Content="{loc:Loc MapList.NewMap}" />
                 </DockPanel>
             </Border>
 
@@ -57,16 +56,16 @@
                     Background="#EE1a1a2e" CornerRadius="6"
                     Padding="14" Margin="4,4,8,8">
                 <StackPanel Spacing="8">
-                    <TextBlock x:Name="DetailMapName" Text="Select a Map"
+                    <TextBlock x:Name="DetailMapName" Text="{loc:Loc MapList.SelectAMap}"
                                Foreground="White" FontSize="22" FontWeight="Bold" />
                     <Separator Background="#444" Height="1" />
-                    <TextBlock x:Name="DetailMapGrid" Text="Grid: -"
+                    <TextBlock x:Name="DetailMapGrid" Text="{loc:Loc MapList.GridDash}"
                                Foreground="#AAA" FontSize="12" />
-                    <TextBlock x:Name="DetailMapWaves" Text="Waves: -"
+                    <TextBlock x:Name="DetailMapWaves" Text="{loc:Loc MapList.WavesDash}"
                                Foreground="#AAA" FontSize="12" />
-                    <TextBlock x:Name="DetailMapEnemies" Text="Enemies: -"
+                    <TextBlock x:Name="DetailMapEnemies" Text="{loc:Loc MapList.EnemiesDash}"
                                Foreground="#AAA" FontSize="12" />
-                    <TextBlock x:Name="DetailMapPath" Text="Path: -"
+                    <TextBlock x:Name="DetailMapPath" Text="{loc:Loc MapList.PathDash}"
                                Foreground="#AAA" FontSize="12" />
                     <TextBlock x:Name="DetailMapStatus" Text=""
                                Foreground="#888" FontSize="11"
@@ -81,17 +80,15 @@
                                 FontSize="14" FontWeight="Bold"
                                 Padding="14,10" CornerRadius="6"
                                 HorizontalAlignment="Stretch"
-                                IsVisible="False">
-                            ✏ Edit Map
-                        </Button>
+                                IsVisible="False"
+                                Content="{loc:Loc MapList.EditMap}" />
                         <Button x:Name="DeleteMapBtn" Click="OnDeleteMap"
                                 Background="#CC6a2a2a" Foreground="White"
                                 FontSize="12"
                                 Padding="10,6" CornerRadius="4"
                                 HorizontalAlignment="Stretch"
-                                IsVisible="False">
-                            🗑 Delete Map
-                        </Button>
+                                IsVisible="False"
+                                Content="{loc:Loc MapList.DeleteMap}" />
                     </StackPanel>
                 </StackPanel>
             </Border>

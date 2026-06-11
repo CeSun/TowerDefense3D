@@ -150,8 +150,8 @@ public partial class MapListControl : UserControl
         if (!File.Exists(filePath))
         {
             ClearMapDetails();
-            DetailMapName.Text = $"Level {num}";
-            DetailMapStatus.Text = "File not found";
+            DetailMapName.Text = Loc.Get("Game.Level", num);
+            DetailMapStatus.Text = Loc.Get("Game.FileNotFound");
             return;
         }
 
@@ -159,8 +159,8 @@ public partial class MapListControl : UserControl
         if (map == null)
         {
             ClearMapDetails();
-            DetailMapName.Text = $"Level {num}";
-            DetailMapStatus.Text = "Failed to load";
+            DetailMapName.Text = Loc.Get("Game.Level", num);
+            DetailMapStatus.Text = Loc.Get("Game.FailedToLoad");
             return;
         }
 
@@ -169,13 +169,13 @@ public partial class MapListControl : UserControl
         RebuildPreviewScene();
 
         // Update detail panel
-        DetailMapName.Text = $"Level {num}";
-        DetailMapGrid.Text = $"Grid: {map.GridCols} × {map.GridRows}";
-        DetailMapWaves.Text = $"Waves: {map.Waves.Count}";
+        DetailMapName.Text = Loc.Get("Game.Level", num);
+        DetailMapGrid.Text = Loc.Get("MapList.Grid", map.GridCols, map.GridRows);
+        DetailMapWaves.Text = Loc.Get("MapList.Waves", map.Waves.Count);
         int totalEnemies = map.Waves.Sum(w => w.Entries.Sum(e => e.Count));
-        DetailMapEnemies.Text = $"Enemies: {totalEnemies}";
+        DetailMapEnemies.Text = Loc.Get("MapList.Enemies", totalEnemies);
         int wpCount = (map.StartCell != null ? 1 : 0) + map.PathWaypoints.Count + (map.EndCell != null ? 1 : 0);
-        DetailMapPath.Text = $"Waypoints: {wpCount}";
+        DetailMapPath.Text = Loc.Get("MapList.WaypointCount", wpCount);
         DetailMapStatus.Text = map.IsComplete ? "✅ Complete" : "⚠ Incomplete";
 
         EditMapBtn.IsVisible = true;
@@ -203,11 +203,11 @@ public partial class MapListControl : UserControl
 
     private void ClearMapDetails()
     {
-        DetailMapName.Text = "Select a Map";
-        DetailMapGrid.Text = "Grid: -";
-        DetailMapWaves.Text = "Waves: -";
-        DetailMapEnemies.Text = "Enemies: -";
-        DetailMapPath.Text = "Path: -";
+        DetailMapName.Text = Loc.Get("MapList.SelectAMap");
+        DetailMapGrid.Text = Loc.Get("MapList.GridDash");
+        DetailMapWaves.Text = Loc.Get("MapList.WavesDash");
+        DetailMapEnemies.Text = Loc.Get("MapList.EnemiesDash");
+        DetailMapPath.Text = Loc.Get("MapList.PathDash");
         DetailMapStatus.Text = "";
         EditMapBtn.IsVisible = false;
         DeleteMapBtn.IsVisible = false;
@@ -229,7 +229,7 @@ public partial class MapListControl : UserControl
         var numbers = GetLevelNumbers();
         if (numbers.Count <= 1)
         {
-            MapListStatus.Text = "Cannot delete the last level.";
+            MapListStatus.Text = Loc.Get("MapList.CannotDeleteLast");
             return;
         }
 
@@ -239,7 +239,7 @@ public partial class MapListControl : UserControl
 
         _selectedMapNum = 0;
         BuildMapGrid();
-        MapListStatus.Text = "Level deleted.";
+        MapListStatus.Text = Loc.Get("MapList.Deleted");
     }
 
     private void OnNewMap(object? sender, RoutedEventArgs e)
