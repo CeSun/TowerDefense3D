@@ -579,6 +579,11 @@ public partial class TowerEditorView : UserControl
         view.MainCamera.RotationDegrees = new Vector3(-35, 0, 0);
         view.Scene.Background = Texture.CreateFromColor(DrawingColor.FromArgb(255, 30, 30, 50));
 
+        // CSM shadow quality
+        view.PipelineSettings.CsmShadowMapResolution = 2048;
+        view.PipelineSettings.CsmCascadeCount = 4;
+        view.PipelineSettings.CsmSplitLambda = 0.6f;
+
         _planeGeo = new PlaneGeometry();
         _boxGeo = new BoxGeometry();
         _cylinderGeo = new CylinderGeometry();

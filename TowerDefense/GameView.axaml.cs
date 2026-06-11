@@ -397,6 +397,11 @@ public partial class GameView : UserControl
         view.MainCamera.Position = new Vector3(10, 16, 20);
         view.MainCamera.RotationDegrees = new Vector3(-55, 0, 0);
         view.Scene.Background = Texture.CreateFromColor(DrawingColor.DarkSlateGray);
+
+        // CSM shadow quality: increase per-cascade resolution and cascade count
+        view.PipelineSettings.CsmShadowMapResolution = 2048;
+        view.PipelineSettings.CsmCascadeCount = 4;
+        view.PipelineSettings.CsmSplitLambda = 0.6f;
         view.PointerMoved += OnPointerMoved;
 
         // Create geometries (reusable)

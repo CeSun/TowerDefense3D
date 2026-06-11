@@ -289,6 +289,11 @@ public partial class MapListControl : UserControl
         view.MainCamera.RotationDegrees = new Vector3(-55, 0, 0);
         view.Scene.Background = Texture.CreateFromColor(DrawingColor.DarkSlateGray);
 
+        // CSM shadow quality
+        view.PipelineSettings.CsmShadowMapResolution = 2048;
+        view.PipelineSettings.CsmCascadeCount = 4;
+        view.PipelineSettings.CsmSplitLambda = 0.6f;
+
         _boxGeo = new BoxGeometry();
         _sphereGeo = new SphereGeometry();
         _planeGeo = new PlaneGeometry();

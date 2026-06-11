@@ -95,6 +95,11 @@ public partial class MapEditorView : UserControl
         view.MainCamera.RotationDegrees = new Vector3(-55, 0, 0);
         view.Scene.Background = Texture.CreateFromColor(DrawingColor.DarkSlateGray);
 
+        // CSM shadow quality
+        view.PipelineSettings.CsmShadowMapResolution = 2048;
+        view.PipelineSettings.CsmCascadeCount = 4;
+        view.PipelineSettings.CsmSplitLambda = 0.6f;
+
         view.PointerPressed += OnEditorPointerPressed;
 
         _boxGeo = new BoxGeometry();
