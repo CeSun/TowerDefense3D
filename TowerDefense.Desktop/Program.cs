@@ -13,5 +13,9 @@ class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
-            .LogToTrace();
+            .LogToTrace()
+            .With(new AvaloniaNativePlatformOptions()
+            {
+                RenderingMode = [AvaloniaNativeRenderingMode.OpenGl]
+            });
 }
