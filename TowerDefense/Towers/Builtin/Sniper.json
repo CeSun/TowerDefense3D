@@ -5,9 +5,6 @@
   "range": 5.0,
   "fireRate": 0.5,
   "projectileSpeed": 10.0,
-  "colorR": 128,
-  "colorG": 0,
-  "colorB": 128,
   "splashRadius": 0.0,
   "slowAmount": 0.0,
   "multiShotCount": 1,
@@ -17,5 +14,10 @@
   "dotDamage": 0.0,
   "dotDuration": 0.0,
   "aoeRadius": 0.0,
-  "visualStyle": "Sniper"
+  "shapes": [
+    { "type": "Box",      "scaleX": 0.55, "scaleY": 0.1,  "scaleZ": 0.55, "colorR": 50,  "colorG": 0,   "colorB": 50 },
+    { "type": "Cylinder", "scaleX": 0.3,  "scaleY": 0.4,  "scaleZ": 0.3,  "colorR": 128, "colorG": 0,   "colorB": 128 },
+    { "type": "Cylinder", "scaleX": 0.1,  "scaleY": 0.5,  "scaleZ": 0.1,  "colorR": 50,  "colorG": 0,   "colorB": 50 },
+    { "type": "Cylinder", "scaleX": 0.18, "scaleY": 0.06, "scaleZ": 0.18, "colorR": 180, "colorG": 100, "colorB": 180 }
+  ]
 }

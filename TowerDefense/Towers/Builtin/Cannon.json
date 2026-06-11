@@ -5,9 +5,6 @@
   "range": 3.0,
   "fireRate": 0.6,
   "projectileSpeed": 3.0,
-  "colorR": 255,
-  "colorG": 69,
-  "colorB": 0,
   "splashRadius": 1.5,
   "slowAmount": 0.0,
   "multiShotCount": 1,
@@ -17,5 +14,9 @@
   "dotDamage": 0.0,
   "dotDuration": 0.0,
   "aoeRadius": 0.0,
-  "visualStyle": "Cannon"
+  "shapes": [
+    { "type": "Box",      "scaleX": 0.55, "scaleY": 0.1,  "scaleZ": 0.55, "colorR": 100, "colorG": 27,  "colorB": 0 },
+    { "type": "Cylinder", "scaleX": 0.3,  "scaleY": 0.4,  "scaleZ": 0.3,  "colorR": 255, "colorG": 69,  "colorB": 0 },
+    { "type": "Sphere",   "scaleX": 0.22, "scaleY": 0.22, "scaleZ": 0.22, "colorR": 255, "colorG": 69,  "colorB": 0 }
+  ]
 }

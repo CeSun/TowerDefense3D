@@ -4,28 +4,61 @@
              x:Class="TowerDefense.TowerEditorView">
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
 
-        <!-- 3D Preview -->
-        <a:Aura3DView Grid.Column="0"
+        <!-- ============================================ -->
+        <!-- LEFT: Shape Library                          -->
+        <!-- ============================================ -->
+        <Border Grid.Column="0" Background="#EE0d0d1a">
+            <Grid RowDefinitions="Auto,Auto,*">
+                <!-- Back button -->
+                <Button Grid.Row="0" x:Name="BackBtn" Click="OnBackClick"
+                        Background="#CC4a6a8a" Foreground="White"
+                        FontSize="11" FontWeight="Bold"
+                        Padding="8,4" CornerRadius="4"
+                        Margin="8" HorizontalAlignment="Left">
+                    ↩ Back
+                </Button>
+
+                <!-- Add Shape Buttons -->
+                <StackPanel Grid.Row="1" Margin="8,0,8,4" Spacing="4">
+                    <TextBlock Text="SHAPES" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                    <Button Click="OnAddBox" Background="#CC4a5a6a" Foreground="White"
+                            FontSize="12" Padding="8,6" CornerRadius="4">
+                        📦 + Box
+                    </Button>
+                    <Button Click="OnAddCylinder" Background="#CC4a5a6a" Foreground="White"
+                            FontSize="12" Padding="8,6" CornerRadius="4">
+                        🥫 + Cylinder
+                    </Button>
+                    <Button Click="OnAddSphere" Background="#CC4a5a6a" Foreground="White"
+                            FontSize="12" Padding="8,6" CornerRadius="4">
+                        🔵 + Sphere
+                    </Button>
+                </StackPanel>
+
+                <!-- Shape List -->
+                <ScrollViewer Grid.Row="2" Margin="4">
+                    <StackPanel x:Name="ShapeListPanel" Spacing="3" />
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- ============================================ -->
+        <!-- CENTER: 3D Preview                          -->
+        <!-- ============================================ -->
+        <a:Aura3DView Grid.Column="1"
                        x:Name="PreviewView"
                        SceneInitialized="OnPreviewSceneInit"
                        SceneUpdated="OnPreviewSceneUpdated" />
 
-        <!-- Back button -->
-        <Button Grid.Column="0" x:Name="BackBtn" Click="OnBackClick"
-                Background="#CC4a6a8a" Foreground="White"
-                FontSize="12" FontWeight="Bold"
-                Padding="10,6" CornerRadius="4"
-                Margin="12" VerticalAlignment="Top" HorizontalAlignment="Left"
-                ZIndex="10">
-            ↩ Back
-        </Button>
-
-        <!-- Editor Sidebar -->
-        <ScrollViewer Grid.Column="1" Background="#EE1a1a2e">
+        <!-- ============================================ -->
+        <!-- RIGHT: Properties                           -->
+        <!-- ============================================ -->
+        <ScrollViewer Grid.Column="2" Background="#EE1a1a2e">
             <StackPanel Spacing="6" Margin="8">
 
                 <!-- Tower List -->
@@ -55,12 +88,159 @@
                 <TextBox x:Name="NameInput" Text="New Tower"
                          KeyDown="OnPropertyKeyDown"
                          Background="#333" Foreground="White" FontSize="13"
-                         BorderBrush="#555" BorderThickness="1"
-                         Padding="6,4" />
+                         BorderBrush="#555" BorderThickness="1" Padding="6,4" />
 
                 <Separator Background="#444" Height="1" />
 
-                <!-- Cost -->
+                <!-- Selected Shape Editor -->
+                <TextBlock Text="SELECTED SHAPE" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock x:Name="SelectedShapeLabel" Text="None"
+                           Foreground="#888" FontSize="11" />
+
+                <!-- Color -->
+                <Border x:Name="ShapeColorPreview" Width="60" Height="30"
+                        CornerRadius="4" HorizontalAlignment="Left"
+                        Background="#808080" IsVisible="False" />
+
+                <StackPanel x:Name="ShapeColorPanel" IsVisible="False" Spacing="3">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="R" Foreground="#FF6666" FontSize="10" Width="12" VerticalAlignment="Center" />
+                        <Slider x:Name="ShapeColorRSlider" Minimum="0" Maximum="255" Value="128"
+                                Width="150" PropertyChanged="OnShapeColorSliderChanged" />
+                        <TextBox x:Name="ShapeColorRInput" Text="128" Width="36"
+                                 KeyDown="OnShapePropertyKeyDown"
+                                 Background="#333" Foreground="#FF6666" FontSize="10"
+                                 BorderBrush="#555" BorderThickness="1"
+                                 Padding="2" VerticalContentAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="G" Foreground="#66FF66" FontSize="10" Width="12" VerticalAlignment="Center" />
+                        <Slider x:Name="ShapeColorGSlider" Minimum="0" Maximum="255" Value="128"
+                                Width="150" PropertyChanged="OnShapeColorSliderChanged" />
+                        <TextBox x:Name="ShapeColorGInput" Text="128" Width="36"
+                                 KeyDown="OnShapePropertyKeyDown"
+                                 Background="#333" Foreground="#66FF66" FontSize="10"
+                                 BorderBrush="#555" BorderThickness="1"
+                                 Padding="2" VerticalContentAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="B" Foreground="#6699FF" FontSize="10" Width="12" VerticalAlignment="Center" />
+                        <Slider x:Name="ShapeColorBSlider" Minimum="0" Maximum="255" Value="128"
+                                Width="150" PropertyChanged="OnShapeColorSliderChanged" />
+                        <TextBox x:Name="ShapeColorBInput" Text="128" Width="36"
+                                 KeyDown="OnShapePropertyKeyDown"
+                                 Background="#333" Foreground="#6699FF" FontSize="10"
+                                 BorderBrush="#555" BorderThickness="1"
+                                 Padding="2" VerticalContentAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Preset colors -->
+                    <WrapPanel>
+                        <Button Click="OnShapePresetColorClick" Tag="#DC143C"
+                                Width="22" Height="22" CornerRadius="3" Margin="1"
+                                Background="#DC143C" BorderBrush="#555" BorderThickness="1" />
+                        <Button Click="OnShapePresetColorClick" Tag="#FFD700"
+                                Width="22" Height="22" CornerRadius="3" Margin="1"
+                                Background="#FFD700" BorderBrush="#555" BorderThickness="1" />
+                        <Button Click="OnShapePresetColorClick" Tag="#9400D3"
+                                Width="22" Height="22" CornerRadius="3" Margin="1"
+                                Background="#9400D3" BorderBrush="#555" BorderThickness="1" />
+                        <Button Click="OnShapePresetColorClick" Tag="#00CED1"
+                                Width="22" Height="22" CornerRadius="3" Margin="1"
+                                Background="#00CED1" BorderBrush="#555" BorderThickness="1" />
+                        <Button Click="OnShapePresetColorClick" Tag="#FF8C00"
+                                Width="22" Height="22" CornerRadius="3" Margin="1"
+                                Background="#FF8C00" BorderBrush="#555" BorderThickness="1" />
+                        <Button Click="OnShapePresetColorClick" Tag="#32CD32"
+                                Width="22" Height="22" CornerRadius="3" Margin="1"
+                                Background="#32CD32" BorderBrush="#555" BorderThickness="1" />
+                        <Button Click="OnShapePresetColorClick" Tag="#FF69B4"
+                                Width="22" Height="22" CornerRadius="3" Margin="1"
+                                Background="#FF69B4" BorderBrush="#555" BorderThickness="1" />
+                        <Button Click="OnShapePresetColorClick" Tag="#4169E1"
+                                Width="22" Height="22" CornerRadius="3" Margin="1"
+                                Background="#4169E1" BorderBrush="#555" BorderThickness="1" />
+                    </WrapPanel>
+                </StackPanel>
+
+                <!-- Shape Scale -->
+                <StackPanel x:Name="ShapeScalePanel" IsVisible="False" Spacing="4">
+                    <TextBlock Text="SCALE X" Foreground="#AAA" FontSize="10" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Slider x:Name="ShapeScaleXSlider" Minimum="0.02" Maximum="3" Value="1"
+                                Width="150" TickFrequency="0.02" PropertyChanged="OnShapeScaleSliderChanged" />
+                        <TextBox x:Name="ShapeScaleXInput" Text="1" Width="44"
+                                 KeyDown="OnShapePropertyKeyDown"
+                                 Background="#333" Foreground="White" FontSize="10"
+                                 BorderBrush="#555" BorderThickness="1"
+                                 Padding="2" VerticalContentAlignment="Center" />
+                    </StackPanel>
+
+                    <TextBlock Text="SCALE Y" Foreground="#AAA" FontSize="10" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Slider x:Name="ShapeScaleYSlider" Minimum="0.02" Maximum="3" Value="1"
+                                Width="150" TickFrequency="0.02" PropertyChanged="OnShapeScaleSliderChanged" />
+                        <TextBox x:Name="ShapeScaleYInput" Text="1" Width="44"
+                                 KeyDown="OnShapePropertyKeyDown"
+                                 Background="#333" Foreground="White" FontSize="10"
+                                 BorderBrush="#555" BorderThickness="1"
+                                 Padding="2" VerticalContentAlignment="Center" />
+                    </StackPanel>
+
+                    <TextBlock Text="SCALE Z" Foreground="#AAA" FontSize="10" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Slider x:Name="ShapeScaleZSlider" Minimum="0.02" Maximum="3" Value="1"
+                                Width="150" TickFrequency="0.02" PropertyChanged="OnShapeScaleSliderChanged" />
+                        <TextBox x:Name="ShapeScaleZInput" Text="1" Width="44"
+                                 KeyDown="OnShapePropertyKeyDown"
+                                 Background="#333" Foreground="White" FontSize="10"
+                                 BorderBrush="#555" BorderThickness="1"
+                                 Padding="2" VerticalContentAlignment="Center" />
+                    </StackPanel>
+
+                    <TextBlock Text="OFFSET Y" Foreground="#AAA" FontSize="10" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Slider x:Name="ShapeOffsetYSlider" Minimum="-1" Maximum="1" Value="0"
+                                Width="150" TickFrequency="0.02" PropertyChanged="OnShapeScaleSliderChanged" />
+                        <TextBox x:Name="ShapeOffsetYInput" Text="0" Width="44"
+                                 KeyDown="OnShapePropertyKeyDown"
+                                 Background="#333" Foreground="White" FontSize="10"
+                                 BorderBrush="#555" BorderThickness="1"
+                                 Padding="2" VerticalContentAlignment="Center" />
+                    </StackPanel>
+
+                    <TextBlock Text="OFFSET X" Foreground="#AAA" FontSize="10" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Slider x:Name="ShapeOffsetXSlider" Minimum="-0.5" Maximum="0.5" Value="0"
+                                Width="150" TickFrequency="0.01" PropertyChanged="OnShapeScaleSliderChanged" />
+                        <TextBox x:Name="ShapeOffsetXInput" Text="0" Width="44"
+                                 KeyDown="OnShapePropertyKeyDown"
+                                 Background="#333" Foreground="White" FontSize="10"
+                                 BorderBrush="#555" BorderThickness="1"
+                                 Padding="2" VerticalContentAlignment="Center" />
+                    </StackPanel>
+
+                    <TextBlock Text="ROTATION Y (deg)" Foreground="#AAA" FontSize="10" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Slider x:Name="ShapeRotationYSlider" Minimum="-180" Maximum="180" Value="0"
+                                Width="150" PropertyChanged="OnShapeScaleSliderChanged" />
+                        <TextBox x:Name="ShapeRotationYInput" Text="0" Width="44"
+                                 KeyDown="OnShapePropertyKeyDown"
+                                 Background="#333" Foreground="White" FontSize="10"
+                                 BorderBrush="#555" BorderThickness="1"
+                                 Padding="2" VerticalContentAlignment="Center" />
+                    </StackPanel>
+
+                    <Button x:Name="RemoveShapeBtn" Click="OnRemoveShape"
+                            Background="#CC6a3a3a" Foreground="White" FontSize="11"
+                            Padding="8,4" CornerRadius="4">
+                        ✕ Remove Shape
+                    </Button>
+                </StackPanel>
+
+                <Separator Background="#444" Height="1" />
+
+                <!-- Basic Stats -->
                 <TextBlock Text="COST (GOLD)" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="CostSlider" Minimum="5" Maximum="1000" Value="50"
@@ -72,7 +252,6 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <!-- Damage -->
                 <TextBlock Text="DAMAGE" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="DamageSlider" Minimum="1" Maximum="200" Value="15"
@@ -84,12 +263,10 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <!-- Range -->
                 <TextBlock Text="RANGE" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="RangeSlider" Minimum="0.5" Maximum="15" Value="3.5"
-                            Width="180" TickFrequency="0.1"
-                            PropertyChanged="OnSliderChanged" />
+                            Width="180" TickFrequency="0.1" PropertyChanged="OnSliderChanged" />
                     <TextBox x:Name="RangeInput" Text="3.5" Width="50"
                              KeyDown="OnPropertyKeyDown"
                              Background="#333" Foreground="White" FontSize="11"
@@ -97,12 +274,10 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <!-- Fire Rate -->
-                <TextBlock Text="FIRE RATE (shots/sec, 0=AOE)" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="FIRE RATE (0=AOE)" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="FireRateSlider" Minimum="0" Maximum="5" Value="1.8"
-                            Width="180" TickFrequency="0.1"
-                            PropertyChanged="OnSliderChanged" />
+                            Width="180" TickFrequency="0.1" PropertyChanged="OnSliderChanged" />
                     <TextBox x:Name="FireRateInput" Text="1.8" Width="50"
                              KeyDown="OnPropertyKeyDown"
                              Background="#333" Foreground="White" FontSize="11"
@@ -110,12 +285,10 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <!-- Projectile Speed -->
                 <TextBlock Text="PROJECTILE SPEED" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="ProjSpeedSlider" Minimum="1" Maximum="20" Value="5"
-                            Width="180"
-                            PropertyChanged="OnSliderChanged" />
+                            Width="180" PropertyChanged="OnSliderChanged" />
                     <TextBox x:Name="ProjSpeedInput" Text="5" Width="50"
                              KeyDown="OnPropertyKeyDown"
                              Background="#333" Foreground="White" FontSize="11"
@@ -125,105 +298,13 @@
 
                 <Separator Background="#444" Height="1" />
 
-                <!-- Color -->
-                <TextBlock Text="COLOR" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
-
-                <!-- Color preview square -->
-                <Border x:Name="ColorPreview" Width="80" Height="40"
-                        CornerRadius="6"
-                        HorizontalAlignment="Left"
-                        Background="#32CD32" />
-
-                <!-- R -->
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="R" Foreground="#FF6666" FontSize="11" Width="16"
-                               VerticalAlignment="Center" />
-                    <Slider x:Name="ColorRSlider" Minimum="0" Maximum="255" Value="50"
-                            Width="170"
-                            PropertyChanged="OnColorSliderChanged" />
-                    <TextBox x:Name="ColorRInput" Text="50" Width="40"
-                             KeyDown="OnPropertyKeyDown"
-                             Background="#333" Foreground="#FF6666" FontSize="11"
-                             BorderBrush="#555" BorderThickness="1"
-                             Padding="4,2" VerticalContentAlignment="Center" />
-                </StackPanel>
-
-                <!-- G -->
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="G" Foreground="#66FF66" FontSize="11" Width="16"
-                               VerticalAlignment="Center" />
-                    <Slider x:Name="ColorGSlider" Minimum="0" Maximum="255" Value="205"
-                            Width="170"
-                            PropertyChanged="OnColorSliderChanged" />
-                    <TextBox x:Name="ColorGInput" Text="205" Width="40"
-                             KeyDown="OnPropertyKeyDown"
-                             Background="#333" Foreground="#66FF66" FontSize="11"
-                             BorderBrush="#555" BorderThickness="1"
-                             Padding="4,2" VerticalContentAlignment="Center" />
-                </StackPanel>
-
-                <!-- B -->
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="B" Foreground="#6699FF" FontSize="11" Width="16"
-                               VerticalAlignment="Center" />
-                    <Slider x:Name="ColorBSlider" Minimum="0" Maximum="255" Value="50"
-                            Width="170"
-                            PropertyChanged="OnColorSliderChanged" />
-                    <TextBox x:Name="ColorBInput" Text="50" Width="40"
-                             KeyDown="OnPropertyKeyDown"
-                             Background="#333" Foreground="#6699FF" FontSize="11"
-                             BorderBrush="#555" BorderThickness="1"
-                             Padding="4,2" VerticalContentAlignment="Center" />
-                </StackPanel>
-
-                <!-- Preset colors -->
-                <TextBlock Text="PRESETS" Foreground="#888" FontSize="10" />
-                <WrapPanel>
-                    <Button Click="OnPresetColorClick" Tag="#DC143C"
-                            Width="28" Height="28" CornerRadius="4" Margin="2"
-                            Background="#DC143C" BorderBrush="#555"
-                            BorderThickness="1" Cursor="Hand" />
-                    <Button Click="OnPresetColorClick" Tag="#FFD700"
-                            Width="28" Height="28" CornerRadius="4" Margin="2"
-                            Background="#FFD700" BorderBrush="#555"
-                            BorderThickness="1" Cursor="Hand" />
-                    <Button Click="OnPresetColorClick" Tag="#9400D3"
-                            Width="28" Height="28" CornerRadius="4" Margin="2"
-                            Background="#9400D3" BorderBrush="#555"
-                            BorderThickness="1" Cursor="Hand" />
-                    <Button Click="OnPresetColorClick" Tag="#00CED1"
-                            Width="28" Height="28" CornerRadius="4" Margin="2"
-                            Background="#00CED1" BorderBrush="#555"
-                            BorderThickness="1" Cursor="Hand" />
-                    <Button Click="OnPresetColorClick" Tag="#FF8C00"
-                            Width="28" Height="28" CornerRadius="4" Margin="2"
-                            Background="#FF8C00" BorderBrush="#555"
-                            BorderThickness="1" Cursor="Hand" />
-                    <Button Click="OnPresetColorClick" Tag="#32CD32"
-                            Width="28" Height="28" CornerRadius="4" Margin="2"
-                            Background="#32CD32" BorderBrush="#555"
-                            BorderThickness="1" Cursor="Hand" />
-                    <Button Click="OnPresetColorClick" Tag="#FF69B4"
-                            Width="28" Height="28" CornerRadius="4" Margin="2"
-                            Background="#FF69B4" BorderBrush="#555"
-                            BorderThickness="1" Cursor="Hand" />
-                    <Button Click="OnPresetColorClick" Tag="#4169E1"
-                            Width="28" Height="28" CornerRadius="4" Margin="2"
-                            Background="#4169E1" BorderBrush="#555"
-                            BorderThickness="1" Cursor="Hand" />
-                </WrapPanel>
-
-                <Separator Background="#444" Height="1" />
-
-                <!-- Special Effects Section -->
+                <!-- Special Effects -->
                 <TextBlock Text="SPECIAL EFFECTS" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
 
-                <!-- Splash Radius -->
                 <TextBlock Text="SPLASH RADIUS" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="SplashRadiusSlider" Minimum="0" Maximum="5" Value="0"
-                            Width="180" TickFrequency="0.1"
-                            PropertyChanged="OnSliderChanged" />
+                            Width="180" TickFrequency="0.1" PropertyChanged="OnSliderChanged" />
                     <TextBox x:Name="SplashRadiusInput" Text="0" Width="50"
                              KeyDown="OnPropertyKeyDown"
                              Background="#333" Foreground="White" FontSize="11"
@@ -231,12 +312,10 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <!-- Slow Amount -->
-                <TextBlock Text="SLOW AMOUNT (0-1)" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="SLOW (0-1)" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="SlowAmountSlider" Minimum="0" Maximum="1" Value="0"
-                            Width="180" TickFrequency="0.05"
-                            PropertyChanged="OnSliderChanged" />
+                            Width="180" TickFrequency="0.05" PropertyChanged="OnSliderChanged" />
                     <TextBox x:Name="SlowAmountInput" Text="0" Width="50"
                              KeyDown="OnPropertyKeyDown"
                              Background="#333" Foreground="White" FontSize="11"
@@ -244,12 +323,10 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <!-- Multi-Shot Count -->
-                <TextBlock Text="MULTI-SHOT COUNT" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="MULTI-SHOT" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="MultiShotCountSlider" Minimum="1" Maximum="10" Value="1"
-                            Width="180"
-                            PropertyChanged="OnSliderChanged" />
+                            Width="180" PropertyChanged="OnSliderChanged" />
                     <TextBox x:Name="MultiShotCountInput" Text="1" Width="50"
                              KeyDown="OnPropertyKeyDown"
                              Background="#333" Foreground="White" FontSize="11"
@@ -257,12 +334,10 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <!-- Arc Angle -->
-                <TextBlock Text="ARC ANGLE (deg)" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="ARC ANGLE" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="ArcAngleSlider" Minimum="0" Maximum="90" Value="0"
-                            Width="180"
-                            PropertyChanged="OnSliderChanged" />
+                            Width="180" PropertyChanged="OnSliderChanged" />
                     <TextBox x:Name="ArcAngleInput" Text="0" Width="50"
                              KeyDown="OnPropertyKeyDown"
                              Background="#333" Foreground="White" FontSize="11"
@@ -270,12 +345,10 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <!-- Crit Chance -->
-                <TextBlock Text="CRIT CHANCE (0-1)" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="CRIT CHANCE" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="CritChanceSlider" Minimum="0" Maximum="1" Value="0"
-                            Width="180" TickFrequency="0.05"
-                            PropertyChanged="OnSliderChanged" />
+                            Width="180" TickFrequency="0.05" PropertyChanged="OnSliderChanged" />
                     <TextBox x:Name="CritChanceInput" Text="0" Width="50"
                              KeyDown="OnPropertyKeyDown"
                              Background="#333" Foreground="White" FontSize="11"
@@ -283,12 +356,10 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <!-- Crit Multiplier -->
                 <TextBlock Text="CRIT MULTIPLIER" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="CritMultiplierSlider" Minimum="1" Maximum="10" Value="2"
-                            Width="180" TickFrequency="0.5"
-                            PropertyChanged="OnSliderChanged" />
+                            Width="180" TickFrequency="0.5" PropertyChanged="OnSliderChanged" />
                     <TextBox x:Name="CritMultiplierInput" Text="2" Width="50"
                              KeyDown="OnPropertyKeyDown"
                              Background="#333" Foreground="White" FontSize="11"
@@ -296,12 +367,10 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <!-- DOT Damage -->
-                <TextBlock Text="DOT DAMAGE (per sec)" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="DOT DAMAGE" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="DotDamageSlider" Minimum="0" Maximum="200" Value="0"
-                            Width="180"
-                            PropertyChanged="OnSliderChanged" />
+                            Width="180" PropertyChanged="OnSliderChanged" />
                     <TextBox x:Name="DotDamageInput" Text="0" Width="50"
                              KeyDown="OnPropertyKeyDown"
                              Background="#333" Foreground="White" FontSize="11"
@@ -309,12 +378,10 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <!-- DOT Duration -->
-                <TextBlock Text="DOT DURATION (sec)" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="DOT DURATION" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="DotDurationSlider" Minimum="0" Maximum="10" Value="0"
-                            Width="180" TickFrequency="0.5"
-                            PropertyChanged="OnSliderChanged" />
+                            Width="180" TickFrequency="0.5" PropertyChanged="OnSliderChanged" />
                     <TextBox x:Name="DotDurationInput" Text="0" Width="50"
                              KeyDown="OnPropertyKeyDown"
                              Background="#333" Foreground="White" FontSize="11"
@@ -322,12 +389,10 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <!-- AOE Radius -->
-                <TextBlock Text="AOE RADIUS (continuous)" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="AOE RADIUS" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="AoeRadiusSlider" Minimum="0" Maximum="5" Value="0"
-                            Width="180" TickFrequency="0.1"
-                            PropertyChanged="OnSliderChanged" />
+                            Width="180" TickFrequency="0.1" PropertyChanged="OnSliderChanged" />
                     <TextBox x:Name="AoeRadiusInput" Text="0" Width="50"
                              KeyDown="OnPropertyKeyDown"
                              Background="#333" Foreground="White" FontSize="11"
@@ -335,24 +400,7 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <!-- Visual Style -->
-                <TextBlock Text="VISUAL STYLE" Foreground="#AAA" FontSize="10" />
-                <ComboBox x:Name="VisualStyleCombo"
-                          Background="#333" Foreground="White"
-                          BorderBrush="#555" BorderThickness="1"
-                          SelectionChanged="OnVisualStyleChanged">
-                    <ComboBoxItem Tag="Auto">🤖 Auto (from stats)</ComboBoxItem>
-                    <ComboBoxItem Tag="Arrow">🏹 Arrow (thin cylinder)</ComboBoxItem>
-                    <ComboBoxItem Tag="Cannon">💣 Cannon (sphere top)</ComboBoxItem>
-                    <ComboBoxItem Tag="Sniper">🎯 Sniper (long barrel)</ComboBoxItem>
-                    <ComboBoxItem Tag="MultiShot">🧨 Multi-Shot (barrels)</ComboBoxItem>
-                    <ComboBoxItem Tag="Poison">☠️ Poison (ball + spike)</ComboBoxItem>
-                    <ComboBoxItem Tag="Sun">☀️ Sun (glow ring)</ComboBoxItem>
-                </ComboBox>
-
-                <Separator Background="#444" Height="1" />
-
-                <!-- Stats summary -->
+                <!-- Stats Summary -->
                 <Border Background="#333" CornerRadius="6" Padding="10,8">
                     <StackPanel Spacing="3">
                         <TextBlock x:Name="SummaryName" Text="New Tower"
@@ -365,8 +413,8 @@
                                    Foreground="#CCC" FontSize="11" />
                         <TextBlock x:Name="SummaryFireRate" Text="Fire Rate: 1.8/s"
                                    Foreground="#CCC" FontSize="11" />
-                        <TextBlock x:Name="SummarySpecials" Text="Specials: None"
-                                   Foreground="#AAA" FontSize="11" />
+                        <TextBlock x:Name="SummaryShapes" Text="Shapes: 0"
+                                   Foreground="#888" FontSize="11" />
                     </StackPanel>
                 </Border>
 
@@ -378,9 +426,7 @@
                 </Button>
 
                 <TextBlock x:Name="StatusLabel" Text=""
-                           Foreground="#AAA" FontSize="11"
-                           TextWrapping="Wrap" />
-
+                           Foreground="#AAA" FontSize="11" TextWrapping="Wrap" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

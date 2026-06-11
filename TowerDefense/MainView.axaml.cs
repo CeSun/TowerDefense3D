@@ -16,16 +16,17 @@ public partial class MainView : UserControl
     private MonsterEditorView? _monsterEditorView;
     private TowerEditorView? _towerEditorView;
     private MapData _currentMapData = null!;
+    private string _dataDir = string.Empty;
     private string _mapsDir = string.Empty;
 
     public MainView()
     {
         InitializeComponent();
 
-        // Use ApplicationData as the writable maps directory (works cross-platform: Desktop + Android).
-        // This is Android's internal app-private storage — no permissions required.
+        // All game data lives under a single TowerDefense folder (easy to find and clean up).
         var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        _mapsDir = Path.Combine(appData, "Maps");
+        _dataDir = Path.Combine(appData, "TowerDefense");
+        _mapsDir = Path.Combine(_dataDir, "Maps");
 
         // Extract built-in maps from embedded resources on first run (or if directory is missing).
         ExtractEmbeddedMaps();
@@ -173,6 +174,7 @@ public partial class MainView : UserControl
             _menuView.OnOpenEditor = () => ShowEditor();
             _menuView.OnOpenMonsterEditor = () => ShowMonsterEditor();
             _menuView.OnOpenTowerEditor = () => ShowTowerEditor();
+            _menuView.OnResetData = () => ResetAllData();
         }
 
         _menuView.MapCount = CountMaps();
@@ -234,9 +236,35 @@ public partial class MainView : UserControl
         }
 
         var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var enemiesDir = Path.Combine(appData, "Enemies");
+        var enemiesDir = Path.Combine(_dataDir, "Enemies");
         _monsterEditorView.Initialize(enemiesDir);
         ContentArea.Content = _monsterEditorView;
+    }
+
+    /// <summary>
+    /// Delete all data (maps, enemies, towers, save) and re-extract built-in defaults.
+    /// </summary>
+    private void ResetAllData()
+    {
+        try
+        {
+            if (Directory.Exists(_dataDir))
+                Directory.Delete(_dataDir, recursive: true);
+        }
+        catch
+        {
+            // Best-effort — some files may be locked.
+        }
+
+        // Re-extract all built-in configs and reload registries
+        ExtractEmbeddedMaps();
+        EnsureMapsDir();            // fallback default map if no embedded maps
+        LoadCustomEnemies();        // extracts embedded + loads all enemies
+        LoadCustomTowers();         // extracts embedded + loads all towers
+
+        // Refresh menu map count
+        if (_menuView != null)
+            _menuView.MapCount = CountMaps();
     }
 
     private void ShowTowerEditor()
@@ -248,7 +276,7 @@ public partial class MainView : UserControl
         }
 
         var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var towersDir = Path.Combine(appData, "Towers");
+        var towersDir = Path.Combine(_dataDir, "Towers");
         _towerEditorView.Initialize(towersDir);
         ContentArea.Content = _towerEditorView;
     }
@@ -257,10 +285,9 @@ public partial class MainView : UserControl
     /// Extract built-in enemy configs from embedded resources, then load all enemies
     /// (built-in + custom) into <see cref="EnemyDefinition.All"/>.
     /// </summary>
-    private static void LoadCustomEnemies()
+    private void LoadCustomEnemies()
     {
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var enemiesDir = Path.Combine(appData, "Enemies");
+        var enemiesDir = Path.Combine(_dataDir, "Enemies");
 
         // Extract built-in enemy JSON files from embedded resources on first run.
         ExtractEmbeddedEnemies(enemiesDir);
@@ -326,10 +353,9 @@ public partial class MainView : UserControl
     /// Extract built-in tower configs from embedded resources, then load all towers
     /// (built-in + custom) into <see cref="TowerDefinition.All"/>.
     /// </summary>
-    private static void LoadCustomTowers()
+    private void LoadCustomTowers()
     {
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var towersDir = Path.Combine(appData, "Towers");
+        var towersDir = Path.Combine(_dataDir, "Towers");
 
         // Extract built-in tower JSON files from embedded resources on first run.
         ExtractEmbeddedTowers(towersDir);

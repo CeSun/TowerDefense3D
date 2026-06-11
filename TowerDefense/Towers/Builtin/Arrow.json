@@ -5,9 +5,6 @@
   "range": 3.5,
   "fireRate": 1.8,
   "projectileSpeed": 5.0,
-  "colorR": 50,
-  "colorG": 205,
-  "colorB": 50,
   "splashRadius": 0.0,
   "slowAmount": 0.0,
   "multiShotCount": 1,
@@ -17,5 +14,9 @@
   "dotDamage": 0.0,
   "dotDuration": 0.0,
   "aoeRadius": 0.0,
-  "visualStyle": "Arrow"
+  "shapes": [
+    { "type": "Box",    "scaleX": 0.55, "scaleY": 0.1,  "scaleZ": 0.55, "colorR": 30,  "colorG": 120, "colorB": 30 },
+    { "type": "Cylinder", "scaleX": 0.3,  "scaleY": 0.4,  "scaleZ": 0.3,  "colorR": 50,  "colorG": 205, "colorB": 50 },
+    { "type": "Cylinder", "scaleX": 0.08, "scaleY": 0.25, "scaleZ": 0.08, "colorR": 30,  "colorG": 120, "colorB": 30 }
+  ]
 }

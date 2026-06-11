@@ -197,11 +197,46 @@ public class EnemyData
     }
 }
 
-// ==================== Custom Tower Data ====================
+// ==================== Tower Shape Data ====================
+
+/// <summary>
+/// A single 3D primitive shape that makes up part of a tower model.
+/// Shapes are stacked along the Y axis and each has its own color.
+/// </summary>
+public class TowerShapeData
+{
+    /// <summary>Shape type: Box, Cylinder, Sphere, Cone.</summary>
+    public string Type { get; set; } = "Cylinder";
+    public float ScaleX { get; set; } = 1.0f;
+    public float ScaleY { get; set; } = 1.0f;
+    public float ScaleZ { get; set; } = 1.0f;
+    /// <summary>Manual Y offset added to auto-stacked position.</summary>
+    public float OffsetY { get; set; }
+    /// <summary>Optional X offset for asymmetric placement.</summary>
+    public float OffsetX { get; set; }
+    /// <summary>Optional Z offset for asymmetric placement.</summary>
+    public float OffsetZ { get; set; }
+    /// <summary>Optional Y-axis rotation in degrees.</summary>
+    public float RotationY { get; set; }
+    public int ColorR { get; set; } = 255;
+    public int ColorG { get; set; } = 255;
+    public int ColorB { get; set; } = 255;
+
+    public System.Drawing.Color GetColor() =>
+        System.Drawing.Color.FromArgb(ColorR, ColorG, ColorB);
+
+    public TowerShapeData Clone() => new()
+    {
+        Type = Type, ScaleX = ScaleX, ScaleY = ScaleY, ScaleZ = ScaleZ,
+        OffsetY = OffsetY, OffsetX = OffsetX, OffsetZ = OffsetZ, RotationY = RotationY,
+        ColorR = ColorR, ColorG = ColorG, ColorB = ColorB,
+    };
+}
+
+// ==================== Tower Data ====================
 
 /// <summary>
 /// Serializable tower definition. Stored as JSON in the Towers directory.
-/// Can be used to create custom tower types alongside built-in ones.
 /// </summary>
 public class TowerData
 {
@@ -211,9 +246,6 @@ public class TowerData
     public float Range { get; set; } = 3.5f;
     public float FireRate { get; set; } = 1.8f;
     public float ProjectileSpeed { get; set; } = 5f;
-    public int ColorR { get; set; } = 50;
-    public int ColorG { get; set; } = 205;
-    public int ColorB { get; set; } = 50;
     public float SplashRadius { get; set; }
     public float SlowAmount { get; set; }
     public int MultiShotCount { get; set; } = 1;
@@ -224,14 +256,12 @@ public class TowerData
     public float DotDuration { get; set; }
     public float AoeRadius { get; set; }
 
-    /// <summary>
-    /// Explicit visual style for the 3D model. One of: Auto, Arrow, Cannon, Sniper, MultiShot, Poison, Sun.
-    /// "Auto" (default) derives the visual from stats.
-    /// </summary>
-    public string VisualStyle { get; set; } = "Auto";
+    /// <summary>3D shapes that compose the tower model, stacked along Y.</summary>
+    public List<TowerShapeData> Shapes { get; set; } = new();
 
+    /// <summary>Returns the color of the first shape, or white if empty.</summary>
     public System.Drawing.Color GetColor() =>
-        System.Drawing.Color.FromArgb(ColorR, ColorG, ColorB);
+        Shapes.Count > 0 ? Shapes[0].GetColor() : System.Drawing.Color.White;
 
     public TowerDefinition ToDefinition() => TowerDefinition.FromTowerData(this);
 
@@ -338,6 +368,8 @@ public record SaveData(int HighestUnlockedLevel = 1)
 [JsonSerializable(typeof(List<WaveEntryData>))]
 [JsonSerializable(typeof(EnemyData))]
 [JsonSerializable(typeof(TowerData))]
+[JsonSerializable(typeof(TowerShapeData))]
+[JsonSerializable(typeof(List<TowerShapeData>))]
 [JsonSerializable(typeof(SaveData))]
 public partial class MapDataJsonContext : JsonSerializerContext
 {

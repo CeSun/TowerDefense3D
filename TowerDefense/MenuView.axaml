@@ -64,6 +64,19 @@
             <TextBlock x:Name="MapCountLabel" Text=""
                        Foreground="#666" FontSize="12"
                        HorizontalAlignment="Center" />
+
+            <Separator Background="#333" Height="1" Width="320" />
+
+            <!-- Reset Data -->
+            <Button x:Name="ResetDataBtn" Click="OnResetDataClick"
+                    Background="#CC4a4a6a" Foreground="#CCC"
+                    FontSize="14" FontWeight="Bold"
+                    Padding="16,10" CornerRadius="8" Width="320"
+                    HorizontalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    Cursor="Hand">
+                🔄  Reset
+            </Button>
         </StackPanel>
     </Grid>
 </UserControl>

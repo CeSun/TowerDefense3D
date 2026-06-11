@@ -583,137 +583,40 @@ public partial class GameView : UserControl
 
     // ==================== Tower Nodes ====================
 
-    /// <summary>Build a tower model from its definition. If <paramref name="translucent"/> is true,
+    /// <summary>Build a tower model from its shape list. If <paramref name="translucent"/> is true,
     /// materials use alpha blending for a ghost preview.</summary>
     private Node BuildTowerModel(TowerDefinition def, bool translucent)
     {
         var node = new Node();
-        var mat = translucent
-            ? CreateTranslucentMaterial(def.Color)
-            : CreateColorMaterial(def.Color);
-        var darkMat = translucent
-            ? CreateTranslucentMaterial(Darken(def.Color, 0.6f))
-            : CreateColorMaterial(Darken(def.Color, 0.6f));
-        var lightMat = translucent
-            ? CreateTranslucentMaterial(Lighten(def.Color, 0.4f))
-            : CreateColorMaterial(Lighten(def.Color, 0.4f));
+        var shapes = def.Shapes ?? new List<TowerShapeData>();
 
-        // Common base
-        var baseMesh = new Mesh { Geometry = _boxGeo!, Material = darkMat };
-        baseMesh.Scale = new Vector3(0.55f, 0.1f, 0.55f);
-        baseMesh.Position = new Vector3(0, 0.1f, 0);
-        node.AddChild(baseMesh, AttachToParentRule.KeepLocal);
+        Material MakeMat(System.Drawing.Color c) => translucent
+            ? CreateTranslucentMaterial(c)
+            : CreateColorMaterial(c);
 
-        // Common body cylinder
-        var bodyMesh = new Mesh { Geometry = _cylinderGeo!, Material = mat };
-        bodyMesh.Scale = new Vector3(0.3f, 0.4f, 0.3f);
-        bodyMesh.Position = new Vector3(0, 0.5f, 0);
-        node.AddChild(bodyMesh, AttachToParentRule.KeepLocal);
-
-        // Resolve effective visual style: explicit choice first, then stat-derived
-        var style = ResolveVisualStyle(def);
-
-        switch (style)
+        // Auto-stack shapes along Y axis
+        float currentY = 0;
+        foreach (var s in shapes)
         {
-            case "Sun":
-                {
-                    var sunCore = new Mesh { Geometry = _sphereGeo!, Material = lightMat };
-                    sunCore.Scale = new Vector3(0.35f, 0.35f, 0.35f);
-                    sunCore.Position = new Vector3(0, 0.95f, 0);
-                    node.AddChild(sunCore, AttachToParentRule.KeepLocal);
+            var mat = MakeMat(s.GetColor());
 
-                    var glowRing = new Mesh { Geometry = _cylinderGeo!, Material = mat };
-                    glowRing.Scale = new Vector3(0.42f, 0.04f, 0.42f);
-                    glowRing.Position = new Vector3(0, 0.8f, 0);
-                    node.AddChild(glowRing, AttachToParentRule.KeepLocal);
-                    break;
-                }
-            case "MultiShot":
-                {
-                    float[] angles = { 0, -30, 30 };
-                    float radius = 0.1f;
-                    foreach (var ang in angles)
-                    {
-                        var rad = ang * MathF.PI / 180f;
-                        var barrel = new Mesh { Geometry = _cylinderGeo!, Material = darkMat };
-                        barrel.Scale = new Vector3(0.07f, 0.22f, 0.07f);
-                        barrel.Position = new Vector3(
-                            MathF.Sin(rad) * radius,
-                            1.05f,
-                            MathF.Cos(rad) * radius
-                        );
-                        barrel.RotationDegrees = new Vector3(ang * 0.4f, 0, 0);
-                        node.AddChild(barrel, AttachToParentRule.KeepLocal);
-                    }
-                    var centerBall = new Mesh { Geometry = _sphereGeo!, Material = lightMat };
-                    centerBall.Scale = new Vector3(0.14f, 0.14f, 0.14f);
-                    centerBall.Position = new Vector3(0, 0.95f, 0);
-                    node.AddChild(centerBall, AttachToParentRule.KeepLocal);
-                    break;
-                }
-            case "Sniper":
-                {
-                    var barrel = new Mesh { Geometry = _cylinderGeo!, Material = darkMat };
-                    barrel.Scale = new Vector3(0.1f, 0.5f, 0.1f);
-                    barrel.Position = new Vector3(0, 1.1f, 0);
-                    node.AddChild(barrel, AttachToParentRule.KeepLocal);
+            Mesh mesh;
+            if (s.Type == "Box") mesh = new Mesh { Geometry = _boxGeo!, Material = mat };
+            else if (s.Type == "Sphere") mesh = new Mesh { Geometry = _sphereGeo!, Material = mat };
+            else mesh = new Mesh { Geometry = _cylinderGeo!, Material = mat }; // Cylinder or Cone fallback
 
-                    var ring = new Mesh { Geometry = _cylinderGeo!, Material = lightMat };
-                    ring.Scale = new Vector3(0.18f, 0.06f, 0.18f);
-                    ring.Position = new Vector3(0, 1.35f, 0);
-                    node.AddChild(ring, AttachToParentRule.KeepLocal);
-                    break;
-                }
-            case "Poison":
-                {
-                    var poisonBall = new Mesh { Geometry = _sphereGeo!, Material = lightMat };
-                    poisonBall.Scale = new Vector3(0.28f, 0.28f, 0.28f);
-                    poisonBall.Position = new Vector3(0, 0.95f, 0);
-                    node.AddChild(poisonBall, AttachToParentRule.KeepLocal);
+            mesh.Scale = new Vector3(s.ScaleX, s.ScaleY, s.ScaleZ);
 
-                    var spike = new Mesh { Geometry = _cylinderGeo!, Material = darkMat };
-                    spike.Scale = new Vector3(0.05f, 0.18f, 0.05f);
-                    spike.Position = new Vector3(0, 1.2f, 0);
-                    node.AddChild(spike, AttachToParentRule.KeepLocal);
-                    break;
-                }
-            case "Cannon":
-                {
-                    var topMesh = new Mesh { Geometry = _sphereGeo!, Material = mat };
-                    topMesh.Scale = new Vector3(0.22f, 0.22f, 0.22f);
-                    topMesh.Position = new Vector3(0, 0.95f, 0);
-                    node.AddChild(topMesh, AttachToParentRule.KeepLocal);
-                    break;
-                }
-            default: // Arrow or Auto
-                {
-                    var topMesh = new Mesh { Geometry = _cylinderGeo!, Material = darkMat };
-                    topMesh.Scale = new Vector3(0.08f, 0.25f, 0.08f);
-                    topMesh.Position = new Vector3(0, 1.0f, 0);
-                    node.AddChild(topMesh, AttachToParentRule.KeepLocal);
-                    break;
-                }
+            float y = currentY + s.ScaleY / 2 + s.OffsetY;
+            mesh.Position = new Vector3(s.OffsetX, y, s.OffsetZ);
+            mesh.RotationDegrees = new Vector3(0, s.RotationY, 0);
+
+            currentY += s.ScaleY + s.OffsetY;
+
+            node.AddChild(mesh, AttachToParentRule.KeepLocal);
         }
+
         return node;
-    }
-
-    /// <summary>
-    /// Resolve the effective visual style for a tower.
-    /// Returns the explicit <see cref="TowerDefinition.VisualStyle"/> if set to something other than "Auto";
-    /// otherwise derives a style from the tower's stats.
-    /// </summary>
-    private static string ResolveVisualStyle(TowerDefinition def)
-    {
-        if (def.VisualStyle != "Auto")
-            return def.VisualStyle;
-
-        // Auto-derive from stats
-        if (def.AoeRadius > 0) return "Sun";
-        if (def.MultiShotCount > 1) return "MultiShot";
-        if (def.CritChance > 0) return "Sniper";
-        if (def.DotDamage > 0) return "Poison";
-        if (def.SplashRadius > 0 || def.SlowAmount > 0) return "Cannon";
-        return "Arrow";
     }
 
     private void OnTowerAdded(TowerInstance tower)
@@ -1291,21 +1194,4 @@ public partial class GameView : UserControl
         };
     }
 
-    private static DrawingColor Darken(DrawingColor c, float factor)
-    {
-        return DrawingColor.FromArgb(
-            c.A,
-            (byte)(c.R * factor),
-            (byte)(c.G * factor),
-            (byte)(c.B * factor));
-    }
-
-    private static DrawingColor Lighten(DrawingColor c, float amount)
-    {
-        return DrawingColor.FromArgb(
-            c.A,
-            (byte)Math.Min(255, c.R + (255 - c.R) * amount),
-            (byte)Math.Min(255, c.G + (255 - c.G) * amount),
-            (byte)Math.Min(255, c.B + (255 - c.B) * amount));
-    }
 }

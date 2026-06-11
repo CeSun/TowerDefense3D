@@ -16,7 +16,6 @@ public record TowerDefinition(
     float Range,
     float FireRate,
     float ProjectileSpeed,
-    Color Color,
     float SplashRadius = 0,
     float SlowAmount = 0,
     int MultiShotCount = 1,
@@ -26,7 +25,7 @@ public record TowerDefinition(
     float DotDamage = 0,
     float DotDuration = 0,
     float AoeRadius = 0,
-    string VisualStyle = "Auto"
+    List<TowerShapeData>? Shapes = null
 )
 {
     /// <summary>Fallback definition used when a tower name cannot be resolved.</summary>
@@ -37,8 +36,16 @@ public record TowerDefinition(
         Range: 3.5f,
         FireRate: 1.8f,
         ProjectileSpeed: 5f,
-        Color: Color.LimeGreen
+        Shapes: new List<TowerShapeData>
+        {
+            new() { Type = "Box", ScaleX = 0.55f, ScaleY = 0.1f, ScaleZ = 0.55f, ColorR = 30, ColorG = 120, ColorB = 30 },
+            new() { Type = "Cylinder", ScaleX = 0.3f, ScaleY = 0.4f, ScaleZ = 0.3f, ColorR = 50, ColorG = 205, ColorB = 50 },
+            new() { Type = "Cylinder", ScaleX = 0.08f, ScaleY = 0.25f, ScaleZ = 0.08f, ColorR = 30, ColorG = 120, ColorB = 30 },
+        }
     );
+
+    /// <summary>Derived projectile color: first shape's color, or white.</summary>
+    public Color Color => Shapes is { Count: > 0 } ? Shapes[0].GetColor() : Color.White;
 
     /// <summary>All loaded tower definitions, keyed by name.</summary>
     public static readonly Dictionary<string, TowerDefinition> All = new();
@@ -62,7 +69,6 @@ public record TowerDefinition(
         Range: data.Range,
         FireRate: data.FireRate,
         ProjectileSpeed: data.ProjectileSpeed,
-        Color: data.GetColor(),
         SplashRadius: data.SplashRadius,
         SlowAmount: data.SlowAmount,
         MultiShotCount: data.MultiShotCount,
@@ -72,7 +78,7 @@ public record TowerDefinition(
         DotDamage: data.DotDamage,
         DotDuration: data.DotDuration,
         AoeRadius: data.AoeRadius,
-        VisualStyle: data.VisualStyle
+        Shapes: data.Shapes.Select(s => s.Clone()).ToList()
     );
 }
 

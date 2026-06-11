@@ -17,6 +17,9 @@ public partial class MenuView : UserControl
     /// <summary>Called when user wants to enter the tower editor.</summary>
     public Action? OnOpenTowerEditor { get; set; }
 
+    /// <summary>Called when user wants to reset all data.</summary>
+    public Action? OnResetData { get; set; }
+
     /// <summary>Optional: the number of available maps, shown as a hint.</summary>
     public int MapCount
     {
@@ -48,5 +51,10 @@ public partial class MenuView : UserControl
     private void OnOpenTowerEditorClick(object? sender, RoutedEventArgs e)
     {
         OnOpenTowerEditor?.Invoke();
+    }
+
+    private void OnResetDataClick(object? sender, RoutedEventArgs e)
+    {
+        OnResetData?.Invoke();
     }
 }
