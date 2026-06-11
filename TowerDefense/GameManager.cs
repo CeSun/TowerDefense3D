@@ -132,7 +132,7 @@ public class GameManager
             WaveNumber = map.Waves.IndexOf(w) + 1,
             DelayBeforeWave = w.DelayBeforeWave,
             Entries = w.Entries.Select(e => new WaveEntry(
-                Enum.TryParse<EnemyType>(e.EnemyType, out var type) ? type : EnemyType.Basic,
+                e.EnemyType,
                 e.Count,
                 e.SpawnInterval
             )).ToList(),
@@ -342,7 +342,7 @@ public class GameManager
         while (_spawnedInEntry < entry.Count && _spawnTimer >= entry.SpawnInterval)
         {
             _spawnTimer -= entry.SpawnInterval;
-            SpawnEnemy(entry.Type);
+            SpawnEnemy(entry.EnemyName);
             _spawnedInEntry++;
         }
 
@@ -373,9 +373,9 @@ public class GameManager
         }
     }
 
-    private void SpawnEnemy(EnemyType type)
+    private void SpawnEnemy(string enemyName)
     {
-        var def = EnemyDefinition.Get(type);
+        var def = EnemyDefinition.Resolve(enemyName);
         var enemy = new EnemyInstance
         {
             Id = _nextId++,

@@ -126,12 +126,13 @@ public record TowerDefinition(
     };
 }
 
-// ==================== Enemy Types ====================
+// ==================== Enemy Definition ====================
 
-public enum EnemyType { Basic, Fast, Tank }
-
+/// <summary>
+/// Runtime enemy definition. All enemies are loaded from JSON config files
+/// (built-in or custom) — no hardcoded types.
+/// </summary>
 public record EnemyDefinition(
-    EnemyType Type,
     string Name,
     float MaxHP,
     float Speed,
@@ -140,43 +141,39 @@ public record EnemyDefinition(
     float Radius = 0.25f
 )
 {
-    public static readonly EnemyDefinition Basic = new(
-        Type: EnemyType.Basic,
-        Name: "Basic",
+    /// <summary>Fallback definition used when an enemy name cannot be resolved.</summary>
+    public static readonly EnemyDefinition Default = new(
+        Name: "Unknown",
         MaxHP: 100,
         Speed: 1.8f,
         GoldReward: 10,
-        Color: Color.Crimson,
-        Radius: 0.22f
+        Color: Color.Gray,
+        Radius: 0.25f
     );
 
-    public static readonly EnemyDefinition Fast = new(
-        Type: EnemyType.Fast,
-        Name: "Fast",
-        MaxHP: 60,
-        Speed: 3.5f,
-        GoldReward: 15,
-        Color: Color.Gold,
-        Radius: 0.18f
-    );
+    /// <summary>All loaded enemy definitions, keyed by name.</summary>
+    public static readonly Dictionary<string, EnemyDefinition> All = new();
 
-    public static readonly EnemyDefinition Tank = new(
-        Type: EnemyType.Tank,
-        Name: "Tank",
-        MaxHP: 350,
-        Speed: 1.0f,
-        GoldReward: 30,
-        Color: Color.DarkViolet,
-        Radius: 0.30f
-    );
-
-    public static EnemyDefinition Get(EnemyType type) => type switch
+    /// <summary>
+    /// Resolve an enemy definition by name (case-sensitive).
+    /// Returns <see cref="Default"/> if not found.
+    /// </summary>
+    public static EnemyDefinition Resolve(string name)
     {
-        EnemyType.Basic => Basic,
-        EnemyType.Fast => Fast,
-        EnemyType.Tank => Tank,
-        _ => Basic
-    };
+        if (All.TryGetValue(name, out var def))
+            return def;
+        return Default;
+    }
+
+    /// <summary>Create an EnemyDefinition from serializable EnemyData.</summary>
+    public static EnemyDefinition FromEnemyData(EnemyData data) => new(
+        Name: data.Name,
+        MaxHP: data.MaxHP,
+        Speed: data.Speed,
+        GoldReward: data.GoldReward,
+        Color: data.GetColor(),
+        Radius: data.Radius
+    );
 }
 
 // ==================== Runtime Game Objects ====================
@@ -195,7 +192,7 @@ public class TowerInstance
 public class EnemyInstance
 {
     public int Id { get; set; }
-    public EnemyDefinition Def { get; set; } = EnemyDefinition.Basic;
+    public EnemyDefinition Def { get; set; } = EnemyDefinition.Default;
     public float HP { get; set; }
     public float MaxHP { get; set; }
     public float Speed { get; set; }
@@ -229,7 +226,7 @@ public class ProjectileData
 
 // ==================== Wave Configuration ====================
 
-public record WaveEntry(EnemyType Type, int Count, float SpawnInterval);
+public record WaveEntry(string EnemyName, int Count, float SpawnInterval);
 
 public class WaveConfig
 {

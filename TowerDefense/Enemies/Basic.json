@@ -1,0 +1,10 @@
+{
+  "name": "Basic",
+  "maxHP": 100.0,
+  "speed": 1.8,
+  "goldReward": 10,
+  "colorR": 220,
+  "colorG": 20,
+  "colorB": 60,
+  "radius": 0.22
+}

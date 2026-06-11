@@ -1,0 +1,10 @@
+{
+  "name": "Tank",
+  "maxHP": 350.0,
+  "speed": 1.0,
+  "goldReward": 30,
+  "colorR": 148,
+  "colorG": 0,
+  "colorB": 211,
+  "radius": 0.30
+}

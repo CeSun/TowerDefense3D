@@ -13,6 +13,7 @@ public partial class MainView : UserControl
     private GameView? _gameView;
     private MapListControl? _mapListView;
     private MapEditorView? _editorView;
+    private MonsterEditorView? _monsterEditorView;
     private MapData _currentMapData = null!;
     private string _mapsDir = string.Empty;
 
@@ -45,6 +46,9 @@ public partial class MainView : UserControl
         }
 
         EnsureMapsDir();
+
+        // Load custom enemy definitions so they are available for gameplay.
+        LoadCustomEnemies();
 
         // Check for command-line args to skip the menu
         var args = Environment.GetCommandLineArgs();
@@ -163,6 +167,7 @@ public partial class MainView : UserControl
             _menuView = new MenuView();
             _menuView.OnPlayGame = () => ShowGame();
             _menuView.OnOpenEditor = () => ShowEditor();
+            _menuView.OnOpenMonsterEditor = () => ShowMonsterEditor();
         }
 
         _menuView.MapCount = CountMaps();
@@ -213,6 +218,94 @@ public partial class MainView : UserControl
         }
 
         ContentArea.Content = _mapListView;
+    }
+
+    private void ShowMonsterEditor()
+    {
+        if (_monsterEditorView == null)
+        {
+            _monsterEditorView = new MonsterEditorView();
+            _monsterEditorView.OnBack = () => ShowMenu();
+        }
+
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var enemiesDir = Path.Combine(appData, "Enemies");
+        var customEnemiesDir = Path.Combine(appData, "CustomEnemies");
+        _monsterEditorView.Initialize(enemiesDir, customEnemiesDir);
+        ContentArea.Content = _monsterEditorView;
+    }
+
+    /// <summary>
+    /// Extract built-in enemy configs from embedded resources, then load all enemies
+    /// (built-in + custom) into <see cref="EnemyDefinition.All"/>.
+    /// </summary>
+    private static void LoadCustomEnemies()
+    {
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var enemiesDir = Path.Combine(appData, "Enemies");
+
+        // Extract built-in enemy JSON files from embedded resources on first run.
+        ExtractEmbeddedEnemies(enemiesDir);
+
+        EnemyDefinition.All.Clear();
+
+        // Load built-in enemies.
+        LoadEnemiesFromDir(enemiesDir);
+
+        // Load custom enemies.
+        var customDir = Path.Combine(appData, "CustomEnemies");
+        LoadEnemiesFromDir(customDir);
+    }
+
+    /// <summary>
+    /// Extract built-in enemy configs to the given directory (skip if already present).
+    /// </summary>
+    private static void ExtractEmbeddedEnemies(string enemiesDir)
+    {
+        var assembly = typeof(MapData).Assembly;
+        var prefix = $"{assembly.GetName().Name}.Enemies.";
+
+        foreach (var resourceName in assembly.GetManifestResourceNames())
+        {
+            if (!resourceName.StartsWith(prefix) || !resourceName.EndsWith(".json"))
+                continue;
+
+            var fileName = resourceName.Substring(prefix.Length);
+            try
+            {
+                Directory.CreateDirectory(enemiesDir);
+                var targetPath = Path.Combine(enemiesDir, fileName);
+                if (File.Exists(targetPath))
+                    continue;
+
+                using var stream = assembly.GetManifestResourceStream(resourceName);
+                if (stream == null) continue;
+
+                using var fileStream = File.Create(targetPath);
+                stream.CopyTo(fileStream);
+            }
+            catch
+            {
+                // Best-effort.
+            }
+        }
+    }
+
+    /// <summary>Load all .json enemy configs from a directory into <see cref="EnemyDefinition.All"/>.</summary>
+    private static void LoadEnemiesFromDir(string dir)
+    {
+        if (!Directory.Exists(dir))
+            return;
+
+        foreach (var file in Directory.GetFiles(dir, "*.json"))
+        {
+            var name = Path.GetFileNameWithoutExtension(file);
+            if (name == "_save") continue;
+
+            var data = EnemyData.LoadFromFile(file);
+            if (data != null)
+                EnemyDefinition.All[data.Name] = data.ToDefinition();
+        }
     }
 
     private void OpenMapInEditor(MapData map, string filePath)

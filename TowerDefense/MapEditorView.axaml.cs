@@ -47,8 +47,7 @@ public partial class MapEditorView : UserControl
     public MapEditorView()
     {
         InitializeComponent();
-        EnemyTypeCombo.ItemsSource = new[] { "Basic", "Fast", "Tank" };
-        EnemyTypeCombo.SelectedIndex = 0;
+        RefreshEnemyTypeCombo();
     }
 
     /// <summary>
@@ -58,6 +57,7 @@ public partial class MapEditorView : UserControl
     {
         _mapData = map;
         _currentFilePath = filePath;
+        RefreshEnemyTypeCombo();
         SyncUIFromMap();
         if (_sceneReady)
             RebuildMapScene();
@@ -642,6 +642,14 @@ public partial class MapEditorView : UserControl
         if (index == total - 1) return DrawingColor.Red;
         float t = (float)index / (total - 1);
         return DrawingColor.FromArgb(255, (byte)(255 * t), (byte)(255 * (1 - Math.Abs(t - 0.5f) * 2)), (byte)(50 * (1 - t)));
+    }
+
+    private void RefreshEnemyTypeCombo()
+    {
+        var names = EnemyDefinition.All.Keys.OrderBy(n => n).ToList();
+        EnemyTypeCombo.ItemsSource = names;
+        if (names.Count > 0 && EnemyTypeCombo.SelectedIndex < 0)
+            EnemyTypeCombo.SelectedIndex = 0;
     }
 
     private static Material CreateMaterial(DrawingColor color) => new()

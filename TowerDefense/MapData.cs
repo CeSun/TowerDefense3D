@@ -120,6 +120,87 @@ public class WaveConfigData
 
 public record WaveEntryData(string EnemyType, int Count, float SpawnInterval);
 
+// ==================== Custom Enemy Data ====================
+
+/// <summary>
+/// Serializable custom enemy definition. Stored as JSON in the CustomEnemies directory.
+/// Can be used alongside built-in enemy types in wave configurations.
+/// </summary>
+public class EnemyData
+{
+    public string Name { get; set; } = "New Enemy";
+    public float MaxHP { get; set; } = 100f;
+    public float Speed { get; set; } = 1.8f;
+    public int GoldReward { get; set; } = 10;
+    public int ColorR { get; set; } = 220;
+    public int ColorG { get; set; } = 20;
+    public int ColorB { get; set; } = 60;
+    public float Radius { get; set; } = 0.25f;
+
+    public System.Drawing.Color GetColor() =>
+        System.Drawing.Color.FromArgb(ColorR, ColorG, ColorB);
+
+    public EnemyDefinition ToDefinition() => EnemyDefinition.FromEnemyData(this);
+
+    // ==================== Serialization ====================
+
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        TypeInfoResolver = MapDataJsonContext.Default,
+    };
+
+    public string ToJson()
+    {
+        return JsonSerializer.Serialize(this, JsonOptions);
+    }
+
+    public static EnemyData? FromJson(string json)
+    {
+        return JsonSerializer.Deserialize(json, MapDataJsonContext.Default.EnemyData);
+    }
+
+    // ==================== File I/O ====================
+
+    /// <summary>Returns the expected directory for custom enemy files.</summary>
+    public static string GetDirectory(string mapsDir) =>
+        Path.Combine(mapsDir, "..", "CustomEnemies");
+
+    public void SaveToFile(string filePath)
+    {
+        var json = ToJson();
+        var dir = Path.GetDirectoryName(filePath);
+        if (dir != null) Directory.CreateDirectory(dir);
+        File.WriteAllText(filePath, json);
+    }
+
+    public static EnemyData? LoadFromFile(string filePath)
+    {
+        if (!File.Exists(filePath))
+            return null;
+        var json = File.ReadAllText(filePath);
+        return FromJson(json);
+    }
+
+    /// <summary>List all custom enemy names found in the given directory.</summary>
+    public static List<string> ListNames(string customEnemiesDir)
+    {
+        var names = new List<string>();
+        if (!Directory.Exists(customEnemiesDir))
+            return names;
+
+        foreach (var file in Directory.GetFiles(customEnemiesDir, "*.json"))
+        {
+            var name = Path.GetFileNameWithoutExtension(file);
+            if (name != "_save")
+                names.Add(name);
+        }
+        names.Sort();
+        return names;
+    }
+}
+
 // ==================== Save Data ====================
 
 /// <summary>
@@ -166,6 +247,7 @@ public record SaveData(int HighestUnlockedLevel = 1)
 [JsonSerializable(typeof(List<WaypointCell>))]
 [JsonSerializable(typeof(List<WaveConfigData>))]
 [JsonSerializable(typeof(List<WaveEntryData>))]
+[JsonSerializable(typeof(EnemyData))]
 [JsonSerializable(typeof(SaveData))]
 public partial class MapDataJsonContext : JsonSerializerContext
 {
