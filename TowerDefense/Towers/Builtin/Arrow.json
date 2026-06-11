@@ -1,0 +1,21 @@
+{
+  "name": "Arrow Tower",
+  "cost": 50,
+  "damage": 15.0,
+  "range": 3.5,
+  "fireRate": 1.8,
+  "projectileSpeed": 5.0,
+  "colorR": 50,
+  "colorG": 205,
+  "colorB": 50,
+  "splashRadius": 0.0,
+  "slowAmount": 0.0,
+  "multiShotCount": 1,
+  "arcAngle": 0.0,
+  "critChance": 0.0,
+  "critMultiplier": 2.0,
+  "dotDamage": 0.0,
+  "dotDuration": 0.0,
+  "aoeRadius": 0.0,
+  "visualStyle": "Arrow"
+}

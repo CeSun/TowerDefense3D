@@ -14,6 +14,9 @@ public partial class MenuView : UserControl
     /// <summary>Called when user wants to enter the monster editor.</summary>
     public Action? OnOpenMonsterEditor { get; set; }
 
+    /// <summary>Called when user wants to enter the tower editor.</summary>
+    public Action? OnOpenTowerEditor { get; set; }
+
     /// <summary>Optional: the number of available maps, shown as a hint.</summary>
     public int MapCount
     {
@@ -40,5 +43,10 @@ public partial class MenuView : UserControl
     private void OnOpenMonsterEditorClick(object? sender, RoutedEventArgs e)
     {
         OnOpenMonsterEditor?.Invoke();
+    }
+
+    private void OnOpenTowerEditorClick(object? sender, RoutedEventArgs e)
+    {
+        OnOpenTowerEditor?.Invoke();
     }
 }

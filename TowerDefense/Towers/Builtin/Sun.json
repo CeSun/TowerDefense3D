@@ -1,0 +1,21 @@
+{
+  "name": "Sun Tower",
+  "cost": 175,
+  "damage": 18.0,
+  "range": 2.5,
+  "fireRate": 0.0,
+  "projectileSpeed": 0.0,
+  "colorR": 255,
+  "colorG": 215,
+  "colorB": 0,
+  "splashRadius": 0.0,
+  "slowAmount": 0.0,
+  "multiShotCount": 1,
+  "arcAngle": 0.0,
+  "critChance": 0.0,
+  "critMultiplier": 2.0,
+  "dotDamage": 0.0,
+  "dotDuration": 0.0,
+  "aoeRadius": 2.5,
+  "visualStyle": "Sun"
+}

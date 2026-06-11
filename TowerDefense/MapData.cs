@@ -123,7 +123,7 @@ public record WaveEntryData(string EnemyType, int Count, float SpawnInterval);
 // ==================== Custom Enemy Data ====================
 
 /// <summary>
-/// Serializable custom enemy definition. Stored as JSON in the CustomEnemies directory.
+/// Serializable enemy definition. Stored as JSON in the Enemies directory.
 /// Can be used alongside built-in enemy types in wave configurations.
 /// </summary>
 public class EnemyData
@@ -163,10 +163,6 @@ public class EnemyData
 
     // ==================== File I/O ====================
 
-    /// <summary>Returns the expected directory for custom enemy files.</summary>
-    public static string GetDirectory(string mapsDir) =>
-        Path.Combine(mapsDir, "..", "CustomEnemies");
-
     public void SaveToFile(string filePath)
     {
         var json = ToJson();
@@ -191,6 +187,99 @@ public class EnemyData
             return names;
 
         foreach (var file in Directory.GetFiles(customEnemiesDir, "*.json"))
+        {
+            var name = Path.GetFileNameWithoutExtension(file);
+            if (name != "_save")
+                names.Add(name);
+        }
+        names.Sort();
+        return names;
+    }
+}
+
+// ==================== Custom Tower Data ====================
+
+/// <summary>
+/// Serializable tower definition. Stored as JSON in the Towers directory.
+/// Can be used to create custom tower types alongside built-in ones.
+/// </summary>
+public class TowerData
+{
+    public string Name { get; set; } = "New Tower";
+    public int Cost { get; set; } = 50;
+    public float Damage { get; set; } = 15f;
+    public float Range { get; set; } = 3.5f;
+    public float FireRate { get; set; } = 1.8f;
+    public float ProjectileSpeed { get; set; } = 5f;
+    public int ColorR { get; set; } = 50;
+    public int ColorG { get; set; } = 205;
+    public int ColorB { get; set; } = 50;
+    public float SplashRadius { get; set; }
+    public float SlowAmount { get; set; }
+    public int MultiShotCount { get; set; } = 1;
+    public float ArcAngle { get; set; }
+    public float CritChance { get; set; }
+    public float CritMultiplier { get; set; } = 2.0f;
+    public float DotDamage { get; set; }
+    public float DotDuration { get; set; }
+    public float AoeRadius { get; set; }
+
+    /// <summary>
+    /// Explicit visual style for the 3D model. One of: Auto, Arrow, Cannon, Sniper, MultiShot, Poison, Sun.
+    /// "Auto" (default) derives the visual from stats.
+    /// </summary>
+    public string VisualStyle { get; set; } = "Auto";
+
+    public System.Drawing.Color GetColor() =>
+        System.Drawing.Color.FromArgb(ColorR, ColorG, ColorB);
+
+    public TowerDefinition ToDefinition() => TowerDefinition.FromTowerData(this);
+
+    // ==================== Serialization ====================
+
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        TypeInfoResolver = MapDataJsonContext.Default,
+    };
+
+    public string ToJson()
+    {
+        return JsonSerializer.Serialize(this, JsonOptions);
+    }
+
+    public static TowerData? FromJson(string json)
+    {
+        return JsonSerializer.Deserialize(json, MapDataJsonContext.Default.TowerData);
+    }
+
+    // ==================== File I/O ====================
+
+    public void SaveToFile(string filePath)
+    {
+        var json = ToJson();
+        var dir = Path.GetDirectoryName(filePath);
+        if (dir != null) Directory.CreateDirectory(dir);
+        File.WriteAllText(filePath, json);
+    }
+
+    public static TowerData? LoadFromFile(string filePath)
+    {
+        if (!File.Exists(filePath))
+            return null;
+        var json = File.ReadAllText(filePath);
+        return FromJson(json);
+    }
+
+    /// <summary>List all tower names found in the given directory.</summary>
+    public static List<string> ListNames(string dir)
+    {
+        var names = new List<string>();
+        if (!Directory.Exists(dir))
+            return names;
+
+        foreach (var file in Directory.GetFiles(dir, "*.json"))
         {
             var name = Path.GetFileNameWithoutExtension(file);
             if (name != "_save")
@@ -248,6 +337,7 @@ public record SaveData(int HighestUnlockedLevel = 1)
 [JsonSerializable(typeof(List<WaveConfigData>))]
 [JsonSerializable(typeof(List<WaveEntryData>))]
 [JsonSerializable(typeof(EnemyData))]
+[JsonSerializable(typeof(TowerData))]
 [JsonSerializable(typeof(SaveData))]
 public partial class MapDataJsonContext : JsonSerializerContext
 {

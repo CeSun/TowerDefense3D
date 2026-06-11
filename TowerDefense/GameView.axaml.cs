@@ -18,8 +18,9 @@ public partial class GameView : UserControl
 {
     // ==================== Core ====================
     private GameManager _gm = null!;
-    private TowerType _selectedTower = TowerType.Arrow;
+    private string _selectedTowerName = "Arrow Tower";
     private bool _isPlacing;
+    private readonly Dictionary<string, Button> _towerButtons = new();
     private Node? _ghostNode;
 
     // ==================== Scene Nodes ====================
@@ -292,6 +293,7 @@ public partial class GameView : UserControl
         _gm.StartGame();
 
         TowerBtnPanel.IsVisible = true;
+        BuildTowerButtons();
         ClearPlacement();
         StatusText.Text = "Editor Test — Select a tower and place it!";
     }
@@ -324,6 +326,7 @@ public partial class GameView : UserControl
         _gm.StartGame();
 
         TowerBtnPanel.IsVisible = true;
+        BuildTowerButtons();
         ClearPlacement();
         StatusText.Text = $"Level {_selectedLevelNum} — Select a tower and place it!";
     }
@@ -607,30 +610,25 @@ public partial class GameView : UserControl
         bodyMesh.Position = new Vector3(0, 0.5f, 0);
         node.AddChild(bodyMesh, AttachToParentRule.KeepLocal);
 
-        switch (def.Type)
-        {
-            case TowerType.Arrow:
-                {
-                    var topMesh = new Mesh { Geometry = _cylinderGeo!, Material = darkMat };
-                    topMesh.Scale = new Vector3(0.08f, 0.25f, 0.08f);
-                    topMesh.Position = new Vector3(0, 1.0f, 0);
-                    node.AddChild(topMesh, AttachToParentRule.KeepLocal);
-                    break;
-                }
-            case TowerType.Sniper:
-                {
-                    var barrel = new Mesh { Geometry = _cylinderGeo!, Material = darkMat };
-                    barrel.Scale = new Vector3(0.1f, 0.5f, 0.1f);
-                    barrel.Position = new Vector3(0, 1.1f, 0);
-                    node.AddChild(barrel, AttachToParentRule.KeepLocal);
+        // Resolve effective visual style: explicit choice first, then stat-derived
+        var style = ResolveVisualStyle(def);
 
-                    var ring = new Mesh { Geometry = _cylinderGeo!, Material = lightMat };
-                    ring.Scale = new Vector3(0.18f, 0.06f, 0.18f);
-                    ring.Position = new Vector3(0, 1.35f, 0);
-                    node.AddChild(ring, AttachToParentRule.KeepLocal);
+        switch (style)
+        {
+            case "Sun":
+                {
+                    var sunCore = new Mesh { Geometry = _sphereGeo!, Material = lightMat };
+                    sunCore.Scale = new Vector3(0.35f, 0.35f, 0.35f);
+                    sunCore.Position = new Vector3(0, 0.95f, 0);
+                    node.AddChild(sunCore, AttachToParentRule.KeepLocal);
+
+                    var glowRing = new Mesh { Geometry = _cylinderGeo!, Material = mat };
+                    glowRing.Scale = new Vector3(0.42f, 0.04f, 0.42f);
+                    glowRing.Position = new Vector3(0, 0.8f, 0);
+                    node.AddChild(glowRing, AttachToParentRule.KeepLocal);
                     break;
                 }
-            case TowerType.MultiShot:
+            case "MultiShot":
                 {
                     float[] angles = { 0, -30, 30 };
                     float radius = 0.1f;
@@ -647,9 +645,26 @@ public partial class GameView : UserControl
                         barrel.RotationDegrees = new Vector3(ang * 0.4f, 0, 0);
                         node.AddChild(barrel, AttachToParentRule.KeepLocal);
                     }
+                    var centerBall = new Mesh { Geometry = _sphereGeo!, Material = lightMat };
+                    centerBall.Scale = new Vector3(0.14f, 0.14f, 0.14f);
+                    centerBall.Position = new Vector3(0, 0.95f, 0);
+                    node.AddChild(centerBall, AttachToParentRule.KeepLocal);
                     break;
                 }
-            case TowerType.Poison:
+            case "Sniper":
+                {
+                    var barrel = new Mesh { Geometry = _cylinderGeo!, Material = darkMat };
+                    barrel.Scale = new Vector3(0.1f, 0.5f, 0.1f);
+                    barrel.Position = new Vector3(0, 1.1f, 0);
+                    node.AddChild(barrel, AttachToParentRule.KeepLocal);
+
+                    var ring = new Mesh { Geometry = _cylinderGeo!, Material = lightMat };
+                    ring.Scale = new Vector3(0.18f, 0.06f, 0.18f);
+                    ring.Position = new Vector3(0, 1.35f, 0);
+                    node.AddChild(ring, AttachToParentRule.KeepLocal);
+                    break;
+                }
+            case "Poison":
                 {
                     var poisonBall = new Mesh { Geometry = _sphereGeo!, Material = lightMat };
                     poisonBall.Scale = new Vector3(0.28f, 0.28f, 0.28f);
@@ -662,20 +677,7 @@ public partial class GameView : UserControl
                     node.AddChild(spike, AttachToParentRule.KeepLocal);
                     break;
                 }
-            case TowerType.Sun:
-                {
-                    var sunCore = new Mesh { Geometry = _sphereGeo!, Material = lightMat };
-                    sunCore.Scale = new Vector3(0.35f, 0.35f, 0.35f);
-                    sunCore.Position = new Vector3(0, 0.95f, 0);
-                    node.AddChild(sunCore, AttachToParentRule.KeepLocal);
-
-                    var glowRing = new Mesh { Geometry = _cylinderGeo!, Material = mat };
-                    glowRing.Scale = new Vector3(0.42f, 0.04f, 0.42f);
-                    glowRing.Position = new Vector3(0, 0.8f, 0);
-                    node.AddChild(glowRing, AttachToParentRule.KeepLocal);
-                    break;
-                }
-            default:
+            case "Cannon":
                 {
                     var topMesh = new Mesh { Geometry = _sphereGeo!, Material = mat };
                     topMesh.Scale = new Vector3(0.22f, 0.22f, 0.22f);
@@ -683,8 +685,35 @@ public partial class GameView : UserControl
                     node.AddChild(topMesh, AttachToParentRule.KeepLocal);
                     break;
                 }
+            default: // Arrow or Auto
+                {
+                    var topMesh = new Mesh { Geometry = _cylinderGeo!, Material = darkMat };
+                    topMesh.Scale = new Vector3(0.08f, 0.25f, 0.08f);
+                    topMesh.Position = new Vector3(0, 1.0f, 0);
+                    node.AddChild(topMesh, AttachToParentRule.KeepLocal);
+                    break;
+                }
         }
         return node;
+    }
+
+    /// <summary>
+    /// Resolve the effective visual style for a tower.
+    /// Returns the explicit <see cref="TowerDefinition.VisualStyle"/> if set to something other than "Auto";
+    /// otherwise derives a style from the tower's stats.
+    /// </summary>
+    private static string ResolveVisualStyle(TowerDefinition def)
+    {
+        if (def.VisualStyle != "Auto")
+            return def.VisualStyle;
+
+        // Auto-derive from stats
+        if (def.AoeRadius > 0) return "Sun";
+        if (def.MultiShotCount > 1) return "MultiShot";
+        if (def.CritChance > 0) return "Sniper";
+        if (def.DotDamage > 0) return "Poison";
+        if (def.SplashRadius > 0 || def.SlowAmount > 0) return "Cannon";
+        return "Arrow";
     }
 
     private void OnTowerAdded(TowerInstance tower)
@@ -913,9 +942,9 @@ public partial class GameView : UserControl
 
         var (col, row) = grid.Value;
 
-        if (_gm.TryPlaceTower(col, row, _selectedTower))
+        if (_gm.TryPlaceTower(col, row, _selectedTowerName))
         {
-            StatusText.Text = $"Placed {TowerDefinition.Get(_selectedTower).Name} at ({col},{row}) | Gold: {_gm.Gold}";
+            StatusText.Text = $"Placed {_selectedTowerName} at ({col},{row}) | Gold: {_gm.Gold}";
             ClearPlacement();
         }
         else if (_gm.PathCells[col, row])
@@ -928,74 +957,79 @@ public partial class GameView : UserControl
         }
         else
         {
-            StatusText.Text = $"Not enough gold! Need {TowerDefinition.Get(_selectedTower).Cost}";
+            var def = TowerDefinition.Resolve(_selectedTowerName);
+            StatusText.Text = $"Not enough gold! Need {def.Cost}";
             ClearPlacement();
         }
     }
 
     // ==================== Tower Selection ====================
 
-    private void OnSelectArrow(object? sender, RoutedEventArgs e)
+    /// <summary>
+    /// Build tower buttons dynamically from <see cref="TowerDefinition.All"/>.
+    /// Called when game starts (tower registry is already populated).
+    /// </summary>
+    private void BuildTowerButtons()
     {
-        _selectedTower = TowerType.Arrow;
-        _isPlacing = true;
-        UpdateTowerButtonHighlight();
-        RebuildGhost();
-        StatusText.Text = "Selected: Arrow Tower (50g) — Click map to place";
+        // Clear old buttons
+        _towerButtons.Clear();
+        // Remove all children except the "TOWERS" label (first child)
+        while (TowerBtnPanel.Children.Count > 1)
+            TowerBtnPanel.Children.RemoveAt(TowerBtnPanel.Children.Count - 1);
+
+        // Sort towers by cost
+        var towers = TowerDefinition.All.Values.OrderBy(t => t.Cost).ToList();
+
+        // Emoji icons for the first 8 towers
+        var icons = new[] { "🏹", "❄️", "💣", "☠️", "🎯", "🧨", "☀️", "🗼" };
+
+        for (int i = 0; i < towers.Count; i++)
+        {
+            var def = towers[i];
+            var icon = i < icons.Length ? icons[i] : "🗼";
+            var name = def.Name;
+
+            // Derive a button color from the tower's color
+            var bgColor = System.Drawing.Color.FromArgb(
+                (byte)(def.Color.R / 2 + 40),
+                (byte)(def.Color.G / 2 + 40),
+                (byte)(def.Color.B / 2 + 40));
+            var bgHex = $"#CC{bgColor.R:X2}{bgColor.G:X2}{bgColor.B:X2}";
+
+            var btn = new Button
+            {
+                Content = $"{icon} {name} ({def.Cost}g)",
+                Background = Avalonia.Media.Brush.Parse(bgHex),
+                Foreground = Avalonia.Media.Brushes.White,
+                FontSize = 13,
+                FontWeight = Avalonia.Media.FontWeight.Bold,
+                Padding = new Avalonia.Thickness(14, 8),
+                CornerRadius = new Avalonia.CornerRadius(6),
+                Width = 180,
+                Tag = name,
+            };
+            btn.Click += (_, _) => OnSelectTower(name, def);
+
+            _towerButtons[name] = btn;
+            TowerBtnPanel.Children.Add(btn);
+        }
     }
 
-    private void OnSelectCannon(object? sender, RoutedEventArgs e)
+    private void OnSelectTower(string name, TowerDefinition def)
     {
-        _selectedTower = TowerType.Cannon;
+        _selectedTowerName = name;
         _isPlacing = true;
         UpdateTowerButtonHighlight();
         RebuildGhost();
-        StatusText.Text = "Selected: Cannon Tower (100g) — Click map to place";
-    }
 
-    private void OnSelectIce(object? sender, RoutedEventArgs e)
-    {
-        _selectedTower = TowerType.Ice;
-        _isPlacing = true;
-        UpdateTowerButtonHighlight();
-        RebuildGhost();
-        StatusText.Text = "Selected: Ice Tower (75g) — Click map to place";
-    }
-
-    private void OnSelectMulti(object? sender, RoutedEventArgs e)
-    {
-        _selectedTower = TowerType.MultiShot;
-        _isPlacing = true;
-        UpdateTowerButtonHighlight();
-        RebuildGhost();
-        StatusText.Text = "Selected: Multi-Shot (150g) — Fires 3 arrows in a fan";
-    }
-
-    private void OnSelectSniper(object? sender, RoutedEventArgs e)
-    {
-        _selectedTower = TowerType.Sniper;
-        _isPlacing = true;
-        UpdateTowerButtonHighlight();
-        RebuildGhost();
-        StatusText.Text = "Selected: Sniper (130g) — Long range, 30% crit ×3";
-    }
-
-    private void OnSelectPoison(object? sender, RoutedEventArgs e)
-    {
-        _selectedTower = TowerType.Poison;
-        _isPlacing = true;
-        UpdateTowerButtonHighlight();
-        RebuildGhost();
-        StatusText.Text = "Selected: Poison (100g) — Damage over time";
-    }
-
-    private void OnSelectSun(object? sender, RoutedEventArgs e)
-    {
-        _selectedTower = TowerType.Sun;
-        _isPlacing = true;
-        UpdateTowerButtonHighlight();
-        RebuildGhost();
-        StatusText.Text = "Selected: Sun (175g) — Continuous AOE burn";
+        var desc = def.AoeRadius > 0 ? "Continuous AOE burn"
+            : def.MultiShotCount > 1 ? $"Fires {def.MultiShotCount} shots in a fan"
+            : def.CritChance > 0 ? $"Long range, {def.CritChance*100:F0}% crit ×{def.CritMultiplier:F1}"
+            : def.DotDamage > 0 ? "Damage over time"
+            : def.SlowAmount > 0 ? "Slows enemies"
+            : def.SplashRadius > 0 ? "Splash damage"
+            : "Basic tower";
+        StatusText.Text = $"Selected: {name} ({def.Cost}g) — {desc}";
     }
 
     private void ClearPlacement()
@@ -1010,7 +1044,7 @@ public partial class GameView : UserControl
     private void EnsureGhost()
     {
         if (_ghostNode != null) return;
-        _ghostNode = BuildTowerModel(TowerDefinition.Get(_selectedTower), translucent: true);
+        _ghostNode = BuildTowerModel(TowerDefinition.Resolve(_selectedTowerName), translucent: true);
         _ghostNode.Position = new Vector3(0, -999, 0); // hidden
         AuraView.AddNode(_ghostNode);
     }
@@ -1115,6 +1149,7 @@ public partial class GameView : UserControl
         _gameOverShown = false;
         GameHudPanel.IsVisible = true;
         TowerBtnPanel.IsVisible = true;
+        BuildTowerButtons();
         ClearPlacement();
         StatusText.Text = $"Level {_selectedLevelNum} — Select a tower and place it!";
     }
@@ -1142,28 +1177,12 @@ public partial class GameView : UserControl
 
     private void UpdateTowerButtonHighlight()
     {
-        var showSelected = _isPlacing;
-
-        ArrowBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.Arrow ? 3 : 0);
-        ArrowBtn.BorderBrush = Avalonia.Media.Brushes.White;
-
-        CannonBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.Cannon ? 3 : 0);
-        CannonBtn.BorderBrush = Avalonia.Media.Brushes.White;
-
-        IceBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.Ice ? 3 : 0);
-        IceBtn.BorderBrush = Avalonia.Media.Brushes.White;
-
-        MultiBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.MultiShot ? 3 : 0);
-        MultiBtn.BorderBrush = Avalonia.Media.Brushes.White;
-
-        SniperBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.Sniper ? 3 : 0);
-        SniperBtn.BorderBrush = Avalonia.Media.Brushes.White;
-
-        PoisonBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.Poison ? 3 : 0);
-        PoisonBtn.BorderBrush = Avalonia.Media.Brushes.White;
-
-        SunBtn.BorderThickness = new Avalonia.Thickness(showSelected && _selectedTower == TowerType.Sun ? 3 : 0);
-        SunBtn.BorderBrush = Avalonia.Media.Brushes.White;
+        foreach (var (name, btn) in _towerButtons)
+        {
+            bool isSelected = _isPlacing && _selectedTowerName == name;
+            btn.BorderThickness = new Avalonia.Thickness(isSelected ? 3 : 0);
+            btn.BorderBrush = Avalonia.Media.Brushes.White;
+        }
     }
 
     // ==================== Game Over ====================
@@ -1248,6 +1267,7 @@ public partial class GameView : UserControl
         _gameOverShown = false;
         GameHudPanel.IsVisible = true;
         TowerBtnPanel.IsVisible = true;
+        BuildTowerButtons();
         ClearPlacement();
         StatusText.Text = $"Level {next} — Select a tower and place it!";
     }

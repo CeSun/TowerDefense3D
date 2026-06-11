@@ -1,0 +1,21 @@
+{
+  "name": "Ice Tower",
+  "cost": 75,
+  "damage": 8.0,
+  "range": 2.8,
+  "fireRate": 1.0,
+  "projectileSpeed": 4.0,
+  "colorR": 0,
+  "colorG": 255,
+  "colorB": 255,
+  "splashRadius": 0.0,
+  "slowAmount": 0.5,
+  "multiShotCount": 1,
+  "arcAngle": 0.0,
+  "critChance": 0.0,
+  "critMultiplier": 2.0,
+  "dotDamage": 0.0,
+  "dotDuration": 0.0,
+  "aoeRadius": 0.0,
+  "visualStyle": "Cannon"
+}

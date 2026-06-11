@@ -1,0 +1,21 @@
+{
+  "name": "Sniper",
+  "cost": 130,
+  "damage": 50.0,
+  "range": 5.0,
+  "fireRate": 0.5,
+  "projectileSpeed": 10.0,
+  "colorR": 128,
+  "colorG": 0,
+  "colorB": 128,
+  "splashRadius": 0.0,
+  "slowAmount": 0.0,
+  "multiShotCount": 1,
+  "arcAngle": 0.0,
+  "critChance": 0.3,
+  "critMultiplier": 3.0,
+  "dotDamage": 0.0,
+  "dotDuration": 0.0,
+  "aoeRadius": 0.0,
+  "visualStyle": "Sniper"
+}

@@ -3,12 +3,13 @@ using System.Numerics;
 
 namespace TowerDefense;
 
-// ==================== Tower Types ====================
+// ==================== Tower Definition ====================
 
-public enum TowerType { Arrow, Cannon, Ice, MultiShot, Sniper, Poison, Sun }
-
+/// <summary>
+/// Runtime tower definition. All towers are loaded from JSON config files
+/// (built-in or custom) — no hardcoded types.
+/// </summary>
 public record TowerDefinition(
-    TowerType Type,
     string Name,
     int Cost,
     float Damage,
@@ -24,11 +25,12 @@ public record TowerDefinition(
     float CritMultiplier = 2.0f,
     float DotDamage = 0,
     float DotDuration = 0,
-    float AoeRadius = 0
+    float AoeRadius = 0,
+    string VisualStyle = "Auto"
 )
 {
-    public static readonly TowerDefinition Arrow = new(
-        Type: TowerType.Arrow,
+    /// <summary>Fallback definition used when a tower name cannot be resolved.</summary>
+    public static readonly TowerDefinition Default = new(
         Name: "Arrow Tower",
         Cost: 50,
         Damage: 15,
@@ -38,92 +40,40 @@ public record TowerDefinition(
         Color: Color.LimeGreen
     );
 
-    public static readonly TowerDefinition Cannon = new(
-        Type: TowerType.Cannon,
-        Name: "Cannon Tower",
-        Cost: 100,
-        Damage: 40,
-        Range: 3.0f,
-        FireRate: 0.6f,
-        ProjectileSpeed: 3f,
-        Color: Color.OrangeRed,
-        SplashRadius: 1.5f
-    );
+    /// <summary>All loaded tower definitions, keyed by name.</summary>
+    public static readonly Dictionary<string, TowerDefinition> All = new();
 
-    public static readonly TowerDefinition Ice = new(
-        Type: TowerType.Ice,
-        Name: "Ice Tower",
-        Cost: 75,
-        Damage: 8,
-        Range: 2.8f,
-        FireRate: 1.0f,
-        ProjectileSpeed: 4f,
-        Color: Color.Cyan,
-        SlowAmount: 0.5f
-    );
-
-    public static readonly TowerDefinition MultiShot = new(
-        Type: TowerType.MultiShot,
-        Name: "Multi-Shot",
-        Cost: 150,
-        Damage: 12,
-        Range: 3.0f,
-        FireRate: 1.0f,
-        ProjectileSpeed: 6f,
-        Color: Color.Orange,
-        MultiShotCount: 3,
-        ArcAngle: 25f
-    );
-
-    public static readonly TowerDefinition Sniper = new(
-        Type: TowerType.Sniper,
-        Name: "Sniper",
-        Cost: 130,
-        Damage: 50,
-        Range: 5.0f,
-        FireRate: 0.5f,
-        ProjectileSpeed: 10f,
-        Color: Color.Purple,
-        CritChance: 0.3f,
-        CritMultiplier: 3.0f
-    );
-
-    public static readonly TowerDefinition Poison = new(
-        Type: TowerType.Poison,
-        Name: "Poison Tower",
-        Cost: 100,
-        Damage: 8,
-        Range: 3.5f,
-        FireRate: 1.5f,
-        ProjectileSpeed: 5f,
-        Color: Color.GreenYellow,
-        DotDamage: 20f,
-        DotDuration: 3.0f
-    );
-
-    public static readonly TowerDefinition Sun = new(
-        Type: TowerType.Sun,
-        Name: "Sun Tower",
-        Cost: 175,
-        Damage: 18,
-        Range: 2.5f,
-        FireRate: 0,
-        ProjectileSpeed: 0,
-        Color: Color.Gold,
-        AoeRadius: 2.5f
-    );
-
-    public static TowerDefinition Get(TowerType type) => type switch
+    /// <summary>
+    /// Resolve a tower definition by name (case-sensitive).
+    /// Returns <see cref="Default"/> if not found.
+    /// </summary>
+    public static TowerDefinition Resolve(string name)
     {
-        TowerType.Arrow => Arrow,
-        TowerType.Cannon => Cannon,
-        TowerType.Ice => Ice,
-        TowerType.MultiShot => MultiShot,
-        TowerType.Sniper => Sniper,
-        TowerType.Poison => Poison,
-        TowerType.Sun => Sun,
-        _ => Arrow
-    };
+        if (All.TryGetValue(name, out var def))
+            return def;
+        return Default;
+    }
+
+    /// <summary>Create a TowerDefinition from serializable TowerData.</summary>
+    public static TowerDefinition FromTowerData(TowerData data) => new(
+        Name: data.Name,
+        Cost: data.Cost,
+        Damage: data.Damage,
+        Range: data.Range,
+        FireRate: data.FireRate,
+        ProjectileSpeed: data.ProjectileSpeed,
+        Color: data.GetColor(),
+        SplashRadius: data.SplashRadius,
+        SlowAmount: data.SlowAmount,
+        MultiShotCount: data.MultiShotCount,
+        ArcAngle: data.ArcAngle,
+        CritChance: data.CritChance,
+        CritMultiplier: data.CritMultiplier,
+        DotDamage: data.DotDamage,
+        DotDuration: data.DotDuration,
+        AoeRadius: data.AoeRadius,
+        VisualStyle: data.VisualStyle
+    );
 }
 
 // ==================== Enemy Definition ====================
@@ -181,7 +131,8 @@ public record EnemyDefinition(
 public class TowerInstance
 {
     public int Id { get; set; }
-    public TowerDefinition Def { get; set; } = TowerDefinition.Arrow;
+    public string TowerName { get; set; } = "Arrow Tower";
+    public TowerDefinition Def { get; set; } = TowerDefinition.Default;
     public int GridCol { get; set; }
     public int GridRow { get; set; }
     public Vector3 Position { get; set; }

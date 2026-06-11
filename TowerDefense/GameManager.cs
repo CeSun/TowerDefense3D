@@ -255,12 +255,12 @@ public class GameManager
 
     // ==================== Player Actions ====================
 
-    public bool TryPlaceTower(int col, int row, TowerType type)
+    public bool TryPlaceTower(int col, int row, string towerName)
     {
         if (!CanPlaceTower(col, row))
             return false;
 
-        var def = TowerDefinition.Get(type);
+        var def = TowerDefinition.Resolve(towerName);
         if (Gold < def.Cost)
             return false;
 
@@ -270,6 +270,7 @@ public class GameManager
         var tower = new TowerInstance
         {
             Id = _nextId++,
+            TowerName = towerName,
             Def = def,
             GridCol = col,
             GridRow = row,

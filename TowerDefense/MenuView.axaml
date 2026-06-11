@@ -49,6 +49,17 @@
                 👾  Monster Editor
             </Button>
 
+            <!-- Tower Editor Button -->
+            <Button x:Name="TowerEditorBtn" Click="OnOpenTowerEditorClick"
+                    Background="#CC5a5a8a" Foreground="White"
+                    FontSize="22" FontWeight="Bold"
+                    Padding="40,18" CornerRadius="12" Width="320"
+                    HorizontalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    Cursor="Hand">
+                🗼  Tower Editor
+            </Button>
+
             <!-- Map count hint -->
             <TextBlock x:Name="MapCountLabel" Text=""
                        Foreground="#666" FontSize="12"

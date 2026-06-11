@@ -1,0 +1,21 @@
+{
+  "name": "Cannon Tower",
+  "cost": 100,
+  "damage": 40.0,
+  "range": 3.0,
+  "fireRate": 0.6,
+  "projectileSpeed": 3.0,
+  "colorR": 255,
+  "colorG": 69,
+  "colorB": 0,
+  "splashRadius": 1.5,
+  "slowAmount": 0.0,
+  "multiShotCount": 1,
+  "arcAngle": 0.0,
+  "critChance": 0.0,
+  "critMultiplier": 2.0,
+  "dotDamage": 0.0,
+  "dotDuration": 0.0,
+  "aoeRadius": 0.0,
+  "visualStyle": "Cannon"
+}

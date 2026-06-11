@@ -19,5 +19,7 @@
     <EmbeddedResource Include="Maps\**" LinkBase="Maps" />
     <Content Include="Enemies\**" CopyToOutputDirectory="PreserveNewest" LinkBase="Enemies" />
     <EmbeddedResource Include="Enemies\**" LinkBase="Enemies" />
+    <Content Include="Towers\**" CopyToOutputDirectory="PreserveNewest" LinkBase="Towers" />
+    <EmbeddedResource Include="Towers\**" LinkBase="Towers" />
   </ItemGroup>
 </Project>

@@ -14,6 +14,7 @@ public partial class MainView : UserControl
     private MapListControl? _mapListView;
     private MapEditorView? _editorView;
     private MonsterEditorView? _monsterEditorView;
+    private TowerEditorView? _towerEditorView;
     private MapData _currentMapData = null!;
     private string _mapsDir = string.Empty;
 
@@ -49,6 +50,9 @@ public partial class MainView : UserControl
 
         // Load custom enemy definitions so they are available for gameplay.
         LoadCustomEnemies();
+
+        // Load tower definitions from built-in + custom JSON files.
+        LoadCustomTowers();
 
         // Check for command-line args to skip the menu
         var args = Environment.GetCommandLineArgs();
@@ -168,6 +172,7 @@ public partial class MainView : UserControl
             _menuView.OnPlayGame = () => ShowGame();
             _menuView.OnOpenEditor = () => ShowEditor();
             _menuView.OnOpenMonsterEditor = () => ShowMonsterEditor();
+            _menuView.OnOpenTowerEditor = () => ShowTowerEditor();
         }
 
         _menuView.MapCount = CountMaps();
@@ -230,9 +235,22 @@ public partial class MainView : UserControl
 
         var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         var enemiesDir = Path.Combine(appData, "Enemies");
-        var customEnemiesDir = Path.Combine(appData, "CustomEnemies");
-        _monsterEditorView.Initialize(enemiesDir, customEnemiesDir);
+        _monsterEditorView.Initialize(enemiesDir);
         ContentArea.Content = _monsterEditorView;
+    }
+
+    private void ShowTowerEditor()
+    {
+        if (_towerEditorView == null)
+        {
+            _towerEditorView = new TowerEditorView();
+            _towerEditorView.OnBack = () => ShowMenu();
+        }
+
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var towersDir = Path.Combine(appData, "Towers");
+        _towerEditorView.Initialize(towersDir);
+        ContentArea.Content = _towerEditorView;
     }
 
     /// <summary>
@@ -249,12 +267,8 @@ public partial class MainView : UserControl
 
         EnemyDefinition.All.Clear();
 
-        // Load built-in enemies.
+        // Load all enemies from the single Enemies/ directory (built-in + custom).
         LoadEnemiesFromDir(enemiesDir);
-
-        // Load custom enemies.
-        var customDir = Path.Combine(appData, "CustomEnemies");
-        LoadEnemiesFromDir(customDir);
     }
 
     /// <summary>
@@ -305,6 +319,75 @@ public partial class MainView : UserControl
             var data = EnemyData.LoadFromFile(file);
             if (data != null)
                 EnemyDefinition.All[data.Name] = data.ToDefinition();
+        }
+    }
+
+    /// <summary>
+    /// Extract built-in tower configs from embedded resources, then load all towers
+    /// (built-in + custom) into <see cref="TowerDefinition.All"/>.
+    /// </summary>
+    private static void LoadCustomTowers()
+    {
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var towersDir = Path.Combine(appData, "Towers");
+
+        // Extract built-in tower JSON files from embedded resources on first run.
+        ExtractEmbeddedTowers(towersDir);
+
+        TowerDefinition.All.Clear();
+
+        // Load all towers from the single Towers/ directory (built-in + custom).
+        LoadTowersFromDir(towersDir);
+    }
+
+    /// <summary>
+    /// Extract built-in tower configs to the given directory (skip if already present).
+    /// </summary>
+    private static void ExtractEmbeddedTowers(string towersDir)
+    {
+        var assembly = typeof(MapData).Assembly;
+        var prefix = $"{assembly.GetName().Name}.Towers.Builtin.";
+
+        foreach (var resourceName in assembly.GetManifestResourceNames())
+        {
+            if (!resourceName.StartsWith(prefix) || !resourceName.EndsWith(".json"))
+                continue;
+
+            var fileName = resourceName.Substring(prefix.Length);
+            try
+            {
+                Directory.CreateDirectory(towersDir);
+                var targetPath = Path.Combine(towersDir, fileName);
+                if (File.Exists(targetPath))
+                    continue;
+
+                using var stream = assembly.GetManifestResourceStream(resourceName);
+                if (stream == null) continue;
+
+                using var fileStream = File.Create(targetPath);
+                stream.CopyTo(fileStream);
+            }
+            catch
+            {
+                // Best-effort.
+            }
+        }
+    }
+
+    /// <summary>Load all .json tower configs from a directory into <see cref="TowerDefinition.All"/>.</summary>
+    private static void LoadTowersFromDir(string dir)
+    {
+        if (!Directory.Exists(dir))
+            return;
+
+        foreach (var file in Directory.GetFiles(dir, "*.json"))
+        {
+            var name = Path.GetFileNameWithoutExtension(file);
+            if (name == "_save") continue;
+
+            var data = TowerData.LoadFromFile(file);
+            if (data != null)
+                TowerDefinition.All[data.Name] = data.ToDefinition();
         }
     }
 

@@ -1,0 +1,21 @@
+{
+  "name": "Multi-Shot",
+  "cost": 150,
+  "damage": 12.0,
+  "range": 3.0,
+  "fireRate": 1.0,
+  "projectileSpeed": 6.0,
+  "colorR": 255,
+  "colorG": 165,
+  "colorB": 0,
+  "splashRadius": 0.0,
+  "slowAmount": 0.0,
+  "multiShotCount": 3,
+  "arcAngle": 25.0,
+  "critChance": 0.0,
+  "critMultiplier": 2.0,
+  "dotDamage": 0.0,
+  "dotDuration": 0.0,
+  "aoeRadius": 0.0,
+  "visualStyle": "MultiShot"
+}

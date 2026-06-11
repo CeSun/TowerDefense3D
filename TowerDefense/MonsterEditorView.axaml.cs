@@ -16,10 +16,8 @@ namespace TowerDefense;
 public partial class MonsterEditorView : UserControl
 {
     // ==================== State ====================
-    private string _enemiesDir = string.Empty;       // built-in enemies
-    private string _customEnemiesDir = string.Empty; // user-created enemies
+    private string _enemiesDir = string.Empty;       // single dir for all enemies (built-in + custom)
     private string _currentFileName = string.Empty;
-    private string _currentSourceDir = string.Empty; // which dir the loaded enemy came from
     private bool _sceneReady;
     private float _rotationTimer;
 
@@ -43,10 +41,9 @@ public partial class MonsterEditorView : UserControl
 
     // ==================== Initialization ====================
 
-    public void Initialize(string enemiesDir, string customEnemiesDir)
+    public void Initialize(string enemiesDir)
     {
         _enemiesDir = enemiesDir;
-        _customEnemiesDir = customEnemiesDir;
         RefreshMonsterList();
     }
 
@@ -54,13 +51,7 @@ public partial class MonsterEditorView : UserControl
 
     private void RefreshMonsterList()
     {
-        // Collect all unique names from both directories.
-        var names = new HashSet<string>();
-        foreach (var n in EnemyData.ListNames(_enemiesDir))
-            names.Add(n);
-        foreach (var n in EnemyData.ListNames(_customEnemiesDir))
-            names.Add(n);
-
+        var names = EnemyData.ListNames(_enemiesDir);
         var sorted = names.OrderBy(n => n).ToList();
         MonsterListCombo.Items.Clear();
         foreach (var name in sorted)
@@ -69,31 +60,15 @@ public partial class MonsterEditorView : UserControl
         DeleteBtn.IsVisible = sorted.Count > 0;
     }
 
-    /// <summary>Find the directory that contains the given enemy file.</summary>
-    private string? FindEnemyDir(string name)
-    {
-        var path = Path.Combine(_enemiesDir, name + ".json");
-        if (File.Exists(path)) return _enemiesDir;
-
-        path = Path.Combine(_customEnemiesDir, name + ".json");
-        if (File.Exists(path)) return _customEnemiesDir;
-
-        return null;
-    }
-
     private void OnMonsterSelected(object? sender, SelectionChangedEventArgs e)
     {
         if (MonsterListCombo.SelectedItem is not string name) return;
 
-        var dir = FindEnemyDir(name);
-        if (dir == null) return;
-
-        var data = EnemyData.LoadFromFile(Path.Combine(dir, name + ".json"));
+        var data = EnemyData.LoadFromFile(Path.Combine(_enemiesDir, name + ".json"));
         if (data != null)
         {
             LoadMonsterData(data);
             _currentFileName = name;
-            _currentSourceDir = dir;
             StatusLabel.Text = $"Loaded: {name}";
         }
     }
@@ -103,7 +78,6 @@ public partial class MonsterEditorView : UserControl
         var data = new EnemyData();
         LoadMonsterData(data);
         _currentFileName = string.Empty;
-        _currentSourceDir = _customEnemiesDir;
         StatusLabel.Text = "New monster (unsaved)";
     }
 
@@ -115,10 +89,7 @@ public partial class MonsterEditorView : UserControl
             return;
         }
 
-        var dir = FindEnemyDir(name);
-        if (dir == null) return;
-
-        var filePath = Path.Combine(dir, name + ".json");
+        var filePath = Path.Combine(_enemiesDir, name + ".json");
         if (File.Exists(filePath))
             File.Delete(filePath);
 
@@ -308,9 +279,7 @@ public partial class MonsterEditorView : UserControl
             return;
         }
 
-        var dir = _currentSourceDir;
-        if (string.IsNullOrEmpty(dir))
-            dir = _customEnemiesDir;
+        var dir = _enemiesDir;
         Directory.CreateDirectory(dir);
 
         var fileName = SanitizeFileName(data.Name);
@@ -318,7 +287,6 @@ public partial class MonsterEditorView : UserControl
         data.SaveToFile(filePath);
 
         _currentFileName = fileName;
-        _currentSourceDir = dir;
         RefreshMonsterList();
         MonsterListCombo.SelectedItem = fileName;
 

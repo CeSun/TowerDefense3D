@@ -1,0 +1,21 @@
+{
+  "name": "Poison Tower",
+  "cost": 100,
+  "damage": 8.0,
+  "range": 3.5,
+  "fireRate": 1.5,
+  "projectileSpeed": 5.0,
+  "colorR": 173,
+  "colorG": 255,
+  "colorB": 47,
+  "splashRadius": 0.0,
+  "slowAmount": 0.0,
+  "multiShotCount": 1,
+  "arcAngle": 0.0,
+  "critChance": 0.0,
+  "critMultiplier": 2.0,
+  "dotDamage": 20.0,
+  "dotDuration": 3.0,
+  "aoeRadius": 0.0,
+  "visualStyle": "Poison"
+}
