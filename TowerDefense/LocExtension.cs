@@ -1,5 +1,6 @@
 using Avalonia.Data;
 using Avalonia.Markup.Xaml;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TowerDefense;
 
@@ -9,6 +10,7 @@ namespace TowerDefense;
 ///
 /// Usage: <c>Text="{loc:Loc Menu.Title}"</c>
 /// </summary>
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
 public sealed class LocExtension : MarkupExtension
 {
     /// <summary>Resource key to look up.</summary>

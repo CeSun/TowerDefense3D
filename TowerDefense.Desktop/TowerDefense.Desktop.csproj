@@ -11,6 +11,17 @@
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 	</PropertyGroup>
 
+	<!--
+		Preserve the TowerDefense assembly and its embedded resources from AOT trimming.
+		The entire UI uses {loc:Loc Key} markup extensions that rely on reflection-based
+		ResourceManager, which the trimmer cannot trace from Program.Main().
+		Without this, ALL text disappears after AOT publish.
+	-->
+	<ItemGroup>
+		<TrimmerRootAssembly Include="TowerDefense" />
+		<TrimmerRootDescriptor Include="rd.xml" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Avalonia.Desktop" Version="12.0.0" />
 	</ItemGroup>

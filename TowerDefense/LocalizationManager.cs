@@ -1,5 +1,6 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Resources;
 using TowerDefense.Properties;
@@ -9,7 +10,13 @@ namespace TowerDefense;
 /// <summary>
 /// Singleton localization manager that wraps the .resx ResourceManager
 /// with INotifyPropertyChanged support for live UI binding updates.
+///
+/// All public members must be preserved for AOT because the indexer
+/// is accessed via Avalonia dynamic bindings and the events are
+/// subscribed via INotifyPropertyChanged/INotifyCollectionChanged.
 /// </summary>
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                           DynamicallyAccessedMemberTypes.PublicEvents)]
 public sealed class LocalizationManager : INotifyPropertyChanged, INotifyCollectionChanged
 {
     public static LocalizationManager Instance { get; } = new();

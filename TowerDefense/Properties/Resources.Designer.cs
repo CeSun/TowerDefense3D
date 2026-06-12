@@ -1,4 +1,5 @@
 #nullable enable
+using System.Diagnostics.CodeAnalysis;
 using System.Resources;
 
 namespace TowerDefense.Properties;
@@ -8,6 +9,7 @@ namespace TowerDefense.Properties;
 /// This is a manually maintained counterpart to the auto-generated designer file
 /// that Visual Studio would normally create from Resources.resx.
 /// </summary>
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
 public static class Resources
 {
     private static ResourceManager? _resourceManager;
