@@ -245,8 +245,26 @@
   <data name="MapEditor.ClickHint" xml:space="preserve">
     <value>🖱 左键点击: 放置 | 右键点击: 移除</value>
   </data>
+  <data name="MapEditor.TapHint" xml:space="preserve">
+    <value>👆 选择上方类型，点击网格放置</value>
+  </data>
+  <data name="MapEditor.WaypointType" xml:space="preserve">
+    <value>路点类型</value>
+  </data>
+  <data name="MapEditor.Coord" xml:space="preserve">
+    <value>坐标:</value>
+  </data>
+  <data name="MapEditor.DeleteWaypoint" xml:space="preserve">
+    <value>🗑 删除路径点</value>
+  </data>
+  <data name="MapEditor.DeleteStart" xml:space="preserve">
+    <value>🗑 删除起点</value>
+  </data>
+  <data name="MapEditor.DeleteEnd" xml:space="preserve">
+    <value>🗑 删除终点</value>
+  </data>
   <data name="MapEditor.GridHint" xml:space="preserve">
-    <value>左键点击: 添加路径点 | 右键点击: 删除</value>
+    <value>点击网格放置。点击已有标记可选中并删除。</value>
   </data>
   <data name="MapEditor.WavesTitle" xml:space="preserve">
     <value>波次</value>

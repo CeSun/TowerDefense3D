@@ -245,8 +245,26 @@
   <data name="MapEditor.ClickHint" xml:space="preserve">
     <value>🖱 Left click: place | Right click: remove</value>
   </data>
+  <data name="MapEditor.TapHint" xml:space="preserve">
+    <value>🖱 Select type above, then tap grid to place</value>
+  </data>
+  <data name="MapEditor.WaypointType" xml:space="preserve">
+    <value>WAYPOINT TYPE</value>
+  </data>
+  <data name="MapEditor.Coord" xml:space="preserve">
+    <value>Coord:</value>
+  </data>
+  <data name="MapEditor.DeleteWaypoint" xml:space="preserve">
+    <value>🗑 Delete Waypoint</value>
+  </data>
+  <data name="MapEditor.DeleteStart" xml:space="preserve">
+    <value>🗑 Delete Start</value>
+  </data>
+  <data name="MapEditor.DeleteEnd" xml:space="preserve">
+    <value>🗑 Delete End</value>
+  </data>
   <data name="MapEditor.GridHint" xml:space="preserve">
-    <value>Left click: add waypoint | Right click: delete</value>
+    <value>Tap grid to place. Tap existing marker to select and delete.</value>
   </data>
   <data name="MapEditor.WavesTitle" xml:space="preserve">
     <value>WAVES</value>

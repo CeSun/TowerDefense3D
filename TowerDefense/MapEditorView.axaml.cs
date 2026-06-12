@@ -16,10 +16,14 @@ public enum PlacementMode { Start, Waypoint, End }
 
 public partial class MapEditorView : UserControl
 {
+    private enum SelectedElement { None, Start, End, Waypoint }
+
     // ==================== State ====================
     private MapData _mapData = MapData.CreateDefault();
     private string? _currentFilePath;
     private PlacementMode _placementMode = PlacementMode.Waypoint;
+    private int _selectedWaypointIndex = -1;
+    private SelectedElement _selectedElement;
 
     // ==================== Scene ====================
     private Node? _groundNode;
@@ -48,6 +52,7 @@ public partial class MapEditorView : UserControl
     {
         InitializeComponent();
         RefreshEnemyTypeCombo();
+        UpdatePlacementModeButtons();
     }
 
     /// <summary>
@@ -57,6 +62,7 @@ public partial class MapEditorView : UserControl
     {
         _mapData = map;
         _currentFilePath = filePath;
+        _selectedWaypointIndex = -1;
         RefreshEnemyTypeCombo();
         SyncUIFromMap();
         if (_sceneReady)
@@ -73,6 +79,7 @@ public partial class MapEditorView : UserControl
         GridRowsInput.Text = _mapData.GridRows.ToString();
         RefreshWaveList();
         RefreshEntryList();
+        HideWaypointInfo();
     }
 
     // ==================== Scene Initialization ====================
@@ -99,8 +106,6 @@ public partial class MapEditorView : UserControl
         view.PipelineSettings.CsmShadowMapResolution = 2048;
         view.PipelineSettings.CsmCascadeCount = 4;
         view.PipelineSettings.CsmSplitLambda = 0.6f;
-
-        view.PointerPressed += OnEditorPointerPressed;
 
         _boxGeo = new BoxGeometry();
         _sphereGeo = new SphereGeometry();
@@ -234,12 +239,23 @@ public partial class MapEditorView : UserControl
         for (int i = 0; i < wps.Count; i++)
         {
             var color = GetWaypointColor(i, wps.Count);
+            var isSelected = i == _selectedWaypointIndex;
+            if (isSelected)
+                color = DrawingColor.FromArgb(255,
+                    (byte)Math.Min(255, color.R + 80),
+                    (byte)Math.Min(255, color.G + 80),
+                    (byte)Math.Min(255, color.B + 80));
+
             var node = new Node { Name = $"Waypoint_{i}" };
             var disc = new Mesh { Geometry = _boxGeo!, Material = CreateMaterial(color) };
-            disc.Scale = new Vector3(0.5f, 0.03f, 0.5f);
+            disc.Scale = isSelected
+                ? new Vector3(0.65f, 0.04f, 0.65f)
+                : new Vector3(0.5f, 0.03f, 0.5f);
             node.AddChild(disc, AttachToParentRule.KeepLocal);
             var sphere = new Mesh { Geometry = _sphereGeo!, Material = CreateMaterial(color) };
-            sphere.Scale = new Vector3(0.20f);
+            sphere.Scale = isSelected
+                ? new Vector3(0.26f)
+                : new Vector3(0.20f);
             sphere.Position = new Vector3(0, 0.10f, 0);
             node.AddChild(sphere, AttachToParentRule.KeepLocal);
             var wp = wps[i];
@@ -315,75 +331,174 @@ public partial class MapEditorView : UserControl
         SetEndBtn.Background = Brush.Parse(_placementMode == PlacementMode.End ? "#CC6a2a2a" : dimBg);
     }
 
-    // ==================== Pointer Input ====================
+    // ==================== Waypoint Info Panel ====================
 
-    private void OnEditorPointerPressed(object? sender, PointerPressedEventArgs e)
+    private void ShowWaypointInfo(int index, int col, int row)
     {
-        if (!_sceneReady) return;
-        var view = EditorView;
-        var pos = e.GetPosition(view);
-        if (e.GetCurrentPoint(view).Properties.IsRightButtonPressed)
-        {
-            HandleRightClick(pos);
-            return;
-        }
+        _selectedElement = SelectedElement.Waypoint;
+        _selectedWaypointIndex = index;
+        WaypointInfoPanel.IsVisible = true;
+
+        WaypointTypeBadge.Background = Brush.Parse("#CC4a6a8a");
+        WaypointTypeText.Text = Loc.Get("MapEditor.Waypoint");
+        WaypointCoordText.Text = $"({col}, {row})";
+
+        DeleteWaypointBtn.Content = Loc.Get("MapEditor.DeleteWaypoint");
+
+        GridStatusText.Text = Loc.Get("MapEditor.SelectedWaypoint", index, col, row);
+        if (_sceneReady) RebuildMapScene();
     }
+
+    private void ShowStartInfo(int col, int row)
+    {
+        _selectedElement = SelectedElement.Start;
+        _selectedWaypointIndex = -1;
+        WaypointInfoPanel.IsVisible = true;
+
+        WaypointTypeBadge.Background = Brush.Parse("#CC2d6a2d");
+        WaypointTypeText.Text = Loc.Get("MapEditor.Start");
+        WaypointCoordText.Text = $"({col}, {row})";
+
+        DeleteWaypointBtn.Content = Loc.Get("MapEditor.DeleteStart");
+
+        GridStatusText.Text = Loc.Get("MapEditor.StartAt", col, row);
+    }
+
+    private void ShowEndInfo(int col, int row)
+    {
+        _selectedElement = SelectedElement.End;
+        _selectedWaypointIndex = -1;
+        WaypointInfoPanel.IsVisible = true;
+
+        WaypointTypeBadge.Background = Brush.Parse("#CC4a2a2a");
+        WaypointTypeText.Text = Loc.Get("MapEditor.End");
+        WaypointCoordText.Text = $"({col}, {row})";
+
+        DeleteWaypointBtn.Content = Loc.Get("MapEditor.DeleteEnd");
+
+        GridStatusText.Text = Loc.Get("MapEditor.EndAt", col, row);
+    }
+
+    private void HideWaypointInfo()
+    {
+        _selectedElement = SelectedElement.None;
+        _selectedWaypointIndex = -1;
+        WaypointInfoPanel.IsVisible = false;
+        if (_sceneReady) RebuildMapScene();
+    }
+
+    private void OnDeleteSelectedWaypoint(object? sender, RoutedEventArgs e)
+    {
+        switch (_selectedElement)
+        {
+            case SelectedElement.Waypoint:
+                if (_selectedWaypointIndex >= 0 && _selectedWaypointIndex < _mapData.PathWaypoints.Count)
+                {
+                    var wp = _mapData.PathWaypoints[_selectedWaypointIndex];
+                    _mapData.PathWaypoints.RemoveAt(_selectedWaypointIndex);
+                    GridStatusText.Text = Loc.Get("MapEditor.RemovedWaypoint", wp.Col, wp.Row);
+                }
+                break;
+            case SelectedElement.Start:
+                if (_mapData.StartCell != null)
+                {
+                    var s = _mapData.StartCell;
+                    _mapData.StartCell = null;
+                    GridStatusText.Text = Loc.Get("MapEditor.RemovedStart", s.Col, s.Row);
+                }
+                break;
+            case SelectedElement.End:
+                if (_mapData.EndCell != null)
+                {
+                    var end = _mapData.EndCell;
+                    _mapData.EndCell = null;
+                    GridStatusText.Text = Loc.Get("MapEditor.RemovedEnd", end.Col, end.Row);
+                }
+                break;
+        }
+        HideWaypointInfo();
+        if (_sceneReady) RebuildMapScene();
+    }
+
+    // ==================== Pointer Input ====================
 
     private void OnEditorObjectPicked(object? sender, ObjectPickedEventArgs args)
     {
         if (!_sceneReady) return;
         var nodeName = args.Node.Name ?? "";
 
+        // Clicked on a waypoint marker → select it
         if (nodeName.StartsWith("Waypoint_"))
         {
             if (int.TryParse(nodeName.Replace("Waypoint_", ""), out int index)
                 && index < _mapData.PathWaypoints.Count)
-                GridStatusText.Text = Loc.Get("MapEditor.SelectedWaypoint", index, _mapData.PathWaypoints[index].Col, _mapData.PathWaypoints[index].Row);
+            {
+                var wp = _mapData.PathWaypoints[index];
+                ShowWaypointInfo(index, wp.Col, wp.Row);
+            }
             return;
         }
-        if (nodeName == "EntryMarker") { var s = _mapData.StartCell; GridStatusText.Text = s != null ? Loc.Get("MapEditor.StartAt", s.Col, s.Row) : Loc.Get("MapEditor.NoStartSet"); return; }
-        if (nodeName == "ExitMarker") { var e = _mapData.EndCell; GridStatusText.Text = e != null ? Loc.Get("MapEditor.EndAt", e.Col, e.Row) : Loc.Get("MapEditor.NoEndSet"); return; }
+
+        // Clicked on entry/exit markers → show info
+        if (nodeName == "EntryMarker")
+        {
+            var s = _mapData.StartCell;
+            if (s != null) ShowStartInfo(s.Col, s.Row);
+            else GridStatusText.Text = Loc.Get("MapEditor.NoStartSet");
+            return;
+        }
+        if (nodeName == "ExitMarker")
+        {
+            var e = _mapData.EndCell;
+            if (e != null) ShowEndInfo(e.Col, e.Row);
+            else GridStatusText.Text = Loc.Get("MapEditor.NoEndSet");
+            return;
+        }
 
         var worldPos = args.WorldPosition;
         var grid = WorldToCell(worldPos);
         if (grid == null) return;
         var (col, row) = grid.Value;
 
+        // Clicked on a grid cell with existing waypoint → select it
+        int existingIdx = FindWaypointAt(col, row);
+        if (existingIdx >= 0)
+        {
+            ShowWaypointInfo(existingIdx, col, row);
+            return;
+        }
+        // Clicked on start/end cell → show info
+        if (IsStartCell(col, row))
+        {
+            ShowStartInfo(col, row);
+            return;
+        }
+        if (IsEndCell(col, row))
+        {
+            ShowEndInfo(col, row);
+            return;
+        }
+
+        // Placement mode: add new element
         switch (_placementMode)
         {
             case PlacementMode.Start:
                 _mapData.StartCell = new WaypointCell(col, row);
                 RebuildMapScene();
-                GridStatusText.Text = Loc.Get("MapEditor.SetStart", col, row);
+                ShowStartInfo(col, row);
                 break;
             case PlacementMode.End:
                 _mapData.EndCell = new WaypointCell(col, row);
                 RebuildMapScene();
-                GridStatusText.Text = Loc.Get("MapEditor.SetEnd", col, row);
+                ShowEndInfo(col, row);
                 break;
             default:
-                if (IsStartCell(col, row) || IsEndCell(col, row))
-                { GridStatusText.Text = Loc.Get("MapEditor.CannotChangeStartEnd", col, row); return; }
-                if (FindWaypointAt(col, row) >= 0) { GridStatusText.Text = Loc.Get("MapEditor.SelectedWaypointAt", col, row); return; }
                 _mapData.PathWaypoints.Add(new WaypointCell(col, row));
+                int newIndex = _mapData.PathWaypoints.Count - 1;
                 RebuildMapScene();
-                GridStatusText.Text = Loc.Get("MapEditor.AddedWaypoint", col, row);
+                ShowWaypointInfo(newIndex, col, row);
                 break;
         }
-    }
-
-    private void HandleRightClick(Avalonia.Point pos)
-    {
-        var pick = EditorView.PickClosestAt(pos.X, pos.Y);
-        if (pick == null) return;
-        var grid = WorldToCell(pick.WorldPosition);
-        if (grid == null) return;
-        var (col, row) = grid.Value;
-
-        if (IsStartCell(col, row)) { _mapData.StartCell = null; RebuildMapScene(); GridStatusText.Text = Loc.Get("MapEditor.RemovedStart", col, row); return; }
-        if (IsEndCell(col, row)) { _mapData.EndCell = null; RebuildMapScene(); GridStatusText.Text = Loc.Get("MapEditor.RemovedEnd", col, row); return; }
-        int index = FindWaypointAt(col, row);
-        if (index >= 0) { _mapData.PathWaypoints.RemoveAt(index); RebuildMapScene(); GridStatusText.Text = Loc.Get("MapEditor.RemovedWaypoint", col, row); }
     }
 
     // ==================== Path Calculation ====================
@@ -596,6 +711,9 @@ public partial class MapEditorView : UserControl
         if (cols == _mapData.GridCols && rows == _mapData.GridRows) return;
         _mapData.GridCols = cols; _mapData.GridRows = rows;
         _mapData.PathWaypoints.RemoveAll(w => w.Col >= cols || w.Row >= rows);
+        if (_selectedWaypointIndex >= _mapData.PathWaypoints.Count)
+            _selectedWaypointIndex = -1;
+        HideWaypointInfo();
         RebuildMapScene();
     }
 
