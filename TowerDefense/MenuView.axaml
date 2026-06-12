@@ -27,7 +27,7 @@
                     Cursor="Hand"
                     Content="{loc:Loc Menu.PlayGame}" />
 
-            <!-- Map Editor Button -->
+            <!-- Editor Button -->
             <Button x:Name="EditorBtn" Click="OnOpenEditorClick"
                     Background="#CC4a6a8a" Foreground="White"
                     FontSize="22" FontWeight="Bold"
@@ -35,27 +35,7 @@
                     HorizontalAlignment="Center"
                     HorizontalContentAlignment="Center"
                     Cursor="Hand"
-                    Content="{loc:Loc Menu.MapEditor}" />
-
-            <!-- Monster Editor Button -->
-            <Button x:Name="MonsterEditorBtn" Click="OnOpenMonsterEditorClick"
-                    Background="#CC8a5a4a" Foreground="White"
-                    FontSize="22" FontWeight="Bold"
-                    Padding="40,18" CornerRadius="12" Width="320"
-                    HorizontalAlignment="Center"
-                    HorizontalContentAlignment="Center"
-                    Cursor="Hand"
-                    Content="{loc:Loc Menu.MonsterEditor}" />
-
-            <!-- Tower Editor Button -->
-            <Button x:Name="TowerEditorBtn" Click="OnOpenTowerEditorClick"
-                    Background="#CC5a5a8a" Foreground="White"
-                    FontSize="22" FontWeight="Bold"
-                    Padding="40,18" CornerRadius="12" Width="320"
-                    HorizontalAlignment="Center"
-                    HorizontalContentAlignment="Center"
-                    Cursor="Hand"
-                    Content="{loc:Loc Menu.TowerEditor}" />
+                    Content="{loc:Loc Menu.Editor}" />
 
             <!-- Map count hint -->
             <TextBlock x:Name="MapCountLabel" Text=""

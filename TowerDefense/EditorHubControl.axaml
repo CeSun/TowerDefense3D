@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:a="https://github.com/CeSun/Aura3D"
+             xmlns:loc="clr-namespace:TowerDefense"
+             x:Class="TowerDefense.EditorHubControl">
+    <Grid Background="#FF0d0d1a">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Top bar -->
+        <Border Grid.Row="0"
+                Background="#CC0d0d1a" Padding="12,8" Margin="8,8,8,0"
+                CornerRadius="6">
+            <DockPanel>
+                <Button x:Name="BackBtn" Click="OnBackClick"
+                        DockPanel.Dock="Left"
+                        Background="#CC4a6a8a" Foreground="White"
+                        FontSize="12" FontWeight="Bold"
+                        Padding="10,6" CornerRadius="4"
+                        Margin="0,0,12,0"
+                        Content="{loc:Loc Game.Back}" />
+                <TextBlock DockPanel.Dock="Left" Text="{loc:Loc EditorHub.Title}" Foreground="White"
+                           FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+            </DockPanel>
+        </Border>
+
+        <!-- Editor cards -->
+        <ScrollViewer Grid.Row="1" Margin="8">
+            <WrapPanel x:Name="CardGrid" Margin="4"
+                       HorizontalAlignment="Center" />
+        </ScrollViewer>
+    </Grid>
+</UserControl>

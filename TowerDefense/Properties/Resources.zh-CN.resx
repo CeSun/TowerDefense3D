@@ -23,14 +23,8 @@
   <data name="Menu.PlayGame" xml:space="preserve">
     <value>▶  开始游戏</value>
   </data>
-  <data name="Menu.MapEditor" xml:space="preserve">
-    <value>🗺  地图编辑器</value>
-  </data>
-  <data name="Menu.MonsterEditor" xml:space="preserve">
-    <value>👾  怪物编辑器</value>
-  </data>
-  <data name="Menu.TowerEditor" xml:space="preserve">
-    <value>🗼  防御塔编辑器</value>
+  <data name="Menu.Editor" xml:space="preserve">
+    <value>🛠  编辑器</value>
   </data>
   <data name="Menu.Reset" xml:space="preserve">
     <value>🔄  重置</value>
@@ -569,5 +563,131 @@
   </data>
   <data name="TowerEditor.Saved" xml:space="preserve">
     <value>已保存: {0}.json</value>
+  </data>
+
+  <!-- ==================== 编辑器中心 ==================== -->
+  <data name="EditorHub.Title" xml:space="preserve">
+    <value>编辑器</value>
+  </data>
+  <data name="EditorHub.MapEditor" xml:space="preserve">
+    <value>地图编辑器</value>
+  </data>
+  <data name="EditorHub.MapEditorDesc" xml:space="preserve">
+    <value>创建和编辑游戏关卡、路径点和波次</value>
+  </data>
+  <data name="EditorHub.TowerEditor" xml:space="preserve">
+    <value>防御塔编辑器</value>
+  </data>
+  <data name="EditorHub.TowerEditorDesc" xml:space="preserve">
+    <value>设计防御塔属性、3D模型和特殊效果</value>
+  </data>
+  <data name="EditorHub.MonsterEditor" xml:space="preserve">
+    <value>怪物编辑器</value>
+  </data>
+  <data name="EditorHub.MonsterEditorDesc" xml:space="preserve">
+    <value>配置敌人生命值、速度、奖励和外观</value>
+  </data>
+
+  <!-- ==================== 防御塔列表 ==================== -->
+  <data name="TowerList.Title" xml:space="preserve">
+    <value>编辑防御塔</value>
+  </data>
+  <data name="TowerList.SelectHint" xml:space="preserve">
+    <value>选择一个防御塔进行编辑，或创建新防御塔</value>
+  </data>
+  <data name="TowerList.NewTower" xml:space="preserve">
+    <value>🆕 新建防御塔</value>
+  </data>
+  <data name="TowerList.SelectATower" xml:space="preserve">
+    <value>选择一个防御塔</value>
+  </data>
+  <data name="TowerList.Cost" xml:space="preserve">
+    <value>费用: {0} 金币</value>
+  </data>
+  <data name="TowerList.CostDash" xml:space="preserve">
+    <value>费用: -</value>
+  </data>
+  <data name="TowerList.Damage" xml:space="preserve">
+    <value>伤害: {0}</value>
+  </data>
+  <data name="TowerList.DamageDash" xml:space="preserve">
+    <value>伤害: -</value>
+  </data>
+  <data name="TowerList.Range" xml:space="preserve">
+    <value>射程: {0}</value>
+  </data>
+  <data name="TowerList.RangeDash" xml:space="preserve">
+    <value>射程: -</value>
+  </data>
+  <data name="TowerList.FireRate" xml:space="preserve">
+    <value>射速: {0}/秒</value>
+  </data>
+  <data name="TowerList.FireRateDash" xml:space="preserve">
+    <value>射速: -</value>
+  </data>
+  <data name="TowerList.FireRateContinuous" xml:space="preserve">
+    <value>射速: 持续AOE</value>
+  </data>
+  <data name="TowerList.ProjectileSpeed" xml:space="preserve">
+    <value>弹丸速度: {0}</value>
+  </data>
+  <data name="TowerList.ProjSpeedDash" xml:space="preserve">
+    <value>弹丸速度: -</value>
+  </data>
+  <data name="TowerList.Shapes" xml:space="preserve">
+    <value>形状数量: {0}</value>
+  </data>
+  <data name="TowerList.ShapesDash" xml:space="preserve">
+    <value>形状数量: -</value>
+  </data>
+  <data name="TowerList.EditTower" xml:space="preserve">
+    <value>✏ 编辑防御塔</value>
+  </data>
+  <data name="TowerList.DeleteTower" xml:space="preserve">
+    <value>🗑 删除防御塔</value>
+  </data>
+
+  <!-- ==================== 怪物列表 ==================== -->
+  <data name="MonsterList.Title" xml:space="preserve">
+    <value>编辑怪物</value>
+  </data>
+  <data name="MonsterList.SelectHint" xml:space="preserve">
+    <value>选择一个怪物进行编辑，或创建新怪物</value>
+  </data>
+  <data name="MonsterList.NewMonster" xml:space="preserve">
+    <value>🆕 新建怪物</value>
+  </data>
+  <data name="MonsterList.SelectAMonster" xml:space="preserve">
+    <value>选择一个怪物</value>
+  </data>
+  <data name="MonsterList.HP" xml:space="preserve">
+    <value>生命值: {0}</value>
+  </data>
+  <data name="MonsterList.HPDash" xml:space="preserve">
+    <value>生命值: -</value>
+  </data>
+  <data name="MonsterList.Speed" xml:space="preserve">
+    <value>速度: {0}</value>
+  </data>
+  <data name="MonsterList.SpeedDash" xml:space="preserve">
+    <value>速度: -</value>
+  </data>
+  <data name="MonsterList.Gold" xml:space="preserve">
+    <value>金币: {0}</value>
+  </data>
+  <data name="MonsterList.GoldDash" xml:space="preserve">
+    <value>金币: -</value>
+  </data>
+  <data name="MonsterList.Size" xml:space="preserve">
+    <value>大小: {0}</value>
+  </data>
+  <data name="MonsterList.SizeDash" xml:space="preserve">
+    <value>大小: -</value>
+  </data>
+  <data name="MonsterList.EditMonster" xml:space="preserve">
+    <value>✏ 编辑怪物</value>
+  </data>
+  <data name="MonsterList.DeleteMonster" xml:space="preserve">
+    <value>🗑 删除怪物</value>
   </data>
 </root>

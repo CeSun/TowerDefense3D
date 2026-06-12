@@ -47,6 +47,33 @@ public partial class MonsterEditorView : UserControl
         RefreshMonsterList();
     }
 
+    /// <summary>
+    /// Load a specific monster for editing (called from the monster list page).
+    /// If the monster has a non-empty name that exists in the file, it is selected from the list.
+    /// Otherwise it is loaded as a new unsaved monster.
+    /// </summary>
+    public void LoadForEdit(EnemyData enemy, string filePath)
+    {
+        _enemiesFilePath = filePath;
+        RefreshMonsterList();
+
+        if (!string.IsNullOrWhiteSpace(enemy.Name))
+        {
+            var enemies = LoadAllEnemies();
+            var existing = enemies.FindIndex(en => en.Name == enemy.Name);
+            if (existing >= 0)
+            {
+                MonsterListCombo.SelectedItem = enemy.Name;
+                return;
+            }
+        }
+
+        // New enemy (not in file yet)
+        LoadMonsterData(enemy);
+        _currentFileName = string.Empty;
+        StatusLabel.Text = "New monster (unsaved)";
+    }
+
     // ==================== Monster List ====================
 
     private List<EnemyData> LoadAllEnemies() => EnemyData.LoadListFromFile(_enemiesFilePath);

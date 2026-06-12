@@ -49,6 +49,33 @@ public partial class TowerEditorView : UserControl
         RefreshTowerList();
     }
 
+    /// <summary>
+    /// Load a specific tower for editing (called from the tower list page).
+    /// If the tower has a non-empty name that exists in the file, it is selected from the list.
+    /// Otherwise it is loaded as a new unsaved tower.
+    /// </summary>
+    public void LoadForEdit(TowerData tower, string filePath)
+    {
+        _towersFilePath = filePath;
+        RefreshTowerList();
+
+        if (!string.IsNullOrWhiteSpace(tower.Name))
+        {
+            var towers = LoadAllTowers();
+            var existing = towers.FindIndex(t => t.Name == tower.Name);
+            if (existing >= 0)
+            {
+                TowerListCombo.SelectedItem = tower.Name;
+                return;
+            }
+        }
+
+        // New tower (not in file yet)
+        LoadTowerData(tower);
+        _currentFileName = string.Empty;
+        StatusLabel.Text = Loc.Get("TowerEditor.NewUnsaved");
+    }
+
     // ==================== Tower List ====================
 
     private List<TowerData> LoadAllTowers() => TowerData.LoadListFromFile(_towersFilePath);

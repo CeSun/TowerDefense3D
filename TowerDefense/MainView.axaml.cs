@@ -15,6 +15,9 @@ public partial class MainView : UserControl
     private MapEditorView? _editorView;
     private MonsterEditorView? _monsterEditorView;
     private TowerEditorView? _towerEditorView;
+    private TowerListControl? _towerListView;
+    private MonsterListControl? _monsterListView;
+    private EditorHubControl? _editorHub;
     private MapData _currentMapData = null!;
     private string _dataDir = string.Empty;
     private string _mapsDir = string.Empty;
@@ -163,9 +166,7 @@ public partial class MainView : UserControl
         {
             _menuView = new MenuView();
             _menuView.OnPlayGame = () => ShowGame();
-            _menuView.OnOpenEditor = () => ShowEditor();
-            _menuView.OnOpenMonsterEditor = () => ShowMonsterEditor();
-            _menuView.OnOpenTowerEditor = () => ShowTowerEditor();
+            _menuView.OnOpenEditor = () => ShowEditorHub();
             _menuView.OnResetData = () => ResetAllData();
         }
 
@@ -199,6 +200,20 @@ public partial class MainView : UserControl
         _gameView.SetSelectedLevel(map.Name);
 
         ContentArea.Content = _gameView;
+    }
+
+    private void ShowEditorHub()
+    {
+        if (_editorHub == null)
+        {
+            _editorHub = new EditorHubControl();
+            _editorHub.OnBack = () => ShowMenu();
+            _editorHub.OnOpenMapEditor = () => ShowEditor();
+            _editorHub.OnOpenTowerEditor = () => ShowTowerList();
+            _editorHub.OnOpenMonsterEditor = () => ShowMonsterList();
+        }
+
+        ContentArea.Content = _editorHub;
     }
 
     private void ShowEditor()
@@ -255,6 +270,72 @@ public partial class MainView : UserControl
 
         if (_menuView != null)
             _menuView.MapCount = CountMaps();
+    }
+
+    private void ShowTowerList()
+    {
+        if (_towerListView == null)
+        {
+            _towerListView = new TowerListControl();
+            _towerListView.OnBack = () => ShowMenu();
+            _towerListView.OnEditTower = (tower, filePath) => OpenTowerInEditor(tower, filePath);
+            _towerListView.Initialize(_towersFilePath);
+        }
+        else
+        {
+            _towerListView.Refresh();
+        }
+
+        ContentArea.Content = _towerListView;
+    }
+
+    private void OpenTowerInEditor(TowerData tower, string filePath)
+    {
+        if (_towerEditorView == null)
+        {
+            _towerEditorView = new TowerEditorView();
+            _towerEditorView.OnBack = () => ShowTowerList();
+        }
+        else
+        {
+            _towerEditorView.OnBack = () => ShowTowerList();
+        }
+
+        _towerEditorView.LoadForEdit(tower, filePath);
+        ContentArea.Content = _towerEditorView;
+    }
+
+    private void ShowMonsterList()
+    {
+        if (_monsterListView == null)
+        {
+            _monsterListView = new MonsterListControl();
+            _monsterListView.OnBack = () => ShowMenu();
+            _monsterListView.OnEditMonster = (enemy, filePath) => OpenMonsterInEditor(enemy, filePath);
+            _monsterListView.Initialize(_enemiesFilePath);
+        }
+        else
+        {
+            _monsterListView.Refresh();
+        }
+
+        ContentArea.Content = _monsterListView;
+    }
+
+    private void OpenMonsterInEditor(EnemyData enemy, string filePath)
+    {
+        if (_monsterEditorView == null)
+        {
+            _monsterEditorView = new MonsterEditorView();
+            _monsterEditorView.OnBack = () => ShowMonsterList();
+        }
+        else
+        {
+            _monsterEditorView.OnBack = () => ShowMonsterList();
+        }
+
+        _monsterEditorView.LoadForEdit(enemy, filePath);
+        ContentArea.Content = _monsterEditorView;
     }
 
     private void ShowTowerEditor()

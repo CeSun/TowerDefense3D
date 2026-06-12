@@ -23,14 +23,8 @@
   <data name="Menu.PlayGame" xml:space="preserve">
     <value>▶  Play Game</value>
   </data>
-  <data name="Menu.MapEditor" xml:space="preserve">
-    <value>🗺  Map Editor</value>
-  </data>
-  <data name="Menu.MonsterEditor" xml:space="preserve">
-    <value>👾  Monster Editor</value>
-  </data>
-  <data name="Menu.TowerEditor" xml:space="preserve">
-    <value>🗼  Tower Editor</value>
+  <data name="Menu.Editor" xml:space="preserve">
+    <value>🛠  Editor</value>
   </data>
   <data name="Menu.Reset" xml:space="preserve">
     <value>🔄  Reset</value>
@@ -569,5 +563,131 @@
   </data>
   <data name="TowerEditor.Saved" xml:space="preserve">
     <value>Saved: {0}.json</value>
+  </data>
+
+  <!-- ==================== EDITOR HUB ==================== -->
+  <data name="EditorHub.Title" xml:space="preserve">
+    <value>EDITORS</value>
+  </data>
+  <data name="EditorHub.MapEditor" xml:space="preserve">
+    <value>Map Editor</value>
+  </data>
+  <data name="EditorHub.MapEditorDesc" xml:space="preserve">
+    <value>Create and edit game levels, waypoints, and waves</value>
+  </data>
+  <data name="EditorHub.TowerEditor" xml:space="preserve">
+    <value>Tower Editor</value>
+  </data>
+  <data name="EditorHub.TowerEditorDesc" xml:space="preserve">
+    <value>Design tower stats, 3D models, and special effects</value>
+  </data>
+  <data name="EditorHub.MonsterEditor" xml:space="preserve">
+    <value>Monster Editor</value>
+  </data>
+  <data name="EditorHub.MonsterEditorDesc" xml:space="preserve">
+    <value>Configure enemy HP, speed, rewards, and appearance</value>
+  </data>
+
+  <!-- ==================== TOWER LIST ==================== -->
+  <data name="TowerList.Title" xml:space="preserve">
+    <value>EDIT TOWERS</value>
+  </data>
+  <data name="TowerList.SelectHint" xml:space="preserve">
+    <value>Select a tower to edit, or create a new one</value>
+  </data>
+  <data name="TowerList.NewTower" xml:space="preserve">
+    <value>🆕 New Tower</value>
+  </data>
+  <data name="TowerList.SelectATower" xml:space="preserve">
+    <value>Select a Tower</value>
+  </data>
+  <data name="TowerList.Cost" xml:space="preserve">
+    <value>Cost: {0} gold</value>
+  </data>
+  <data name="TowerList.CostDash" xml:space="preserve">
+    <value>Cost: -</value>
+  </data>
+  <data name="TowerList.Damage" xml:space="preserve">
+    <value>Damage: {0}</value>
+  </data>
+  <data name="TowerList.DamageDash" xml:space="preserve">
+    <value>Damage: -</value>
+  </data>
+  <data name="TowerList.Range" xml:space="preserve">
+    <value>Range: {0}</value>
+  </data>
+  <data name="TowerList.RangeDash" xml:space="preserve">
+    <value>Range: -</value>
+  </data>
+  <data name="TowerList.FireRate" xml:space="preserve">
+    <value>Fire Rate: {0}/s</value>
+  </data>
+  <data name="TowerList.FireRateDash" xml:space="preserve">
+    <value>Fire Rate: -</value>
+  </data>
+  <data name="TowerList.FireRateContinuous" xml:space="preserve">
+    <value>Fire Rate: Continuous AOE</value>
+  </data>
+  <data name="TowerList.ProjectileSpeed" xml:space="preserve">
+    <value>Projectile Speed: {0}</value>
+  </data>
+  <data name="TowerList.ProjSpeedDash" xml:space="preserve">
+    <value>Projectile Speed: -</value>
+  </data>
+  <data name="TowerList.Shapes" xml:space="preserve">
+    <value>Shapes: {0}</value>
+  </data>
+  <data name="TowerList.ShapesDash" xml:space="preserve">
+    <value>Shapes: -</value>
+  </data>
+  <data name="TowerList.EditTower" xml:space="preserve">
+    <value>✏ Edit Tower</value>
+  </data>
+  <data name="TowerList.DeleteTower" xml:space="preserve">
+    <value>🗑 Delete Tower</value>
+  </data>
+
+  <!-- ==================== MONSTER LIST ==================== -->
+  <data name="MonsterList.Title" xml:space="preserve">
+    <value>EDIT MONSTERS</value>
+  </data>
+  <data name="MonsterList.SelectHint" xml:space="preserve">
+    <value>Select a monster to edit, or create a new one</value>
+  </data>
+  <data name="MonsterList.NewMonster" xml:space="preserve">
+    <value>🆕 New Monster</value>
+  </data>
+  <data name="MonsterList.SelectAMonster" xml:space="preserve">
+    <value>Select a Monster</value>
+  </data>
+  <data name="MonsterList.HP" xml:space="preserve">
+    <value>HP: {0}</value>
+  </data>
+  <data name="MonsterList.HPDash" xml:space="preserve">
+    <value>HP: -</value>
+  </data>
+  <data name="MonsterList.Speed" xml:space="preserve">
+    <value>Speed: {0}</value>
+  </data>
+  <data name="MonsterList.SpeedDash" xml:space="preserve">
+    <value>Speed: -</value>
+  </data>
+  <data name="MonsterList.Gold" xml:space="preserve">
+    <value>Gold: {0}</value>
+  </data>
+  <data name="MonsterList.GoldDash" xml:space="preserve">
+    <value>Gold: -</value>
+  </data>
+  <data name="MonsterList.Size" xml:space="preserve">
+    <value>Size: {0}</value>
+  </data>
+  <data name="MonsterList.SizeDash" xml:space="preserve">
+    <value>Size: -</value>
+  </data>
+  <data name="MonsterList.EditMonster" xml:space="preserve">
+    <value>✏ Edit Monster</value>
+  </data>
+  <data name="MonsterList.DeleteMonster" xml:space="preserve">
+    <value>🗑 Delete Monster</value>
   </data>
 </root>

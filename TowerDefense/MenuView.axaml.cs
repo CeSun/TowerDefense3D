@@ -8,14 +8,8 @@ public partial class MenuView : UserControl
     /// <summary>Called when user wants to enter game mode.</summary>
     public Action? OnPlayGame { get; set; }
 
-    /// <summary>Called when user wants to enter the map editor.</summary>
+    /// <summary>Called when user wants to enter the editor hub.</summary>
     public Action? OnOpenEditor { get; set; }
-
-    /// <summary>Called when user wants to enter the monster editor.</summary>
-    public Action? OnOpenMonsterEditor { get; set; }
-
-    /// <summary>Called when user wants to enter the tower editor.</summary>
-    public Action? OnOpenTowerEditor { get; set; }
 
     /// <summary>Called when user wants to reset all data.</summary>
     public Action? OnResetData { get; set; }
@@ -41,16 +35,6 @@ public partial class MenuView : UserControl
     private void OnOpenEditorClick(object? sender, RoutedEventArgs e)
     {
         OnOpenEditor?.Invoke();
-    }
-
-    private void OnOpenMonsterEditorClick(object? sender, RoutedEventArgs e)
-    {
-        OnOpenMonsterEditor?.Invoke();
-    }
-
-    private void OnOpenTowerEditorClick(object? sender, RoutedEventArgs e)
-    {
-        OnOpenTowerEditor?.Invoke();
     }
 
     private void OnResetDataClick(object? sender, RoutedEventArgs e)
