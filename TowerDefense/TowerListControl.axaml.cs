@@ -78,17 +78,24 @@ public partial class TowerListControl : UserControl
             var color = t.GetColor();
             var card = new Button
             {
-                Width = 120,
-                Height = 90,
+                Width = 140,
+                Height = 100,
                 Margin = new Avalonia.Thickness(6),
                 CornerRadius = new Avalonia.CornerRadius(8),
-                FontSize = 13,
-                FontWeight = FontWeight.Bold,
-                Foreground = Brushes.White,
                 Background = Brush.Parse("#CC2d3a5a"),
                 BorderBrush = new SolidColorBrush(Avalonia.Media.Color.FromRgb(color.R, color.G, color.B)),
                 BorderThickness = new Avalonia.Thickness(0),
-                Content = t.Name,
+                HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                Content = new TextBlock
+                {
+                    Text = t.Name,
+                    FontSize = 14,
+                    FontWeight = FontWeight.Bold,
+                    Foreground = Brushes.White,
+                    TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                    TextAlignment = Avalonia.Media.TextAlignment.Center,
+                },
                 Tag = i,
             };
             var idx = i; // capture for lambda

@@ -29,7 +29,7 @@
         <!-- Editor cards -->
         <ScrollViewer Grid.Row="1" Margin="8">
             <WrapPanel x:Name="CardGrid" Margin="4"
-                       HorizontalAlignment="Center" />
+                       HorizontalAlignment="Center" VerticalAlignment="Center" />
         </ScrollViewer>
     </Grid>
 </UserControl>

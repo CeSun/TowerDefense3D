@@ -221,7 +221,7 @@ public partial class MainView : UserControl
         if (_mapListView == null)
         {
             _mapListView = new MapListControl();
-            _mapListView.OnMainMenu = () => ShowMenu();
+            _mapListView.OnMainMenu = () => ShowEditorHub();
             _mapListView.OnEditMap = (map, filePath) => OpenMapInEditor(map, filePath);
             _mapListView.Initialize(_mapsDir);
         }
@@ -277,7 +277,7 @@ public partial class MainView : UserControl
         if (_towerListView == null)
         {
             _towerListView = new TowerListControl();
-            _towerListView.OnBack = () => ShowMenu();
+            _towerListView.OnBack = () => ShowEditorHub();
             _towerListView.OnEditTower = (tower, filePath) => OpenTowerInEditor(tower, filePath);
             _towerListView.Initialize(_towersFilePath);
         }
@@ -310,7 +310,7 @@ public partial class MainView : UserControl
         if (_monsterListView == null)
         {
             _monsterListView = new MonsterListControl();
-            _monsterListView.OnBack = () => ShowMenu();
+            _monsterListView.OnBack = () => ShowEditorHub();
             _monsterListView.OnEditMonster = (enemy, filePath) => OpenMonsterInEditor(enemy, filePath);
             _monsterListView.Initialize(_enemiesFilePath);
         }

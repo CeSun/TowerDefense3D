@@ -104,13 +104,20 @@ public partial class MapListControl : UserControl
                 Height = 90,
                 Margin = new Avalonia.Thickness(6),
                 CornerRadius = new Avalonia.CornerRadius(8),
-                FontSize = 14,
-                FontWeight = FontWeight.Bold,
-                Foreground = Brushes.White,
                 Background = Brush.Parse("#CC2d5a27"),
                 BorderBrush = Brushes.LimeGreen,
                 BorderThickness = new Avalonia.Thickness(0),
-                Content = $"Level {num}",
+                HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                Content = new TextBlock
+                {
+                    Text = $"Level {num}",
+                    FontSize = 14,
+                    FontWeight = FontWeight.Bold,
+                    Foreground = Brushes.White,
+                    TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                    TextAlignment = Avalonia.Media.TextAlignment.Center,
+                },
                 Tag = num,
             };
             card.Click += (_, _) =>
