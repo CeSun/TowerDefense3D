@@ -332,6 +332,9 @@
   <data name="MapEditor.NeedWave" xml:space="preserve">
     <value>至少添加一个波次。</value>
   </data>
+  <data name="MapEditor.ModeNone" xml:space="preserve">
+    <value>模式: 无 — 点击标记可选中，选择类型后可放置</value>
+  </data>
   <data name="MapEditor.ModeStart" xml:space="preserve">
     <value>模式: 起点 — 点击一个格子将其设置为路径入口</value>
   </data>

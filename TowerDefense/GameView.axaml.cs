@@ -104,15 +104,11 @@ public partial class GameView : UserControl
     private List<int> GetLevelNumbers()
     {
         var numbers = new List<int>();
-        if (Directory.Exists(_mapsDir))
-        {
-            foreach (var file in Directory.GetFiles(_mapsDir, "*.json"))
-            {
-                var fname = Path.GetFileNameWithoutExtension(file);
-                if (int.TryParse(fname, out int num))
-                    numbers.Add(num);
-            }
-        }
+        var mapsFilePath = Path.Combine(_mapsDir, "maps.json");
+        var maps = MapData.LoadListFromFile(mapsFilePath);
+        foreach (var m in maps)
+            if (int.TryParse(m.Name, out int num))
+                numbers.Add(num);
         numbers.Sort();
         if (numbers.Count == 0) numbers.Add(1);
         return numbers;
@@ -204,17 +200,9 @@ public partial class GameView : UserControl
 
     private void UpdateLevelDetails(int num)
     {
-        var filePath = Path.Combine(_mapsDir, num + ".json");
-        if (!File.Exists(filePath))
-        {
-            DetailLevelNum.Text = Loc.Get("Game.Level", num);
-            DetailWaves.Text = Loc.Get("Game.FileNotFound");
-            DetailStatus.Text = "";
-            LevelStartBtn.IsVisible = false;
-            return;
-        }
-
-        var map = MapData.LoadFromFile(filePath);
+        var mapsFilePath = Path.Combine(_mapsDir, "maps.json");
+        var maps = MapData.LoadListFromFile(mapsFilePath);
+        var map = maps.FirstOrDefault(m => m.Name == num.ToString());
         if (map == null)
         {
             DetailLevelNum.Text = Loc.Get("Game.Level", num);
@@ -303,9 +291,9 @@ public partial class GameView : UserControl
         if (_selectedLevelNum <= 0) return;
         if (_selectedLevelNum > _highestUnlockedLevel && !_editorTestMode) return;
 
-        var filePath = Path.Combine(_mapsDir, _selectedLevelNum + ".json");
-        if (!File.Exists(filePath)) return;
-        var map = MapData.LoadFromFile(filePath);
+        var mapsFilePath = Path.Combine(_mapsDir, "maps.json");
+        var maps = MapData.LoadListFromFile(mapsFilePath);
+        var map = maps.FirstOrDefault(m => m.Name == _selectedLevelNum.ToString());
         if (map == null) return;
 
         // Hide level select, show game HUD
@@ -888,13 +876,9 @@ public partial class GameView : UserControl
         // Sort towers by cost
         var towers = TowerDefinition.All.Values.OrderBy(t => t.Cost).ToList();
 
-        // Emoji icons for the first 8 towers
-        var icons = new[] { "🏹", "❄️", "💣", "☠️", "🎯", "🧨", "☀️", "🗼" };
-
         for (int i = 0; i < towers.Count; i++)
         {
             var def = towers[i];
-            var icon = i < icons.Length ? icons[i] : "🗼";
             var name = def.Name;
 
             // Derive a button color from the tower's color
@@ -906,7 +890,7 @@ public partial class GameView : UserControl
 
             var btn = new Button
             {
-                Content = $"{icon} {name} ({def.Cost}g)",
+                Content = $"{name} ({def.Cost}g)",
                 Background = Avalonia.Media.Brush.Parse(bgHex),
                 Foreground = Avalonia.Media.Brushes.White,
                 FontSize = 13,
@@ -1139,8 +1123,9 @@ public partial class GameView : UserControl
             }
 
             // Show "Next Level" button if next level exists
-            var nextPath = Path.Combine(_mapsDir, (_selectedLevelNum + 1) + ".json");
-            if (File.Exists(nextPath))
+            var mapsFilePath2 = Path.Combine(_mapsDir, "maps.json");
+            var allMaps = MapData.LoadListFromFile(mapsFilePath2);
+            if (allMaps.Any(m => m.Name == (_selectedLevelNum + 1).ToString()))
                 GameOverNextBtn.IsVisible = true;
         }
         else
@@ -1154,10 +1139,9 @@ public partial class GameView : UserControl
     private void OnNextLevelClick(object? sender, RoutedEventArgs e)
     {
         var next = _selectedLevelNum + 1;
-        var filePath = Path.Combine(_mapsDir, next + ".json");
-        if (!File.Exists(filePath)) return;
-
-        var map = MapData.LoadFromFile(filePath);
+        var mapsFilePath = Path.Combine(_mapsDir, "maps.json");
+        var maps = MapData.LoadListFromFile(mapsFilePath);
+        var map = maps.FirstOrDefault(m => m.Name == next.ToString());
         if (map == null) return;
 
         _selectedLevelNum = next;

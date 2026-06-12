@@ -16,7 +16,7 @@ namespace TowerDefense;
 public partial class MonsterEditorView : UserControl
 {
     // ==================== State ====================
-    private string _enemiesDir = string.Empty;       // single dir for all enemies (built-in + custom)
+    private string _enemiesFilePath = string.Empty;
     private string _currentFileName = string.Empty;
     private bool _sceneReady;
     private float _rotationTimer;
@@ -41,30 +41,32 @@ public partial class MonsterEditorView : UserControl
 
     // ==================== Initialization ====================
 
-    public void Initialize(string enemiesDir)
+    public void Initialize(string enemiesFilePath)
     {
-        _enemiesDir = enemiesDir;
+        _enemiesFilePath = enemiesFilePath;
         RefreshMonsterList();
     }
 
     // ==================== Monster List ====================
 
+    private List<EnemyData> LoadAllEnemies() => EnemyData.LoadListFromFile(_enemiesFilePath);
+
     private void RefreshMonsterList()
     {
-        var names = EnemyData.ListNames(_enemiesDir);
-        var sorted = names.OrderBy(n => n).ToList();
+        var enemies = LoadAllEnemies();
         MonsterListCombo.Items.Clear();
-        foreach (var name in sorted)
-            MonsterListCombo.Items.Add(name);
+        foreach (var e in enemies)
+            MonsterListCombo.Items.Add(e.Name);
         MonsterListCombo.SelectedIndex = -1;
-        DeleteBtn.IsVisible = sorted.Count > 0;
+        DeleteBtn.IsVisible = enemies.Count > 0;
     }
 
     private void OnMonsterSelected(object? sender, SelectionChangedEventArgs e)
     {
         if (MonsterListCombo.SelectedItem is not string name) return;
 
-        var data = EnemyData.LoadFromFile(Path.Combine(_enemiesDir, name + ".json"));
+        var enemies = LoadAllEnemies();
+        var data = enemies.FirstOrDefault(en => en.Name == name);
         if (data != null)
         {
             LoadMonsterData(data);
@@ -89,9 +91,10 @@ public partial class MonsterEditorView : UserControl
             return;
         }
 
-        var filePath = Path.Combine(_enemiesDir, name + ".json");
-        if (File.Exists(filePath))
-            File.Delete(filePath);
+        var enemies = LoadAllEnemies();
+        enemies.RemoveAll(en => en.Name == name);
+        EnemyData.SaveListToFile(_enemiesFilePath, enemies);
+        EnemyDefinition.All.Remove(name);
 
         _currentFileName = string.Empty;
         RefreshMonsterList();
@@ -279,22 +282,27 @@ public partial class MonsterEditorView : UserControl
             return;
         }
 
-        var dir = _enemiesDir;
-        Directory.CreateDirectory(dir);
+        var dir = Path.GetDirectoryName(_enemiesFilePath);
+        if (dir != null) Directory.CreateDirectory(dir);
 
-        var fileName = SanitizeFileName(data.Name);
-        var filePath = Path.Combine(dir, fileName + ".json");
-        data.SaveToFile(filePath);
+        // Load all enemies, update/add the current one, save all
+        var enemies = LoadAllEnemies();
+        var existing = enemies.FindIndex(en => en.Name == data.Name);
+        if (existing >= 0)
+            enemies[existing] = data;
+        else
+            enemies.Add(data);
+        EnemyData.SaveListToFile(_enemiesFilePath, enemies);
 
-        _currentFileName = fileName;
+        _currentFileName = data.Name;
         RefreshMonsterList();
-        MonsterListCombo.SelectedItem = fileName;
+        MonsterListCombo.SelectedItem = data.Name;
 
         // Update the runtime registry
         var def = data.ToDefinition();
         EnemyDefinition.All[data.Name] = def;
 
-        StatusLabel.Text = $"Saved: {fileName}.json";
+        StatusLabel.Text = $"Saved: {data.Name}";
     }
 
     private static string SanitizeFileName(string name)

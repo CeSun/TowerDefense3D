@@ -18,6 +18,9 @@ public partial class MainView : UserControl
     private MapData _currentMapData = null!;
     private string _dataDir = string.Empty;
     private string _mapsDir = string.Empty;
+    private string _mapsFilePath = string.Empty;
+    private string _towersFilePath = string.Empty;
+    private string _enemiesFilePath = string.Empty;
 
     public MainView()
     {
@@ -27,32 +30,19 @@ public partial class MainView : UserControl
         var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         _dataDir = Path.Combine(appData, "TowerDefense");
         _mapsDir = Path.Combine(_dataDir, "Maps");
+        _mapsFilePath = Path.Combine(_mapsDir, "maps.json");
+        _towersFilePath = Path.Combine(_dataDir, "Towers", "towers.json");
+        _enemiesFilePath = Path.Combine(_dataDir, "Enemies", "enemies.json");
 
-        // Extract built-in maps from embedded resources on first run (or if directory is missing).
-        ExtractEmbeddedMaps();
+        // Extract built-in configs from embedded resources on first run.
+        ExtractEmbeddedFile(_mapsFilePath, "maps.json");
+        ExtractEmbeddedFile(_towersFilePath, "towers.json");
+        ExtractEmbeddedFile(_enemiesFilePath, "enemies.json");
 
-        // Fall back to desktop dev paths if extraction didn't yield anything.
-        if (!Directory.Exists(_mapsDir) || Directory.GetFiles(_mapsDir, "*.json").Length == 0)
-        {
-            var fallback = Path.Combine(AppContext.BaseDirectory, "Maps");
-            if (Directory.Exists(fallback))
-            {
-                _mapsDir = fallback;
-            }
-            else
-            {
-                var projectDir = FindProjectMapsDir();
-                if (projectDir != null)
-                    _mapsDir = projectDir;
-            }
-        }
+        EnsureFallbackMaps();
 
-        EnsureMapsDir();
-
-        // Load custom enemy definitions so they are available for gameplay.
+        // Load all definitions into the global registries.
         LoadCustomEnemies();
-
-        // Load tower definitions from built-in + custom JSON files.
         LoadCustomTowers();
 
         // Check for command-line args to skip the menu
@@ -86,45 +76,66 @@ public partial class MainView : UserControl
         }
     }
 
-    // ==================== Maps Directory ====================
+    // ==================== File Extraction ====================
 
     /// <summary>
-    /// Extract built-in map JSON files from embedded resources to the app data directory.
+    /// Extract a single embedded resource file to the target path (skip if already present).
+    /// Matches the resource whose name ends with <paramref name="resourceSuffix"/>.
     /// </summary>
-    private void ExtractEmbeddedMaps()
+    private static void ExtractEmbeddedFile(string targetPath, string resourceSuffix)
     {
-        if (Directory.Exists(_mapsDir) && Directory.GetFiles(_mapsDir, "*.json").Length > 0)
-            return;
+        if (File.Exists(targetPath)) return;
 
         var assembly = typeof(MapData).Assembly;
-        var prefix = $"{assembly.GetName().Name}.Maps.";
 
-        foreach (var resourceName in assembly.GetManifestResourceNames())
+        try
         {
-            if (!resourceName.StartsWith(prefix) || !resourceName.EndsWith(".json"))
-                continue;
-
-            var fileName = resourceName.Substring(prefix.Length);
-
-            try
+            foreach (var resourceName in assembly.GetManifestResourceNames())
             {
-                Directory.CreateDirectory(_mapsDir);
-
-                var targetPath = Path.Combine(_mapsDir, fileName);
-                if (File.Exists(targetPath))
+                if (!resourceName.EndsWith(resourceSuffix))
                     continue;
+
+                var dir = Path.GetDirectoryName(targetPath);
+                if (dir != null) Directory.CreateDirectory(dir);
 
                 using var stream = assembly.GetManifestResourceStream(resourceName);
                 if (stream == null) continue;
 
                 using var fileStream = File.Create(targetPath);
                 stream.CopyTo(fileStream);
-            }
-            catch
-            {
-                // Best-effort: skip files that fail.
+                return;
             }
         }
+        catch
+        {
+            // Best-effort: skip files that fail.
+        }
+    }
+
+    private void EnsureFallbackMaps()
+    {
+        if (File.Exists(_mapsFilePath)) return;
+
+        // Fall back to desktop dev paths if no maps file found
+        var fallback = Path.Combine(AppContext.BaseDirectory, "Maps", "maps.json");
+        if (File.Exists(fallback))
+        {
+            _mapsFilePath = fallback;
+            _mapsDir = Path.GetDirectoryName(fallback)!;
+            return;
+        }
+
+        var projectDir = FindProjectMapsDir();
+        if (projectDir != null)
+        {
+            _mapsDir = projectDir;
+            _mapsFilePath = Path.Combine(projectDir, "maps.json");
+            if (File.Exists(_mapsFilePath)) return;
+        }
+
+        // Create default maps file with a starter map
+        Directory.CreateDirectory(_mapsDir);
+        MapData.SaveListToFile(_mapsFilePath, new[] { MapData.CreateDefault() });
     }
 
     private static string? FindProjectMapsDir()
@@ -142,25 +153,6 @@ public partial class MainView : UserControl
             if (dir == null) break;
         }
         return null;
-    }
-
-    private void EnsureMapsDir()
-    {
-        if (!Directory.Exists(_mapsDir))
-            Directory.CreateDirectory(_mapsDir);
-
-        var defaultPath = Path.Combine(_mapsDir, "1.json");
-        if (!File.Exists(defaultPath))
-        {
-            MapData.CreateDefault().SaveToFile(defaultPath);
-        }
-    }
-
-    private int CountMaps()
-    {
-        if (!Directory.Exists(_mapsDir)) return 0;
-        return Directory.GetFiles(_mapsDir, "*.json")
-            .Count(f => int.TryParse(Path.GetFileNameWithoutExtension(f), out _));
     }
 
     // ==================== Navigation ====================
@@ -211,7 +203,6 @@ public partial class MainView : UserControl
 
     private void ShowEditor()
     {
-        // Show map list first
         if (_mapListView == null)
         {
             _mapListView = new MapListControl();
@@ -235,9 +226,7 @@ public partial class MainView : UserControl
             _monsterEditorView.OnBack = () => ShowMenu();
         }
 
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var enemiesDir = Path.Combine(_dataDir, "Enemies");
-        _monsterEditorView.Initialize(enemiesDir);
+        _monsterEditorView.Initialize(_enemiesFilePath);
         ContentArea.Content = _monsterEditorView;
     }
 
@@ -257,12 +246,13 @@ public partial class MainView : UserControl
         }
 
         // Re-extract all built-in configs and reload registries
-        ExtractEmbeddedMaps();
-        EnsureMapsDir();            // fallback default map if no embedded maps
-        LoadCustomEnemies();        // extracts embedded + loads all enemies
-        LoadCustomTowers();         // extracts embedded + loads all towers
+        ExtractEmbeddedFile(_mapsFilePath, "maps.json");
+        ExtractEmbeddedFile(_towersFilePath, "towers.json");
+        ExtractEmbeddedFile(_enemiesFilePath, "enemies.json");
+        EnsureFallbackMaps();
+        LoadCustomEnemies();
+        LoadCustomTowers();
 
-        // Refresh menu map count
         if (_menuView != null)
             _menuView.MapCount = CountMaps();
     }
@@ -275,146 +265,32 @@ public partial class MainView : UserControl
             _towerEditorView.OnBack = () => ShowMenu();
         }
 
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var towersDir = Path.Combine(_dataDir, "Towers");
-        _towerEditorView.Initialize(towersDir);
+        _towerEditorView.Initialize(_towersFilePath);
         ContentArea.Content = _towerEditorView;
     }
 
-    /// <summary>
-    /// Extract built-in enemy configs from embedded resources, then load all enemies
-    /// (built-in + custom) into <see cref="EnemyDefinition.All"/>.
-    /// </summary>
+    // ==================== Definition Loading ====================
+
     private void LoadCustomEnemies()
     {
-        var enemiesDir = Path.Combine(_dataDir, "Enemies");
-
-        // Extract built-in enemy JSON files from embedded resources on first run.
-        ExtractEmbeddedEnemies(enemiesDir);
-
         EnemyDefinition.All.Clear();
-
-        // Load all enemies from the single Enemies/ directory (built-in + custom).
-        LoadEnemiesFromDir(enemiesDir);
+        var list = EnemyData.LoadListFromFile(_enemiesFilePath);
+        foreach (var data in list)
+            EnemyDefinition.All[data.Name] = data.ToDefinition();
     }
 
-    /// <summary>
-    /// Extract built-in enemy configs to the given directory (skip if already present).
-    /// </summary>
-    private static void ExtractEmbeddedEnemies(string enemiesDir)
-    {
-        var assembly = typeof(MapData).Assembly;
-        var prefix = $"{assembly.GetName().Name}.Enemies.";
-
-        foreach (var resourceName in assembly.GetManifestResourceNames())
-        {
-            if (!resourceName.StartsWith(prefix) || !resourceName.EndsWith(".json"))
-                continue;
-
-            var fileName = resourceName.Substring(prefix.Length);
-            try
-            {
-                Directory.CreateDirectory(enemiesDir);
-                var targetPath = Path.Combine(enemiesDir, fileName);
-                if (File.Exists(targetPath))
-                    continue;
-
-                using var stream = assembly.GetManifestResourceStream(resourceName);
-                if (stream == null) continue;
-
-                using var fileStream = File.Create(targetPath);
-                stream.CopyTo(fileStream);
-            }
-            catch
-            {
-                // Best-effort.
-            }
-        }
-    }
-
-    /// <summary>Load all .json enemy configs from a directory into <see cref="EnemyDefinition.All"/>.</summary>
-    private static void LoadEnemiesFromDir(string dir)
-    {
-        if (!Directory.Exists(dir))
-            return;
-
-        foreach (var file in Directory.GetFiles(dir, "*.json"))
-        {
-            var name = Path.GetFileNameWithoutExtension(file);
-            if (name == "_save") continue;
-
-            var data = EnemyData.LoadFromFile(file);
-            if (data != null)
-                EnemyDefinition.All[data.Name] = data.ToDefinition();
-        }
-    }
-
-    /// <summary>
-    /// Extract built-in tower configs from embedded resources, then load all towers
-    /// (built-in + custom) into <see cref="TowerDefinition.All"/>.
-    /// </summary>
     private void LoadCustomTowers()
     {
-        var towersDir = Path.Combine(_dataDir, "Towers");
-
-        // Extract built-in tower JSON files from embedded resources on first run.
-        ExtractEmbeddedTowers(towersDir);
-
         TowerDefinition.All.Clear();
-
-        // Load all towers from the single Towers/ directory (built-in + custom).
-        LoadTowersFromDir(towersDir);
+        var list = TowerData.LoadListFromFile(_towersFilePath);
+        foreach (var data in list)
+            TowerDefinition.All[data.Name] = data.ToDefinition();
     }
 
-    /// <summary>
-    /// Extract built-in tower configs to the given directory (skip if already present).
-    /// </summary>
-    private static void ExtractEmbeddedTowers(string towersDir)
+    private int CountMaps()
     {
-        var assembly = typeof(MapData).Assembly;
-        var prefix = $"{assembly.GetName().Name}.Towers.Builtin.";
-
-        foreach (var resourceName in assembly.GetManifestResourceNames())
-        {
-            if (!resourceName.StartsWith(prefix) || !resourceName.EndsWith(".json"))
-                continue;
-
-            var fileName = resourceName.Substring(prefix.Length);
-            try
-            {
-                Directory.CreateDirectory(towersDir);
-                var targetPath = Path.Combine(towersDir, fileName);
-                if (File.Exists(targetPath))
-                    continue;
-
-                using var stream = assembly.GetManifestResourceStream(resourceName);
-                if (stream == null) continue;
-
-                using var fileStream = File.Create(targetPath);
-                stream.CopyTo(fileStream);
-            }
-            catch
-            {
-                // Best-effort.
-            }
-        }
-    }
-
-    /// <summary>Load all .json tower configs from a directory into <see cref="TowerDefinition.All"/>.</summary>
-    private static void LoadTowersFromDir(string dir)
-    {
-        if (!Directory.Exists(dir))
-            return;
-
-        foreach (var file in Directory.GetFiles(dir, "*.json"))
-        {
-            var name = Path.GetFileNameWithoutExtension(file);
-            if (name == "_save") continue;
-
-            var data = TowerData.LoadFromFile(file);
-            if (data != null)
-                TowerDefinition.All[data.Name] = data.ToDefinition();
-        }
+        var maps = MapData.LoadListFromFile(_mapsFilePath);
+        return maps.Count;
     }
 
     private void OpenMapInEditor(MapData map, string filePath)

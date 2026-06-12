@@ -56,6 +56,21 @@ public class MapData
         return FromJson(json);
     }
 
+    public static List<MapData> LoadListFromFile(string filePath)
+    {
+        if (!File.Exists(filePath)) return new();
+        var json = File.ReadAllText(filePath);
+        return JsonSerializer.Deserialize(json, MapDataJsonContext.Default.ListMapData) ?? new();
+    }
+
+    public static void SaveListToFile(string filePath, IEnumerable<MapData> maps)
+    {
+        var dir = Path.GetDirectoryName(filePath);
+        if (dir != null) Directory.CreateDirectory(dir);
+        var json = JsonSerializer.Serialize(maps.ToList(), MapDataJsonContext.Default.ListMapData);
+        File.WriteAllText(filePath, json);
+    }
+
     // ==================== Default Map ====================
 
     /// <summary>
@@ -189,11 +204,26 @@ public class EnemyData
         foreach (var file in Directory.GetFiles(customEnemiesDir, "*.json"))
         {
             var name = Path.GetFileNameWithoutExtension(file);
-            if (name != "_save")
+            if (name != "_save" && name != "enemies")
                 names.Add(name);
         }
         names.Sort();
         return names;
+    }
+
+    public static List<EnemyData> LoadListFromFile(string filePath)
+    {
+        if (!File.Exists(filePath)) return new();
+        var json = File.ReadAllText(filePath);
+        return JsonSerializer.Deserialize(json, MapDataJsonContext.Default.ListEnemyData) ?? new();
+    }
+
+    public static void SaveListToFile(string filePath, IEnumerable<EnemyData> enemies)
+    {
+        var dir = Path.GetDirectoryName(filePath);
+        if (dir != null) Directory.CreateDirectory(dir);
+        var json = JsonSerializer.Serialize(enemies.ToList(), MapDataJsonContext.Default.ListEnemyData);
+        File.WriteAllText(filePath, json);
     }
 }
 
@@ -312,11 +342,26 @@ public class TowerData
         foreach (var file in Directory.GetFiles(dir, "*.json"))
         {
             var name = Path.GetFileNameWithoutExtension(file);
-            if (name != "_save")
+            if (name != "_save" && name != "towers")
                 names.Add(name);
         }
         names.Sort();
         return names;
+    }
+
+    public static List<TowerData> LoadListFromFile(string filePath)
+    {
+        if (!File.Exists(filePath)) return new();
+        var json = File.ReadAllText(filePath);
+        return JsonSerializer.Deserialize(json, MapDataJsonContext.Default.ListTowerData) ?? new();
+    }
+
+    public static void SaveListToFile(string filePath, IEnumerable<TowerData> towers)
+    {
+        var dir = Path.GetDirectoryName(filePath);
+        if (dir != null) Directory.CreateDirectory(dir);
+        var json = JsonSerializer.Serialize(towers.ToList(), MapDataJsonContext.Default.ListTowerData);
+        File.WriteAllText(filePath, json);
     }
 }
 
@@ -371,6 +416,9 @@ public record SaveData(int HighestUnlockedLevel = 1)
 [JsonSerializable(typeof(TowerShapeData))]
 [JsonSerializable(typeof(List<TowerShapeData>))]
 [JsonSerializable(typeof(SaveData))]
+[JsonSerializable(typeof(List<MapData>))]
+[JsonSerializable(typeof(List<EnemyData>))]
+[JsonSerializable(typeof(List<TowerData>))]
 public partial class MapDataJsonContext : JsonSerializerContext
 {
 }

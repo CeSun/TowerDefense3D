@@ -332,6 +332,9 @@
   <data name="MapEditor.NeedWave" xml:space="preserve">
     <value>Add at least one wave.</value>
   </data>
+  <data name="MapEditor.ModeNone" xml:space="preserve">
+    <value>Mode: None — Tap a marker to select, or choose a type to place</value>
+  </data>
   <data name="MapEditor.ModeStart" xml:space="preserve">
     <value>Mode: START — Click a cell to set it as the path entry point</value>
   </data>

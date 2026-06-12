@@ -14,7 +14,7 @@ namespace TowerDefense;
 public partial class MapListControl : UserControl
 {
     // ==================== State ====================
-    private string _mapsDir = string.Empty;
+    private string _mapsFilePath = string.Empty;
     private MapData _previewMap = MapData.CreateDefault();
     private int _selectedMapNum;
     private readonly Dictionary<int, Button> _mapCards = new();
@@ -47,8 +47,8 @@ public partial class MapListControl : UserControl
 
     public void Initialize(string mapsDir)
     {
-        _mapsDir = mapsDir;
-        EnsureMapsDir();
+        _mapsFilePath = Path.Combine(mapsDir, "maps.json");
+        EnsureMapsFile();
         BuildMapGrid();
     }
 
@@ -58,42 +58,32 @@ public partial class MapListControl : UserControl
         BuildMapGrid();
     }
 
-    private void EnsureMapsDir()
+    private List<MapData> LoadAllMaps() => MapData.LoadListFromFile(_mapsFilePath);
+
+    private void EnsureMapsFile()
     {
-        if (!Directory.Exists(_mapsDir))
-            Directory.CreateDirectory(_mapsDir);
-        var defaultPath = Path.Combine(_mapsDir, "1.json");
-        if (!File.Exists(defaultPath))
-            MapData.CreateDefault().SaveToFile(defaultPath);
+        var dir = Path.GetDirectoryName(_mapsFilePath);
+        if (dir != null) Directory.CreateDirectory(dir);
+        if (!File.Exists(_mapsFilePath))
+            MapData.SaveListToFile(_mapsFilePath, new[] { MapData.CreateDefault() });
     }
 
     private int GetNextLevelNumber()
     {
+        var maps = LoadAllMaps();
         int max = 0;
-        if (Directory.Exists(_mapsDir))
-        {
-            foreach (var file in Directory.GetFiles(_mapsDir, "*.json"))
-            {
-                var name = Path.GetFileNameWithoutExtension(file);
-                if (int.TryParse(name, out int num) && num > max)
-                    max = num;
-            }
-        }
+        foreach (var m in maps)
+            if (int.TryParse(m.Name, out int num) && num > max)
+                max = num;
         return max + 1;
     }
 
     private List<int> GetLevelNumbers()
     {
         var numbers = new List<int>();
-        if (Directory.Exists(_mapsDir))
-        {
-            foreach (var file in Directory.GetFiles(_mapsDir, "*.json"))
-            {
-                var fname = Path.GetFileNameWithoutExtension(file);
-                if (int.TryParse(fname, out int num))
-                    numbers.Add(num);
-            }
-        }
+        foreach (var m in LoadAllMaps())
+            if (int.TryParse(m.Name, out int num))
+                numbers.Add(num);
         numbers.Sort();
         return numbers;
     }
@@ -146,21 +136,13 @@ public partial class MapListControl : UserControl
         _selectedMapNum = num;
         UpdateMapCardStyles();
 
-        var filePath = Path.Combine(_mapsDir, num + ".json");
-        if (!File.Exists(filePath))
-        {
-            ClearMapDetails();
-            DetailMapName.Text = Loc.Get("Game.Level", num);
-            DetailMapStatus.Text = Loc.Get("Game.FileNotFound");
-            return;
-        }
-
-        var map = MapData.LoadFromFile(filePath);
+        var maps = LoadAllMaps();
+        var map = maps.FirstOrDefault(m => m.Name == num.ToString());
         if (map == null)
         {
             ClearMapDetails();
             DetailMapName.Text = Loc.Get("Game.Level", num);
-            DetailMapStatus.Text = Loc.Get("Game.FailedToLoad");
+            DetailMapStatus.Text = Loc.Get("Game.FileNotFound");
             return;
         }
 
@@ -218,24 +200,22 @@ public partial class MapListControl : UserControl
     private void OnEditMapClick(object? sender, RoutedEventArgs e)
     {
         if (_selectedMapNum <= 0) return;
-        var filePath = Path.Combine(_mapsDir, _selectedMapNum + ".json");
-        OnEditMap?.Invoke(_previewMap, filePath);
+        OnEditMap?.Invoke(_previewMap, _mapsFilePath);
     }
 
     private void OnDeleteMap(object? sender, RoutedEventArgs e)
     {
         if (_selectedMapNum <= 0) return;
 
-        var numbers = GetLevelNumbers();
-        if (numbers.Count <= 1)
+        var maps = LoadAllMaps();
+        if (maps.Count <= 1)
         {
             MapListStatus.Text = Loc.Get("MapList.CannotDeleteLast");
             return;
         }
 
-        var filePath = Path.Combine(_mapsDir, _selectedMapNum + ".json");
-        if (File.Exists(filePath))
-            File.Delete(filePath);
+        maps.RemoveAll(m => m.Name == _selectedMapNum.ToString());
+        MapData.SaveListToFile(_mapsFilePath, maps);
 
         _selectedMapNum = 0;
         BuildMapGrid();
@@ -263,9 +243,11 @@ public partial class MapListControl : UserControl
                 },
             },
         };
-        var filePath = Path.Combine(_mapsDir, next + ".json");
-        map.SaveToFile(filePath);
-        OnEditMap?.Invoke(map, filePath);
+
+        var maps = LoadAllMaps();
+        maps.Add(map);
+        MapData.SaveListToFile(_mapsFilePath, maps);
+        OnEditMap?.Invoke(map, _mapsFilePath);
     }
 
     private void OnMainMenuClick(object? sender, RoutedEventArgs e)

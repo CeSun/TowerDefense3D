@@ -50,7 +50,8 @@
         <a:Aura3DView Grid.Column="1"
                        x:Name="PreviewView"
                        SceneInitialized="OnPreviewSceneInit"
-                       SceneUpdated="OnPreviewSceneUpdated" />
+                       SceneUpdated="OnPreviewSceneUpdated"
+                       ObjectPicked="OnPreviewObjectPicked" />
 
         <!-- ============================================ -->
         <!-- RIGHT: Properties                           -->

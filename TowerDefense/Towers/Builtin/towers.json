@@ -1,0 +1,388 @@
+[
+  {
+    "name": "🏹 Arrow Tower",
+    "cost": 50,
+    "damage": 15.0,
+    "range": 3.5,
+    "fireRate": 1.8,
+    "projectileSpeed": 5.0,
+    "splashRadius": 0.0,
+    "slowAmount": 0.0,
+    "multiShotCount": 1,
+    "arcAngle": 0.0,
+    "critChance": 0.0,
+    "critMultiplier": 2.0,
+    "dotDamage": 0.0,
+    "dotDuration": 0.0,
+    "aoeRadius": 0.0,
+    "shapes": [
+      {
+        "type": "Box",
+        "scaleX": 0.55,
+        "scaleY": 0.1,
+        "scaleZ": 0.55,
+        "colorR": 30,
+        "colorG": 120,
+        "colorB": 30
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.3,
+        "scaleY": 0.4,
+        "scaleZ": 0.3,
+        "colorR": 50,
+        "colorG": 205,
+        "colorB": 50
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.08,
+        "scaleY": 0.25,
+        "scaleZ": 0.08,
+        "colorR": 30,
+        "colorG": 120,
+        "colorB": 30
+      }
+    ]
+  },
+  {
+    "name": "💣 Cannon Tower",
+    "cost": 100,
+    "damage": 40.0,
+    "range": 3.0,
+    "fireRate": 0.6,
+    "projectileSpeed": 3.0,
+    "splashRadius": 1.5,
+    "slowAmount": 0.0,
+    "multiShotCount": 1,
+    "arcAngle": 0.0,
+    "critChance": 0.0,
+    "critMultiplier": 2.0,
+    "dotDamage": 0.0,
+    "dotDuration": 0.0,
+    "aoeRadius": 0.0,
+    "shapes": [
+      {
+        "type": "Box",
+        "scaleX": 0.55,
+        "scaleY": 0.1,
+        "scaleZ": 0.55,
+        "colorR": 100,
+        "colorG": 27,
+        "colorB": 0
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.3,
+        "scaleY": 0.4,
+        "scaleZ": 0.3,
+        "colorR": 255,
+        "colorG": 69,
+        "colorB": 0
+      },
+      {
+        "type": "Sphere",
+        "scaleX": 0.22,
+        "scaleY": 0.22,
+        "scaleZ": 0.22,
+        "colorR": 255,
+        "colorG": 69,
+        "colorB": 0
+      }
+    ]
+  },
+  {
+    "name": "❄️ Ice Tower",
+    "cost": 75,
+    "damage": 8.0,
+    "range": 2.8,
+    "fireRate": 1.0,
+    "projectileSpeed": 4.0,
+    "splashRadius": 0.0,
+    "slowAmount": 0.5,
+    "multiShotCount": 1,
+    "arcAngle": 0.0,
+    "critChance": 0.0,
+    "critMultiplier": 2.0,
+    "dotDamage": 0.0,
+    "dotDuration": 0.0,
+    "aoeRadius": 0.0,
+    "shapes": [
+      {
+        "type": "Box",
+        "scaleX": 0.55,
+        "scaleY": 0.1,
+        "scaleZ": 0.55,
+        "colorR": 0,
+        "colorG": 100,
+        "colorB": 100
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.3,
+        "scaleY": 0.4,
+        "scaleZ": 0.3,
+        "colorR": 0,
+        "colorG": 255,
+        "colorB": 255
+      },
+      {
+        "type": "Sphere",
+        "scaleX": 0.22,
+        "scaleY": 0.22,
+        "scaleZ": 0.22,
+        "colorR": 0,
+        "colorG": 255,
+        "colorB": 255
+      }
+    ]
+  },
+  {
+    "name": "🧨 Multi-Shot",
+    "cost": 150,
+    "damage": 12.0,
+    "range": 3.0,
+    "fireRate": 1.0,
+    "projectileSpeed": 6.0,
+    "splashRadius": 0.0,
+    "slowAmount": 0.0,
+    "multiShotCount": 3,
+    "arcAngle": 25.0,
+    "critChance": 0.0,
+    "critMultiplier": 2.0,
+    "dotDamage": 0.0,
+    "dotDuration": 0.0,
+    "aoeRadius": 0.0,
+    "shapes": [
+      {
+        "type": "Box",
+        "scaleX": 0.55,
+        "scaleY": 0.1,
+        "scaleZ": 0.55,
+        "colorR": 100,
+        "colorG": 65,
+        "colorB": 0
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.3,
+        "scaleY": 0.4,
+        "scaleZ": 0.3,
+        "colorR": 255,
+        "colorG": 165,
+        "colorB": 0
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.07,
+        "scaleY": 0.22,
+        "scaleZ": 0.07,
+        "offsetX": -0.08,
+        "offsetZ": 0.05,
+        "rotationY": -10,
+        "colorR": 100,
+        "colorG": 65,
+        "colorB": 0
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.07,
+        "scaleY": 0.22,
+        "scaleZ": 0.07,
+        "offsetX": 0,
+        "offsetZ": 0.1,
+        "rotationY": 0,
+        "colorR": 100,
+        "colorG": 65,
+        "colorB": 0
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.07,
+        "scaleY": 0.22,
+        "scaleZ": 0.07,
+        "offsetX": 0.08,
+        "offsetZ": 0.05,
+        "rotationY": 10,
+        "colorR": 100,
+        "colorG": 65,
+        "colorB": 0
+      },
+      {
+        "type": "Sphere",
+        "scaleX": 0.14,
+        "scaleY": 0.14,
+        "scaleZ": 0.14,
+        "colorR": 255,
+        "colorG": 200,
+        "colorB": 100
+      }
+    ]
+  },
+  {
+    "name": "☠️ Poison Tower",
+    "cost": 100,
+    "damage": 8.0,
+    "range": 3.5,
+    "fireRate": 1.5,
+    "projectileSpeed": 5.0,
+    "splashRadius": 0.0,
+    "slowAmount": 0.0,
+    "multiShotCount": 1,
+    "arcAngle": 0.0,
+    "critChance": 0.0,
+    "critMultiplier": 2.0,
+    "dotDamage": 20.0,
+    "dotDuration": 3.0,
+    "aoeRadius": 0.0,
+    "shapes": [
+      {
+        "type": "Box",
+        "scaleX": 0.55,
+        "scaleY": 0.1,
+        "scaleZ": 0.55,
+        "colorR": 70,
+        "colorG": 100,
+        "colorB": 20
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.3,
+        "scaleY": 0.4,
+        "scaleZ": 0.3,
+        "colorR": 173,
+        "colorG": 255,
+        "colorB": 47
+      },
+      {
+        "type": "Sphere",
+        "scaleX": 0.28,
+        "scaleY": 0.28,
+        "scaleZ": 0.28,
+        "colorR": 200,
+        "colorG": 255,
+        "colorB": 120
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.05,
+        "scaleY": 0.18,
+        "scaleZ": 0.05,
+        "offsetY": 0.05,
+        "colorR": 70,
+        "colorG": 100,
+        "colorB": 20
+      }
+    ]
+  },
+  {
+    "name": "🎯 Sniper",
+    "cost": 130,
+    "damage": 50.0,
+    "range": 5.0,
+    "fireRate": 0.5,
+    "projectileSpeed": 10.0,
+    "splashRadius": 0.0,
+    "slowAmount": 0.0,
+    "multiShotCount": 1,
+    "arcAngle": 0.0,
+    "critChance": 0.3,
+    "critMultiplier": 3.0,
+    "dotDamage": 0.0,
+    "dotDuration": 0.0,
+    "aoeRadius": 0.0,
+    "shapes": [
+      {
+        "type": "Box",
+        "scaleX": 0.55,
+        "scaleY": 0.1,
+        "scaleZ": 0.55,
+        "colorR": 50,
+        "colorG": 0,
+        "colorB": 50
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.3,
+        "scaleY": 0.4,
+        "scaleZ": 0.3,
+        "colorR": 128,
+        "colorG": 0,
+        "colorB": 128
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.1,
+        "scaleY": 0.5,
+        "scaleZ": 0.1,
+        "colorR": 50,
+        "colorG": 0,
+        "colorB": 50
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.18,
+        "scaleY": 0.06,
+        "scaleZ": 0.18,
+        "colorR": 180,
+        "colorG": 100,
+        "colorB": 180
+      }
+    ]
+  },
+  {
+    "name": "☀️ Sun Tower",
+    "cost": 175,
+    "damage": 18.0,
+    "range": 2.5,
+    "fireRate": 0.0,
+    "projectileSpeed": 0.0,
+    "splashRadius": 0.0,
+    "slowAmount": 0.0,
+    "multiShotCount": 1,
+    "arcAngle": 0.0,
+    "critChance": 0.0,
+    "critMultiplier": 2.0,
+    "dotDamage": 0.0,
+    "dotDuration": 0.0,
+    "aoeRadius": 2.5,
+    "shapes": [
+      {
+        "type": "Box",
+        "scaleX": 0.55,
+        "scaleY": 0.1,
+        "scaleZ": 0.55,
+        "colorR": 100,
+        "colorG": 85,
+        "colorB": 0
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.3,
+        "scaleY": 0.4,
+        "scaleZ": 0.3,
+        "colorR": 255,
+        "colorG": 215,
+        "colorB": 0
+      },
+      {
+        "type": "Cylinder",
+        "scaleX": 0.42,
+        "scaleY": 0.04,
+        "scaleZ": 0.42,
+        "colorR": 255,
+        "colorG": 215,
+        "colorB": 0
+      },
+      {
+        "type": "Sphere",
+        "scaleX": 0.35,
+        "scaleY": 0.35,
+        "scaleZ": 0.35,
+        "colorR": 255,
+        "colorG": 240,
+        "colorB": 100
+      }
+    ]
+  }
+]

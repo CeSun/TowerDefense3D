@@ -12,7 +12,7 @@ using DrawingColor = System.Drawing.Color;
 
 namespace TowerDefense;
 
-public enum PlacementMode { Start, Waypoint, End }
+public enum PlacementMode { None, Start, Waypoint, End }
 
 public partial class MapEditorView : UserControl
 {
@@ -270,26 +270,34 @@ public partial class MapEditorView : UserControl
         if (_mapData.StartCell != null)
         {
             var s = _mapData.StartCell;
+            var isSelected = _selectedElement == SelectedElement.Start;
+            var color = isSelected ? DrawingColor.FromArgb(255, 100, 255, 100) : DrawingColor.LimeGreen;
             _entryMarkerNode = new Mesh
             {
                 Geometry = _boxGeo!,
-                Material = CreateMaterial(DrawingColor.LimeGreen),
+                Material = CreateMaterial(color),
                 Name = "EntryMarker",
             };
-            _entryMarkerNode.Scale = new Vector3(0.2f, 0.08f, 0.8f);
+            _entryMarkerNode.Scale = isSelected
+                ? new Vector3(0.28f, 0.11f, 1.0f)
+                : new Vector3(0.2f, 0.08f, 0.8f);
             _entryMarkerNode.Position = CellToWorld(s.Col, s.Row) + new Vector3(-0.5f, 0.06f, 0);
             view.AddNode(_entryMarkerNode);
         }
         if (_mapData.EndCell != null)
         {
             var e = _mapData.EndCell;
+            var isSelected = _selectedElement == SelectedElement.End;
+            var color = isSelected ? DrawingColor.FromArgb(255, 255, 100, 100) : DrawingColor.Red;
             _exitMarkerNode = new Mesh
             {
                 Geometry = _boxGeo!,
-                Material = CreateMaterial(DrawingColor.Red),
+                Material = CreateMaterial(color),
                 Name = "ExitMarker",
             };
-            _exitMarkerNode.Scale = new Vector3(0.2f, 0.08f, 0.8f);
+            _exitMarkerNode.Scale = isSelected
+                ? new Vector3(0.28f, 0.11f, 1.0f)
+                : new Vector3(0.2f, 0.08f, 0.8f);
             _exitMarkerNode.Position = CellToWorld(e.Col, e.Row) + new Vector3(0.5f, 0.06f, 0);
             view.AddNode(_exitMarkerNode);
         }
@@ -299,35 +307,42 @@ public partial class MapEditorView : UserControl
 
     private void OnSetStartMode(object? sender, RoutedEventArgs e)
     {
-        _placementMode = PlacementMode.Start;
+        _placementMode = _placementMode == PlacementMode.Start ? PlacementMode.None : PlacementMode.Start;
         UpdatePlacementModeButtons();
-        GridStatusText.Text = Loc.Get("MapEditor.ModeStart");
+        GridStatusText.Text = _placementMode == PlacementMode.None
+            ? Loc.Get("MapEditor.ModeNone")
+            : Loc.Get("MapEditor.ModeStart");
     }
     private void OnSetWaypointMode(object? sender, RoutedEventArgs e)
     {
-        _placementMode = PlacementMode.Waypoint;
+        _placementMode = _placementMode == PlacementMode.Waypoint ? PlacementMode.None : PlacementMode.Waypoint;
         UpdatePlacementModeButtons();
-        GridStatusText.Text = Loc.Get("MapEditor.ModeWaypoint");
+        GridStatusText.Text = _placementMode == PlacementMode.None
+            ? Loc.Get("MapEditor.ModeNone")
+            : Loc.Get("MapEditor.ModeWaypoint");
     }
     private void OnSetEndMode(object? sender, RoutedEventArgs e)
     {
-        _placementMode = PlacementMode.End;
+        _placementMode = _placementMode == PlacementMode.End ? PlacementMode.None : PlacementMode.End;
         UpdatePlacementModeButtons();
-        GridStatusText.Text = Loc.Get("MapEditor.ModeEnd");
+        GridStatusText.Text = _placementMode == PlacementMode.None
+            ? Loc.Get("MapEditor.ModeNone")
+            : Loc.Get("MapEditor.ModeEnd");
     }
 
     private void UpdatePlacementModeButtons()
     {
         var dimBg = "#CC3a3a4a";
+        var none = _placementMode == PlacementMode.None;
         var activeBorder = new Avalonia.Thickness(2);
         SetStartBtn.BorderThickness = _placementMode == PlacementMode.Start ? activeBorder : default;
         SetStartBtn.BorderBrush = _placementMode == PlacementMode.Start ? Brushes.LimeGreen : null;
+        SetStartBtn.Background = Brush.Parse(_placementMode == PlacementMode.Start ? "#CC2d6a2d" : dimBg);
         AddWaypointBtn.BorderThickness = _placementMode == PlacementMode.Waypoint ? activeBorder : default;
         AddWaypointBtn.BorderBrush = _placementMode == PlacementMode.Waypoint ? Brushes.CornflowerBlue : null;
+        AddWaypointBtn.Background = Brush.Parse(_placementMode == PlacementMode.Waypoint ? "#CC4a6a8a" : dimBg);
         SetEndBtn.BorderThickness = _placementMode == PlacementMode.End ? activeBorder : default;
         SetEndBtn.BorderBrush = _placementMode == PlacementMode.End ? Brushes.Red : null;
-        SetStartBtn.Background = Brush.Parse(_placementMode == PlacementMode.Start ? "#CC2d6a2d" : dimBg);
-        AddWaypointBtn.Background = Brush.Parse(_placementMode == PlacementMode.Waypoint ? "#CC4a6a8a" : dimBg);
         SetEndBtn.Background = Brush.Parse(_placementMode == PlacementMode.End ? "#CC6a2a2a" : dimBg);
     }
 
@@ -362,6 +377,7 @@ public partial class MapEditorView : UserControl
         DeleteWaypointBtn.Content = Loc.Get("MapEditor.DeleteStart");
 
         GridStatusText.Text = Loc.Get("MapEditor.StartAt", col, row);
+        if (_sceneReady) RebuildMapScene();
     }
 
     private void ShowEndInfo(int col, int row)
@@ -377,6 +393,7 @@ public partial class MapEditorView : UserControl
         DeleteWaypointBtn.Content = Loc.Get("MapEditor.DeleteEnd");
 
         GridStatusText.Text = Loc.Get("MapEditor.EndAt", col, row);
+        if (_sceneReady) RebuildMapScene();
     }
 
     private void HideWaypointInfo()
@@ -482,6 +499,9 @@ public partial class MapEditorView : UserControl
         // Placement mode: add new element
         switch (_placementMode)
         {
+            case PlacementMode.None:
+                // No placement mode active — just ignore grid clicks on empty cells
+                break;
             case PlacementMode.Start:
                 _mapData.StartCell = new WaypointCell(col, row);
                 RebuildMapScene();
@@ -736,8 +756,15 @@ public partial class MapEditorView : UserControl
             GridStatusText.Text = Loc.Get("MapEditor.NoFilePath");
             return;
         }
-        _mapData.SaveToFile(_currentFilePath);
-        GridStatusText.Text = Loc.Get("MapEditor.Saved", _currentFilePath);
+        // Save to the consolidated maps.json file
+        var maps = MapData.LoadListFromFile(_currentFilePath);
+        var existing = maps.FindIndex(m => m.Name == _mapData.Name);
+        if (existing >= 0)
+            maps[existing] = _mapData;
+        else
+            maps.Add(_mapData);
+        MapData.SaveListToFile(_currentFilePath, maps);
+        GridStatusText.Text = Loc.Get("MapEditor.Saved", _mapData.Name);
     }
 
     // ==================== Test Map ====================

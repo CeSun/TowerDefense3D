@@ -1,0 +1,1224 @@
+[
+  {
+    "name": "1",
+    "gridCols": 20,
+    "gridRows": 12,
+    "cellSize": 1.0,
+    "startCell": {
+      "col": 0,
+      "row": 6
+    },
+    "endCell": {
+      "col": 19,
+      "row": 6
+    },
+    "pathWaypoints": [
+      {
+        "col": 4,
+        "row": 6
+      },
+      {
+        "col": 8,
+        "row": 6
+      },
+      {
+        "col": 12,
+        "row": 6
+      },
+      {
+        "col": 16,
+        "row": 6
+      }
+    ],
+    "waves": [
+      {
+        "delayBeforeWave": 3.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 5,
+            "spawnInterval": 1.5
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 8,
+            "spawnInterval": 1.2
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 10,
+            "spawnInterval": 1.0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "2",
+    "gridCols": 20,
+    "gridRows": 12,
+    "cellSize": 1.0,
+    "startCell": {
+      "col": 0,
+      "row": 2
+    },
+    "endCell": {
+      "col": 18,
+      "row": 10
+    },
+    "pathWaypoints": [
+      {
+        "col": 10,
+        "row": 2
+      },
+      {
+        "col": 10,
+        "row": 10
+      }
+    ],
+    "waves": [
+      {
+        "delayBeforeWave": 3.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 6,
+            "spawnInterval": 1.4
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 9,
+            "spawnInterval": 1.1
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 12,
+            "spawnInterval": 0.9
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "3",
+    "gridCols": 20,
+    "gridRows": 14,
+    "cellSize": 1.0,
+    "startCell": {
+      "col": 0,
+      "row": 3
+    },
+    "endCell": {
+      "col": 19,
+      "row": 10
+    },
+    "pathWaypoints": [
+      {
+        "col": 5,
+        "row": 3
+      },
+      {
+        "col": 5,
+        "row": 10
+      },
+      {
+        "col": 10,
+        "row": 10
+      },
+      {
+        "col": 10,
+        "row": 3
+      },
+      {
+        "col": 15,
+        "row": 3
+      },
+      {
+        "col": 15,
+        "row": 10
+      }
+    ],
+    "waves": [
+      {
+        "delayBeforeWave": 3.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 8,
+            "spawnInterval": 1.3
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 10,
+            "spawnInterval": 1.0
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 8,
+            "spawnInterval": 0.8
+          },
+          {
+            "enemyType": "Fast",
+            "count": 3,
+            "spawnInterval": 1.5
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 12,
+            "spawnInterval": 0.7
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "4",
+    "gridCols": 20,
+    "gridRows": 14,
+    "cellSize": 1.0,
+    "startCell": {
+      "col": 1,
+      "row": 2
+    },
+    "endCell": {
+      "col": 1,
+      "row": 11
+    },
+    "pathWaypoints": [
+      {
+        "col": 1,
+        "row": 6
+      },
+      {
+        "col": 8,
+        "row": 6
+      },
+      {
+        "col": 8,
+        "row": 2
+      },
+      {
+        "col": 15,
+        "row": 2
+      },
+      {
+        "col": 15,
+        "row": 11
+      },
+      {
+        "col": 8,
+        "row": 11
+      },
+      {
+        "col": 8,
+        "row": 7
+      }
+    ],
+    "waves": [
+      {
+        "delayBeforeWave": 3.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 8,
+            "spawnInterval": 1.2
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 6,
+            "spawnInterval": 1.0
+          },
+          {
+            "enemyType": "Fast",
+            "count": 5,
+            "spawnInterval": 1.3
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 8,
+            "spawnInterval": 1.1
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 10,
+            "spawnInterval": 0.8
+          },
+          {
+            "enemyType": "Fast",
+            "count": 6,
+            "spawnInterval": 1.0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "5",
+    "gridCols": 22,
+    "gridRows": 14,
+    "cellSize": 1.0,
+    "startCell": {
+      "col": 0,
+      "row": 2
+    },
+    "endCell": {
+      "col": 21,
+      "row": 11
+    },
+    "pathWaypoints": [
+      {
+        "col": 4,
+        "row": 2
+      },
+      {
+        "col": 4,
+        "row": 11
+      },
+      {
+        "col": 8,
+        "row": 11
+      },
+      {
+        "col": 8,
+        "row": 2
+      },
+      {
+        "col": 12,
+        "row": 2
+      },
+      {
+        "col": 12,
+        "row": 11
+      },
+      {
+        "col": 16,
+        "row": 11
+      },
+      {
+        "col": 16,
+        "row": 2
+      }
+    ],
+    "waves": [
+      {
+        "delayBeforeWave": 3.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 10,
+            "spawnInterval": 1.2
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 8,
+            "spawnInterval": 0.9
+          },
+          {
+            "enemyType": "Fast",
+            "count": 4,
+            "spawnInterval": 1.2
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 10,
+            "spawnInterval": 1.0
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 12,
+            "spawnInterval": 0.7
+          },
+          {
+            "enemyType": "Fast",
+            "count": 6,
+            "spawnInterval": 0.9
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 8,
+            "spawnInterval": 0.6
+          },
+          {
+            "enemyType": "Fast",
+            "count": 8,
+            "spawnInterval": 0.8
+          },
+          {
+            "enemyType": "Tank",
+            "count": 2,
+            "spawnInterval": 2.0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "6",
+    "gridCols": 22,
+    "gridRows": 16,
+    "cellSize": 1.0,
+    "startCell": {
+      "col": 2,
+      "row": 2
+    },
+    "endCell": {
+      "col": 19,
+      "row": 13
+    },
+    "pathWaypoints": [
+      {
+        "col": 2,
+        "row": 7
+      },
+      {
+        "col": 7,
+        "row": 7
+      },
+      {
+        "col": 7,
+        "row": 2
+      },
+      {
+        "col": 14,
+        "row": 2
+      },
+      {
+        "col": 14,
+        "row": 7
+      },
+      {
+        "col": 7,
+        "row": 12
+      },
+      {
+        "col": 14,
+        "row": 12
+      },
+      {
+        "col": 14,
+        "row": 13
+      }
+    ],
+    "waves": [
+      {
+        "delayBeforeWave": 3.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 10,
+            "spawnInterval": 1.1
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 8,
+            "spawnInterval": 0.8
+          },
+          {
+            "enemyType": "Tank",
+            "count": 2,
+            "spawnInterval": 2.5
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 12,
+            "spawnInterval": 0.9
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 10,
+            "spawnInterval": 0.6
+          },
+          {
+            "enemyType": "Fast",
+            "count": 5,
+            "spawnInterval": 0.8
+          },
+          {
+            "enemyType": "Tank",
+            "count": 3,
+            "spawnInterval": 2.0
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 10,
+            "spawnInterval": 0.6
+          },
+          {
+            "enemyType": "Tank",
+            "count": 4,
+            "spawnInterval": 1.8
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "7",
+    "gridCols": 24,
+    "gridRows": 16,
+    "cellSize": 1.0,
+    "startCell": {
+      "col": 0,
+      "row": 8
+    },
+    "endCell": {
+      "col": 23,
+      "row": 7
+    },
+    "pathWaypoints": [
+      {
+        "col": 3,
+        "row": 8
+      },
+      {
+        "col": 3,
+        "row": 3
+      },
+      {
+        "col": 8,
+        "row": 3
+      },
+      {
+        "col": 8,
+        "row": 12
+      },
+      {
+        "col": 13,
+        "row": 12
+      },
+      {
+        "col": 13,
+        "row": 3
+      },
+      {
+        "col": 18,
+        "row": 3
+      },
+      {
+        "col": 18,
+        "row": 12
+      }
+    ],
+    "waves": [
+      {
+        "delayBeforeWave": 3.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 12,
+            "spawnInterval": 1.0
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 8,
+            "spawnInterval": 0.7
+          },
+          {
+            "enemyType": "Fast",
+            "count": 6,
+            "spawnInterval": 1.0
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 10,
+            "spawnInterval": 0.8
+          },
+          {
+            "enemyType": "Tank",
+            "count": 3,
+            "spawnInterval": 2.2
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 15,
+            "spawnInterval": 0.6
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 8,
+            "spawnInterval": 0.5
+          },
+          {
+            "enemyType": "Fast",
+            "count": 8,
+            "spawnInterval": 0.6
+          },
+          {
+            "enemyType": "Tank",
+            "count": 3,
+            "spawnInterval": 2.0
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 12,
+            "spawnInterval": 0.5
+          },
+          {
+            "enemyType": "Tank",
+            "count": 5,
+            "spawnInterval": 1.5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "8",
+    "gridCols": 24,
+    "gridRows": 18,
+    "cellSize": 1.0,
+    "startCell": {
+      "col": 1,
+      "row": 1
+    },
+    "endCell": {
+      "col": 22,
+      "row": 16
+    },
+    "pathWaypoints": [
+      {
+        "col": 1,
+        "row": 8
+      },
+      {
+        "col": 6,
+        "row": 8
+      },
+      {
+        "col": 6,
+        "row": 1
+      },
+      {
+        "col": 11,
+        "row": 1
+      },
+      {
+        "col": 11,
+        "row": 16
+      },
+      {
+        "col": 16,
+        "row": 16
+      },
+      {
+        "col": 16,
+        "row": 1
+      },
+      {
+        "col": 21,
+        "row": 1
+      },
+      {
+        "col": 21,
+        "row": 8
+      }
+    ],
+    "waves": [
+      {
+        "delayBeforeWave": 3.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 12,
+            "spawnInterval": 0.9
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 10,
+            "spawnInterval": 0.7
+          },
+          {
+            "enemyType": "Fast",
+            "count": 5,
+            "spawnInterval": 0.9
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 12,
+            "spawnInterval": 0.7
+          },
+          {
+            "enemyType": "Tank",
+            "count": 3,
+            "spawnInterval": 2.0
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Tank",
+            "count": 6,
+            "spawnInterval": 2.2
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 15,
+            "spawnInterval": 0.5
+          },
+          {
+            "enemyType": "Fast",
+            "count": 8,
+            "spawnInterval": 0.6
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 10,
+            "spawnInterval": 0.5
+          },
+          {
+            "enemyType": "Tank",
+            "count": 5,
+            "spawnInterval": 1.5
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 10,
+            "spawnInterval": 0.4
+          },
+          {
+            "enemyType": "Fast",
+            "count": 10,
+            "spawnInterval": 0.5
+          },
+          {
+            "enemyType": "Tank",
+            "count": 4,
+            "spawnInterval": 1.5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "9",
+    "gridCols": 28,
+    "gridRows": 18,
+    "cellSize": 1.0,
+    "startCell": {
+      "col": 0,
+      "row": 9
+    },
+    "endCell": {
+      "col": 27,
+      "row": 8
+    },
+    "pathWaypoints": [
+      {
+        "col": 4,
+        "row": 9
+      },
+      {
+        "col": 4,
+        "row": 4
+      },
+      {
+        "col": 8,
+        "row": 4
+      },
+      {
+        "col": 8,
+        "row": 14
+      },
+      {
+        "col": 12,
+        "row": 14
+      },
+      {
+        "col": 12,
+        "row": 4
+      },
+      {
+        "col": 16,
+        "row": 4
+      },
+      {
+        "col": 16,
+        "row": 14
+      },
+      {
+        "col": 20,
+        "row": 14
+      },
+      {
+        "col": 20,
+        "row": 4
+      },
+      {
+        "col": 24,
+        "row": 4
+      },
+      {
+        "col": 24,
+        "row": 8
+      }
+    ],
+    "waves": [
+      {
+        "delayBeforeWave": 3.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 15,
+            "spawnInterval": 0.9
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 10,
+            "spawnInterval": 0.6
+          },
+          {
+            "enemyType": "Fast",
+            "count": 8,
+            "spawnInterval": 0.8
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 15,
+            "spawnInterval": 0.7
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 12,
+            "spawnInterval": 0.5
+          },
+          {
+            "enemyType": "Tank",
+            "count": 5,
+            "spawnInterval": 2.0
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 10,
+            "spawnInterval": 0.5
+          },
+          {
+            "enemyType": "Tank",
+            "count": 4,
+            "spawnInterval": 1.8
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 20,
+            "spawnInterval": 0.4
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 10,
+            "spawnInterval": 0.3
+          },
+          {
+            "enemyType": "Fast",
+            "count": 10,
+            "spawnInterval": 0.4
+          },
+          {
+            "enemyType": "Tank",
+            "count": 6,
+            "spawnInterval": 1.5
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 15,
+            "spawnInterval": 0.3
+          },
+          {
+            "enemyType": "Tank",
+            "count": 8,
+            "spawnInterval": 1.2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "10",
+    "gridCols": 30,
+    "gridRows": 20,
+    "cellSize": 1.0,
+    "startCell": {
+      "col": 0,
+      "row": 10
+    },
+    "endCell": {
+      "col": 29,
+      "row": 9
+    },
+    "pathWaypoints": [
+      {
+        "col": 3,
+        "row": 10
+      },
+      {
+        "col": 3,
+        "row": 3
+      },
+      {
+        "col": 7,
+        "row": 3
+      },
+      {
+        "col": 7,
+        "row": 17
+      },
+      {
+        "col": 11,
+        "row": 17
+      },
+      {
+        "col": 11,
+        "row": 3
+      },
+      {
+        "col": 15,
+        "row": 3
+      },
+      {
+        "col": 15,
+        "row": 17
+      },
+      {
+        "col": 19,
+        "row": 17
+      },
+      {
+        "col": 19,
+        "row": 3
+      },
+      {
+        "col": 23,
+        "row": 3
+      },
+      {
+        "col": 23,
+        "row": 17
+      },
+      {
+        "col": 27,
+        "row": 17
+      },
+      {
+        "col": 27,
+        "row": 9
+      }
+    ],
+    "waves": [
+      {
+        "delayBeforeWave": 3.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 15,
+            "spawnInterval": 0.8
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 3.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 12,
+            "spawnInterval": 0.6
+          },
+          {
+            "enemyType": "Fast",
+            "count": 8,
+            "spawnInterval": 0.7
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 15,
+            "spawnInterval": 0.6
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 10,
+            "spawnInterval": 0.4
+          },
+          {
+            "enemyType": "Tank",
+            "count": 6,
+            "spawnInterval": 1.8
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 4.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 12,
+            "spawnInterval": 0.5
+          },
+          {
+            "enemyType": "Tank",
+            "count": 4,
+            "spawnInterval": 1.5
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 20,
+            "spawnInterval": 0.3
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Fast",
+            "count": 15,
+            "spawnInterval": 0.4
+          },
+          {
+            "enemyType": "Tank",
+            "count": 6,
+            "spawnInterval": 1.5
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 15,
+            "spawnInterval": 0.3
+          },
+          {
+            "enemyType": "Fast",
+            "count": 10,
+            "spawnInterval": 0.3
+          },
+          {
+            "enemyType": "Tank",
+            "count": 6,
+            "spawnInterval": 1.2
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Tank",
+            "count": 10,
+            "spawnInterval": 1.5
+          }
+        ]
+      },
+      {
+        "delayBeforeWave": 5.0,
+        "entries": [
+          {
+            "enemyType": "Basic",
+            "count": 15,
+            "spawnInterval": 0.2
+          },
+          {
+            "enemyType": "Fast",
+            "count": 15,
+            "spawnInterval": 0.2
+          },
+          {
+            "enemyType": "Tank",
+            "count": 10,
+            "spawnInterval": 1.0
+          }
+        ]
+      }
+    ]
+  }
+]

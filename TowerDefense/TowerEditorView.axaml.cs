@@ -16,7 +16,7 @@ namespace TowerDefense;
 public partial class TowerEditorView : UserControl
 {
     // ==================== State ====================
-    private string _towersDir = string.Empty;
+    private string _towersFilePath = string.Empty;
     private string _currentFileName = string.Empty;
     private readonly List<TowerShapeData> _shapes = new();
     private int _selectedShapeIndex = -1;
@@ -43,30 +43,32 @@ public partial class TowerEditorView : UserControl
 
     // ==================== Initialization ====================
 
-    public void Initialize(string towersDir)
+    public void Initialize(string towersFilePath)
     {
-        _towersDir = towersDir;
+        _towersFilePath = towersFilePath;
         RefreshTowerList();
     }
 
     // ==================== Tower List ====================
 
+    private List<TowerData> LoadAllTowers() => TowerData.LoadListFromFile(_towersFilePath);
+
     private void RefreshTowerList()
     {
-        var names = TowerData.ListNames(_towersDir);
-        var sorted = names.OrderBy(n => n).ToList();
+        var towers = LoadAllTowers();
         TowerListCombo.Items.Clear();
-        foreach (var name in sorted)
-            TowerListCombo.Items.Add(name);
+        foreach (var t in towers)
+            TowerListCombo.Items.Add(t.Name);
         TowerListCombo.SelectedIndex = -1;
-        DeleteBtn.IsVisible = sorted.Count > 0;
+        DeleteBtn.IsVisible = towers.Count > 0;
     }
 
     private void OnTowerSelected(object? sender, SelectionChangedEventArgs e)
     {
         if (TowerListCombo.SelectedItem is not string name) return;
 
-        var data = TowerData.LoadFromFile(Path.Combine(_towersDir, name + ".json"));
+        var towers = LoadAllTowers();
+        var data = towers.FirstOrDefault(t => t.Name == name);
         if (data != null)
         {
             LoadTowerData(data);
@@ -90,8 +92,10 @@ public partial class TowerEditorView : UserControl
             StatusLabel.Text = Loc.Get("TowerEditor.SelectToDelete");
             return;
         }
-        var filePath = Path.Combine(_towersDir, name + ".json");
-        if (File.Exists(filePath)) File.Delete(filePath);
+        var towers = LoadAllTowers();
+        towers.RemoveAll(t => t.Name == name);
+        TowerData.SaveListToFile(_towersFilePath, towers);
+        TowerDefinition.All.Remove(name);
         _currentFileName = string.Empty;
         RefreshTowerList();
         StatusLabel.Text = Loc.Get("TowerEditor.DeletedMsg", name);
@@ -540,21 +544,27 @@ public partial class TowerEditorView : UserControl
             return;
         }
 
-        var dir = _towersDir;
-        Directory.CreateDirectory(dir);
+        var dir = Path.GetDirectoryName(_towersFilePath);
+        if (dir != null) Directory.CreateDirectory(dir);
+
+        // Load all towers, update/add the current one, save all
+        var towers = LoadAllTowers();
+        var existing = towers.FindIndex(t => t.Name == data.Name);
+        if (existing >= 0)
+            towers[existing] = data;
+        else
+            towers.Add(data);
+        TowerData.SaveListToFile(_towersFilePath, towers);
 
         var fileName = SanitizeFileName(data.Name);
-        var filePath = Path.Combine(dir, fileName + ".json");
-        data.SaveToFile(filePath);
-
         _currentFileName = fileName;
         RefreshTowerList();
-        TowerListCombo.SelectedItem = fileName;
+        TowerListCombo.SelectedItem = data.Name;
 
         var def = data.ToDefinition();
         TowerDefinition.All[data.Name] = def;
 
-        StatusLabel.Text = Loc.Get("TowerEditor.Saved", fileName);
+        StatusLabel.Text = Loc.Get("TowerEditor.Saved", data.Name);
     }
 
     private static string SanitizeFileName(string name)
@@ -607,6 +617,16 @@ public partial class TowerEditorView : UserControl
         RebuildPreviewScene();
     }
 
+    private void OnPreviewObjectPicked(object? sender, ObjectPickedEventArgs args)
+    {
+        var nodeName = args.Node.Name ?? "";
+        if (nodeName.StartsWith("Shape_") && int.TryParse(nodeName.Replace("Shape_", ""), out int index)
+            && index >= 0 && index < _shapes.Count)
+        {
+            SelectShape(index);
+        }
+    }
+
     private void OnPreviewSceneUpdated(object? sender, UpdateRoutedEventArgs args)
     {
         _rotationTimer += (float)(args.DeltaTime * 20.0);
@@ -646,9 +666,9 @@ public partial class TowerEditorView : UserControl
             var mat = CreateMaterial(color);
 
             Mesh mesh;
-            if (s.Type == "Box") mesh = new Mesh { Geometry = _boxGeo!, Material = mat };
-            else if (s.Type == "Sphere") mesh = new Mesh { Geometry = _sphereGeo!, Material = mat };
-            else mesh = new Mesh { Geometry = _cylinderGeo!, Material = mat }; // Cylinder or Cone (ConeGeometry not in Aura3D)
+            if (s.Type == "Box") mesh = new Mesh { Geometry = _boxGeo!, Material = mat, Name = $"Shape_{i}" };
+            else if (s.Type == "Sphere") mesh = new Mesh { Geometry = _sphereGeo!, Material = mat, Name = $"Shape_{i}" };
+            else mesh = new Mesh { Geometry = _cylinderGeo!, Material = mat, Name = $"Shape_{i}" };
 
             mesh.Scale = new Vector3(s.ScaleX, s.ScaleY, s.ScaleZ);
 

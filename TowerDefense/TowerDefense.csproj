@@ -15,11 +15,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Maps\**" CopyToOutputDirectory="PreserveNewest" LinkBase="Maps" />
-    <EmbeddedResource Include="Maps\**" LinkBase="Maps" />
-    <Content Include="Enemies\**" CopyToOutputDirectory="PreserveNewest" LinkBase="Enemies" />
-    <EmbeddedResource Include="Enemies\**" LinkBase="Enemies" />
-    <Content Include="Towers\**" CopyToOutputDirectory="PreserveNewest" LinkBase="Towers" />
-    <EmbeddedResource Include="Towers\**" LinkBase="Towers" />
+    <Content Include="Maps\maps.json" CopyToOutputDirectory="PreserveNewest" LinkBase="Maps" />
+    <EmbeddedResource Include="Maps\maps.json" />
+    <Content Include="Enemies\enemies.json" CopyToOutputDirectory="PreserveNewest" LinkBase="Enemies" />
+    <EmbeddedResource Include="Enemies\enemies.json" />
+    <Content Include="Towers\Builtin\towers.json" CopyToOutputDirectory="PreserveNewest" LinkBase="Towers" />
+    <EmbeddedResource Include="Towers\Builtin\towers.json" />
   </ItemGroup>
 </Project>

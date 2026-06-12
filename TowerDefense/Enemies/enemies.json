@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Basic",
+    "maxHP": 100.0,
+    "speed": 1.8,
+    "goldReward": 10,
+    "colorR": 220,
+    "colorG": 20,
+    "colorB": 60,
+    "radius": 0.22
+  },
+  {
+    "name": "Fast",
+    "maxHP": 60.0,
+    "speed": 3.5,
+    "goldReward": 15,
+    "colorR": 255,
+    "colorG": 215,
+    "colorB": 0,
+    "radius": 0.18
+  },
+  {
+    "name": "Tank",
+    "maxHP": 350.0,
+    "speed": 1.0,
+    "goldReward": 30,
+    "colorR": 148,
+    "colorG": 0,
+    "colorB": 211,
+    "radius": 0.3
+  }
+]
