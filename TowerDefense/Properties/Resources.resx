@@ -248,35 +248,71 @@
   <data name="MapEditor.GridHint" xml:space="preserve">
     <value>Left click: add waypoint | Right click: delete</value>
   </data>
-  <data name="MapEditor.Waves" xml:space="preserve">
-    <value>WAVES ({0})</value>
+  <data name="MapEditor.WavesTitle" xml:space="preserve">
+    <value>WAVES</value>
   </data>
   <data name="MapEditor.AddWave" xml:space="preserve">
     <value>＋ Add Wave</value>
   </data>
-  <data name="MapEditor.WaveLabel" xml:space="preserve">
-    <value>Wave {0}</value>
+  <data name="MapEditor.DeleteWave" xml:space="preserve">
+    <value>✕ Delete Wave</value>
   </data>
-  <data name="MapEditor.EnemyType" xml:space="preserve">
-    <value>Type: {0}</value>
+  <data name="MapEditor.EditWave" xml:space="preserve">
+    <value>EDIT WAVE</value>
   </data>
-  <data name="MapEditor.EnemyCount" xml:space="preserve">
-    <value>Count: {0}</value>
+  <data name="MapEditor.Delay" xml:space="preserve">
+    <value>Delay:</value>
+  </data>
+  <data name="MapEditor.SecondAbbr" xml:space="preserve">
+    <value>s</value>
+  </data>
+  <data name="MapEditor.Entries" xml:space="preserve">
+    <value>Entries:</value>
+  </data>
+  <data name="MapEditor.Type" xml:space="preserve">
+    <value>Type:</value>
+  </data>
+  <data name="MapEditor.Count" xml:space="preserve">
+    <value>Count:</value>
   </data>
   <data name="MapEditor.Interval" xml:space="preserve">
-    <value>Interval: {0}s</value>
+    <value>Interval:</value>
   </data>
-  <data name="MapEditor.RemoveWave" xml:space="preserve">
-    <value>✕ Remove Wave</value>
+  <data name="MapEditor.AddEntry" xml:space="preserve">
+    <value>＋ Add Entry</value>
   </data>
-  <data name="MapEditor.AddEnemy" xml:space="preserve">
-    <value>＋ Add Enemy</value>
+  <data name="MapEditor.DeleteEntry" xml:space="preserve">
+    <value>✕ Delete</value>
   </data>
-  <data name="MapEditor.Name" xml:space="preserve">
-    <value>Name</value>
+  <data name="MapEditor.TestMap" xml:space="preserve">
+    <value>▶ Test Map</value>
   </data>
-  <data name="MapEditor.Test" xml:space="preserve">
-    <value>▶ Test</value>
+  <data name="MapEditor.WaveEntryFormat" xml:space="preserve">
+    <value>Wave {0} — {1} entries, delay {2:F1}s</value>
+  </data>
+  <data name="MapEditor.EntryFormat" xml:space="preserve">
+    <value>{0} ×{1} ({2:F1}s)</value>
+  </data>
+  <data name="MapEditor.StartAt" xml:space="preserve">
+    <value>START @ ({0}, {1})</value>
+  </data>
+  <data name="MapEditor.EndAt" xml:space="preserve">
+    <value>END @ ({0}, {1})</value>
+  </data>
+  <data name="MapEditor.NoStartSet" xml:space="preserve">
+    <value>No start set.</value>
+  </data>
+  <data name="MapEditor.NoEndSet" xml:space="preserve">
+    <value>No end set.</value>
+  </data>
+  <data name="MapEditor.MissingStart" xml:space="preserve">
+    <value>Missing START point.</value>
+  </data>
+  <data name="MapEditor.MissingEnd" xml:space="preserve">
+    <value>Missing END point.</value>
+  </data>
+  <data name="MapEditor.NeedWave" xml:space="preserve">
+    <value>Add at least one wave.</value>
   </data>
   <data name="MapEditor.ModeStart" xml:space="preserve">
     <value>Mode: START — Click a cell to set it as the path entry point</value>
@@ -408,31 +444,109 @@
   <data name="TowerEditor.Save" xml:space="preserve">
     <value>💾 Save Tower</value>
   </data>
-  <data name="TowerEditor.Cost" xml:space="preserve">
-    <value>COST</value>
+  <data name="TowerEditor.ScaleX" xml:space="preserve">
+    <value>SCALE X</value>
   </data>
-  <data name="TowerEditor.Range" xml:space="preserve">
-    <value>RANGE</value>
+  <data name="TowerEditor.ScaleY" xml:space="preserve">
+    <value>SCALE Y</value>
+  </data>
+  <data name="TowerEditor.ScaleZ" xml:space="preserve">
+    <value>SCALE Z</value>
+  </data>
+  <data name="TowerEditor.OffsetY" xml:space="preserve">
+    <value>OFFSET Y</value>
+  </data>
+  <data name="TowerEditor.OffsetX" xml:space="preserve">
+    <value>OFFSET X</value>
+  </data>
+  <data name="TowerEditor.RotationY" xml:space="preserve">
+    <value>ROTATION Y (deg)</value>
+  </data>
+  <data name="TowerEditor.RemoveShape" xml:space="preserve">
+    <value>✕ Remove Shape</value>
+  </data>
+  <data name="TowerEditor.CostGold" xml:space="preserve">
+    <value>COST (GOLD)</value>
   </data>
   <data name="TowerEditor.Damage" xml:space="preserve">
     <value>DAMAGE</value>
   </data>
-  <data name="TowerEditor.Cooldown" xml:space="preserve">
-    <value>COOLDOWN</value>
+  <data name="TowerEditor.Range" xml:space="preserve">
+    <value>RANGE</value>
+  </data>
+  <data name="TowerEditor.FireRate" xml:space="preserve">
+    <value>FIRE RATE (0=AOE)</value>
   </data>
   <data name="TowerEditor.ProjectileSpeed" xml:space="preserve">
     <value>PROJECTILE SPEED</value>
   </data>
-  <data name="TowerEditor.Color" xml:space="preserve">
-    <value>COLOR</value>
+  <data name="TowerEditor.SpecialEffects" xml:space="preserve">
+    <value>SPECIAL EFFECTS</value>
   </data>
-  <data name="TowerEditor.ShapeColor" xml:space="preserve">
-    <value>SHAPE COLOR</value>
+  <data name="TowerEditor.SplashRadius" xml:space="preserve">
+    <value>SPLASH RADIUS</value>
   </data>
-  <data name="TowerEditor.ProjectileColor" xml:space="preserve">
-    <value>PROJECTILE COLOR</value>
+  <data name="TowerEditor.SlowAmount" xml:space="preserve">
+    <value>SLOW (0-1)</value>
   </data>
-  <data name="TowerEditor.Special" xml:space="preserve">
-    <value>SPECIAL</value>
+  <data name="TowerEditor.MultiShot" xml:space="preserve">
+    <value>MULTI-SHOT</value>
+  </data>
+  <data name="TowerEditor.ArcAngle" xml:space="preserve">
+    <value>ARC ANGLE</value>
+  </data>
+  <data name="TowerEditor.CritChance" xml:space="preserve">
+    <value>CRIT CHANCE</value>
+  </data>
+  <data name="TowerEditor.CritMultiplier" xml:space="preserve">
+    <value>CRIT MULTIPLIER</value>
+  </data>
+  <data name="TowerEditor.DotDamage" xml:space="preserve">
+    <value>DOT DAMAGE</value>
+  </data>
+  <data name="TowerEditor.DotDuration" xml:space="preserve">
+    <value>DOT DURATION</value>
+  </data>
+  <data name="TowerEditor.AoeRadius" xml:space="preserve">
+    <value>AOE RADIUS</value>
+  </data>
+  <data name="TowerEditor.Loaded" xml:space="preserve">
+    <value>Loaded: {0}</value>
+  </data>
+  <data name="TowerEditor.NewUnsaved" xml:space="preserve">
+    <value>New tower (unsaved)</value>
+  </data>
+  <data name="TowerEditor.SelectToDelete" xml:space="preserve">
+    <value>Select a tower to delete.</value>
+  </data>
+  <data name="TowerEditor.DeletedMsg" xml:space="preserve">
+    <value>Deleted: {0}</value>
+  </data>
+  <data name="TowerEditor.ShapeLabel" xml:space="preserve">
+    <value>{0} (#{1})</value>
+  </data>
+  <data name="TowerEditor.CostSummary" xml:space="preserve">
+    <value>Cost: {0} gold</value>
+  </data>
+  <data name="TowerEditor.DamageSummary" xml:space="preserve">
+    <value>Damage: {0}</value>
+  </data>
+  <data name="TowerEditor.RangeSummary" xml:space="preserve">
+    <value>Range: {0}</value>
+  </data>
+  <data name="TowerEditor.FireRateSummary" xml:space="preserve">
+    <value>Fire Rate: {0}/s</value>
+  </data>
+  <data name="TowerEditor.FireRateContinuous" xml:space="preserve">
+    <value>Fire Rate: Continuous AOE</value>
+  </data>
+  <data name="TowerEditor.ShapesCount" xml:space="preserve">
+    <value>Shapes: {0}</value>
+  </data>
+  <data name="TowerEditor.EnterName" xml:space="preserve">
+    <value>Please enter a name.</value>
+  </data>
+  <data name="TowerEditor.Saved" xml:space="preserve">
+    <value>Saved: {0}.json</value>
   </data>
 </root>

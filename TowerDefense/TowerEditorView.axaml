@@ -160,7 +160,7 @@
 
                 <!-- Shape Scale -->
                 <StackPanel x:Name="ShapeScalePanel" IsVisible="False" Spacing="4">
-                    <TextBlock Text="SCALE X" Foreground="#AAA" FontSize="10" />
+                    <TextBlock Text="{loc:Loc TowerEditor.ScaleX}" Foreground="#AAA" FontSize="10" />
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Slider x:Name="ShapeScaleXSlider" Minimum="0.02" Maximum="3" Value="1"
                                 Width="150" TickFrequency="0.02" PropertyChanged="OnShapeScaleSliderChanged" />
@@ -171,7 +171,7 @@
                                  Padding="2" VerticalContentAlignment="Center" />
                     </StackPanel>
 
-                    <TextBlock Text="SCALE Y" Foreground="#AAA" FontSize="10" />
+                    <TextBlock Text="{loc:Loc TowerEditor.ScaleY}" Foreground="#AAA" FontSize="10" />
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Slider x:Name="ShapeScaleYSlider" Minimum="0.02" Maximum="3" Value="1"
                                 Width="150" TickFrequency="0.02" PropertyChanged="OnShapeScaleSliderChanged" />
@@ -182,7 +182,7 @@
                                  Padding="2" VerticalContentAlignment="Center" />
                     </StackPanel>
 
-                    <TextBlock Text="SCALE Z" Foreground="#AAA" FontSize="10" />
+                    <TextBlock Text="{loc:Loc TowerEditor.ScaleZ}" Foreground="#AAA" FontSize="10" />
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Slider x:Name="ShapeScaleZSlider" Minimum="0.02" Maximum="3" Value="1"
                                 Width="150" TickFrequency="0.02" PropertyChanged="OnShapeScaleSliderChanged" />
@@ -193,7 +193,7 @@
                                  Padding="2" VerticalContentAlignment="Center" />
                     </StackPanel>
 
-                    <TextBlock Text="OFFSET Y" Foreground="#AAA" FontSize="10" />
+                    <TextBlock Text="{loc:Loc TowerEditor.OffsetY}" Foreground="#AAA" FontSize="10" />
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Slider x:Name="ShapeOffsetYSlider" Minimum="-1" Maximum="1" Value="0"
                                 Width="150" TickFrequency="0.02" PropertyChanged="OnShapeScaleSliderChanged" />
@@ -204,7 +204,7 @@
                                  Padding="2" VerticalContentAlignment="Center" />
                     </StackPanel>
 
-                    <TextBlock Text="OFFSET X" Foreground="#AAA" FontSize="10" />
+                    <TextBlock Text="{loc:Loc TowerEditor.OffsetX}" Foreground="#AAA" FontSize="10" />
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Slider x:Name="ShapeOffsetXSlider" Minimum="-0.5" Maximum="0.5" Value="0"
                                 Width="150" TickFrequency="0.01" PropertyChanged="OnShapeScaleSliderChanged" />
@@ -215,7 +215,7 @@
                                  Padding="2" VerticalContentAlignment="Center" />
                     </StackPanel>
 
-                    <TextBlock Text="ROTATION Y (deg)" Foreground="#AAA" FontSize="10" />
+                    <TextBlock Text="{loc:Loc TowerEditor.RotationY}" Foreground="#AAA" FontSize="10" />
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Slider x:Name="ShapeRotationYSlider" Minimum="-180" Maximum="180" Value="0"
                                 Width="150" PropertyChanged="OnShapeScaleSliderChanged" />
@@ -229,13 +229,13 @@
                     <Button x:Name="RemoveShapeBtn" Click="OnRemoveShape"
                             Background="#CC6a3a3a" Foreground="White" FontSize="11"
                             Padding="8,4" CornerRadius="4"
-                            Content="✕ Remove Shape" />
+                            Content="{loc:Loc TowerEditor.RemoveShape}" />
                 </StackPanel>
 
                 <Separator Background="#444" Height="1" />
 
                 <!-- Basic Stats -->
-                <TextBlock Text="COST (GOLD)" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc TowerEditor.CostGold}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="CostSlider" Minimum="5" Maximum="1000" Value="50"
                             Width="180" PropertyChanged="OnSliderChanged" />
@@ -246,7 +246,7 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <TextBlock Text="DAMAGE" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc TowerEditor.Damage}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="DamageSlider" Minimum="1" Maximum="200" Value="15"
                             Width="180" PropertyChanged="OnSliderChanged" />
@@ -257,7 +257,7 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <TextBlock Text="RANGE" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc TowerEditor.Range}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="RangeSlider" Minimum="0.5" Maximum="15" Value="3.5"
                             Width="180" TickFrequency="0.1" PropertyChanged="OnSliderChanged" />
@@ -268,7 +268,7 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <TextBlock Text="FIRE RATE (0=AOE)" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc TowerEditor.FireRate}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="FireRateSlider" Minimum="0" Maximum="5" Value="1.8"
                             Width="180" TickFrequency="0.1" PropertyChanged="OnSliderChanged" />
@@ -279,7 +279,7 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <TextBlock Text="PROJECTILE SPEED" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc TowerEditor.ProjectileSpeed}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="ProjSpeedSlider" Minimum="1" Maximum="20" Value="5"
                             Width="180" PropertyChanged="OnSliderChanged" />
@@ -293,9 +293,9 @@
                 <Separator Background="#444" Height="1" />
 
                 <!-- Special Effects -->
-                <TextBlock Text="SPECIAL EFFECTS" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
+                <TextBlock Text="{loc:Loc TowerEditor.SpecialEffects}" Foreground="#AAA" FontSize="11" FontWeight="Bold" />
 
-                <TextBlock Text="SPLASH RADIUS" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="{loc:Loc TowerEditor.SplashRadius}" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="SplashRadiusSlider" Minimum="0" Maximum="5" Value="0"
                             Width="180" TickFrequency="0.1" PropertyChanged="OnSliderChanged" />
@@ -306,7 +306,7 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <TextBlock Text="SLOW (0-1)" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="{loc:Loc TowerEditor.SlowAmount}" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="SlowAmountSlider" Minimum="0" Maximum="1" Value="0"
                             Width="180" TickFrequency="0.05" PropertyChanged="OnSliderChanged" />
@@ -317,7 +317,7 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <TextBlock Text="MULTI-SHOT" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="{loc:Loc TowerEditor.MultiShot}" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="MultiShotCountSlider" Minimum="1" Maximum="10" Value="1"
                             Width="180" PropertyChanged="OnSliderChanged" />
@@ -328,7 +328,7 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <TextBlock Text="ARC ANGLE" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="{loc:Loc TowerEditor.ArcAngle}" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="ArcAngleSlider" Minimum="0" Maximum="90" Value="0"
                             Width="180" PropertyChanged="OnSliderChanged" />
@@ -339,7 +339,7 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <TextBlock Text="CRIT CHANCE" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="{loc:Loc TowerEditor.CritChance}" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="CritChanceSlider" Minimum="0" Maximum="1" Value="0"
                             Width="180" TickFrequency="0.05" PropertyChanged="OnSliderChanged" />
@@ -350,7 +350,7 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <TextBlock Text="CRIT MULTIPLIER" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="{loc:Loc TowerEditor.CritMultiplier}" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="CritMultiplierSlider" Minimum="1" Maximum="10" Value="2"
                             Width="180" TickFrequency="0.5" PropertyChanged="OnSliderChanged" />
@@ -361,7 +361,7 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <TextBlock Text="DOT DAMAGE" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="{loc:Loc TowerEditor.DotDamage}" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="DotDamageSlider" Minimum="0" Maximum="200" Value="0"
                             Width="180" PropertyChanged="OnSliderChanged" />
@@ -372,7 +372,7 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <TextBlock Text="DOT DURATION" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="{loc:Loc TowerEditor.DotDuration}" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="DotDurationSlider" Minimum="0" Maximum="10" Value="0"
                             Width="180" TickFrequency="0.5" PropertyChanged="OnSliderChanged" />
@@ -383,7 +383,7 @@
                              Padding="4,2" VerticalContentAlignment="Center" />
                 </StackPanel>
 
-                <TextBlock Text="AOE RADIUS" Foreground="#AAA" FontSize="10" />
+                <TextBlock Text="{loc:Loc TowerEditor.AoeRadius}" Foreground="#AAA" FontSize="10" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <Slider x:Name="AoeRadiusSlider" Minimum="0" Maximum="5" Value="0"
                             Width="180" TickFrequency="0.1" PropertyChanged="OnSliderChanged" />

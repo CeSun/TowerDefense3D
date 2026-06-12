@@ -71,7 +71,7 @@ public partial class TowerEditorView : UserControl
         {
             LoadTowerData(data);
             _currentFileName = name;
-            StatusLabel.Text = $"Loaded: {name}";
+            StatusLabel.Text = Loc.Get("TowerEditor.Loaded", name);
         }
     }
 
@@ -80,21 +80,21 @@ public partial class TowerEditorView : UserControl
         var data = new TowerData();
         LoadTowerData(data);
         _currentFileName = string.Empty;
-        StatusLabel.Text = "New tower (unsaved)";
+        StatusLabel.Text = Loc.Get("TowerEditor.NewUnsaved");
     }
 
     private void OnDeleteTower(object? sender, RoutedEventArgs e)
     {
         if (TowerListCombo.SelectedItem is not string name)
         {
-            StatusLabel.Text = "Select a tower to delete.";
+            StatusLabel.Text = Loc.Get("TowerEditor.SelectToDelete");
             return;
         }
         var filePath = Path.Combine(_towersDir, name + ".json");
         if (File.Exists(filePath)) File.Delete(filePath);
         _currentFileName = string.Empty;
         RefreshTowerList();
-        StatusLabel.Text = $"Deleted: {name}";
+        StatusLabel.Text = Loc.Get("TowerEditor.DeletedMsg", name);
     }
 
     // ==================== Shape Management ====================
@@ -166,7 +166,7 @@ public partial class TowerEditorView : UserControl
 
         _suppressShapeUpdates = true;
 
-        SelectedShapeLabel.Text = $"{s.Type} (#{index + 1})";
+        SelectedShapeLabel.Text = Loc.Get("TowerEditor.ShapeLabel", s.Type, index + 1);
         ShapeColorPreview.IsVisible = true;
         ShapeColorPanel.IsVisible = true;
         ShapeScalePanel.IsVisible = true;
@@ -202,7 +202,7 @@ public partial class TowerEditorView : UserControl
     private void ClearShapeEditor()
     {
         _selectedShapeIndex = -1;
-        SelectedShapeLabel.Text = "None";
+        SelectedShapeLabel.Text = Loc.Get("TowerEditor.None");
         ShapeColorPreview.IsVisible = false;
         ShapeColorPanel.IsVisible = false;
         ShapeScalePanel.IsVisible = false;
@@ -522,11 +522,11 @@ public partial class TowerEditorView : UserControl
     {
         var data = GatherTowerData();
         SummaryName.Text = data.Name;
-        SummaryCost.Text = $"Cost: {data.Cost} gold";
-        SummaryDamage.Text = $"Damage: {data.Damage:F0}";
-        SummaryRange.Text = $"Range: {data.Range:F1}";
-        SummaryFireRate.Text = data.FireRate > 0 ? $"Fire Rate: {data.FireRate:F1}/s" : "Fire Rate: Continuous AOE";
-        SummaryShapes.Text = $"Shapes: {_shapes.Count}";
+        SummaryCost.Text = Loc.Get("TowerEditor.CostSummary", data.Cost);
+        SummaryDamage.Text = Loc.Get("TowerEditor.DamageSummary", data.Damage.ToString("F0"));
+        SummaryRange.Text = Loc.Get("TowerEditor.RangeSummary", data.Range.ToString("F1"));
+        SummaryFireRate.Text = data.FireRate > 0 ? Loc.Get("TowerEditor.FireRateSummary", data.FireRate.ToString("F1")) : Loc.Get("TowerEditor.FireRateContinuous");
+        SummaryShapes.Text = Loc.Get("TowerEditor.ShapesCount", _shapes.Count);
     }
 
     // ==================== Save ====================
@@ -536,7 +536,7 @@ public partial class TowerEditorView : UserControl
         var data = GatherTowerData();
         if (string.IsNullOrWhiteSpace(data.Name))
         {
-            StatusLabel.Text = "Please enter a name.";
+            StatusLabel.Text = Loc.Get("TowerEditor.EnterName");
             return;
         }
 
@@ -554,7 +554,7 @@ public partial class TowerEditorView : UserControl
         var def = data.ToDefinition();
         TowerDefinition.All[data.Name] = def;
 
-        StatusLabel.Text = $"Saved: {fileName}.json";
+        StatusLabel.Text = Loc.Get("TowerEditor.Saved", fileName);
     }
 
     private static string SanitizeFileName(string name)

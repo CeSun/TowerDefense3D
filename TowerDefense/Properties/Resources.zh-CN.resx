@@ -248,35 +248,71 @@
   <data name="MapEditor.GridHint" xml:space="preserve">
     <value>左键点击: 添加路径点 | 右键点击: 删除</value>
   </data>
-  <data name="MapEditor.Waves" xml:space="preserve">
-    <value>波次 ({0})</value>
+  <data name="MapEditor.WavesTitle" xml:space="preserve">
+    <value>波次</value>
   </data>
   <data name="MapEditor.AddWave" xml:space="preserve">
     <value>＋ 添加波次</value>
   </data>
-  <data name="MapEditor.WaveLabel" xml:space="preserve">
-    <value>第 {0} 波</value>
+  <data name="MapEditor.DeleteWave" xml:space="preserve">
+    <value>✕ 删除波次</value>
   </data>
-  <data name="MapEditor.EnemyType" xml:space="preserve">
-    <value>类型: {0}</value>
+  <data name="MapEditor.EditWave" xml:space="preserve">
+    <value>编辑波次</value>
   </data>
-  <data name="MapEditor.EnemyCount" xml:space="preserve">
-    <value>数量: {0}</value>
+  <data name="MapEditor.Delay" xml:space="preserve">
+    <value>延迟:</value>
+  </data>
+  <data name="MapEditor.SecondAbbr" xml:space="preserve">
+    <value>秒</value>
+  </data>
+  <data name="MapEditor.Entries" xml:space="preserve">
+    <value>条目:</value>
+  </data>
+  <data name="MapEditor.Type" xml:space="preserve">
+    <value>类型:</value>
+  </data>
+  <data name="MapEditor.Count" xml:space="preserve">
+    <value>数量:</value>
   </data>
   <data name="MapEditor.Interval" xml:space="preserve">
-    <value>间隔: {0}秒</value>
+    <value>间隔:</value>
   </data>
-  <data name="MapEditor.RemoveWave" xml:space="preserve">
-    <value>✕ 移除波次</value>
+  <data name="MapEditor.AddEntry" xml:space="preserve">
+    <value>＋ 添加条目</value>
   </data>
-  <data name="MapEditor.AddEnemy" xml:space="preserve">
-    <value>＋ 添加敌人</value>
+  <data name="MapEditor.DeleteEntry" xml:space="preserve">
+    <value>✕ 删除</value>
   </data>
-  <data name="MapEditor.Name" xml:space="preserve">
-    <value>名称</value>
+  <data name="MapEditor.TestMap" xml:space="preserve">
+    <value>▶ 测试地图</value>
   </data>
-  <data name="MapEditor.Test" xml:space="preserve">
-    <value>▶ 测试</value>
+  <data name="MapEditor.WaveEntryFormat" xml:space="preserve">
+    <value>第{0}波 — {1}个敌人, 延迟{2:F1}秒</value>
+  </data>
+  <data name="MapEditor.EntryFormat" xml:space="preserve">
+    <value>{0} ×{1} ({2:F1}秒)</value>
+  </data>
+  <data name="MapEditor.StartAt" xml:space="preserve">
+    <value>起点 @ ({0}, {1})</value>
+  </data>
+  <data name="MapEditor.EndAt" xml:space="preserve">
+    <value>终点 @ ({0}, {1})</value>
+  </data>
+  <data name="MapEditor.NoStartSet" xml:space="preserve">
+    <value>未设置起点。</value>
+  </data>
+  <data name="MapEditor.NoEndSet" xml:space="preserve">
+    <value>未设置终点。</value>
+  </data>
+  <data name="MapEditor.MissingStart" xml:space="preserve">
+    <value>缺少起点。</value>
+  </data>
+  <data name="MapEditor.MissingEnd" xml:space="preserve">
+    <value>缺少终点。</value>
+  </data>
+  <data name="MapEditor.NeedWave" xml:space="preserve">
+    <value>至少添加一个波次。</value>
   </data>
   <data name="MapEditor.ModeStart" xml:space="preserve">
     <value>模式: 起点 — 点击一个格子将其设置为路径入口</value>
@@ -408,31 +444,109 @@
   <data name="TowerEditor.Save" xml:space="preserve">
     <value>💾 保存防御塔</value>
   </data>
-  <data name="TowerEditor.Cost" xml:space="preserve">
-    <value>费用</value>
+  <data name="TowerEditor.ScaleX" xml:space="preserve">
+    <value>缩放 X</value>
   </data>
-  <data name="TowerEditor.Range" xml:space="preserve">
-    <value>射程</value>
+  <data name="TowerEditor.ScaleY" xml:space="preserve">
+    <value>缩放 Y</value>
+  </data>
+  <data name="TowerEditor.ScaleZ" xml:space="preserve">
+    <value>缩放 Z</value>
+  </data>
+  <data name="TowerEditor.OffsetY" xml:space="preserve">
+    <value>偏移 Y</value>
+  </data>
+  <data name="TowerEditor.OffsetX" xml:space="preserve">
+    <value>偏移 X</value>
+  </data>
+  <data name="TowerEditor.RotationY" xml:space="preserve">
+    <value>旋转 Y (度)</value>
+  </data>
+  <data name="TowerEditor.RemoveShape" xml:space="preserve">
+    <value>✕ 移除形状</value>
+  </data>
+  <data name="TowerEditor.CostGold" xml:space="preserve">
+    <value>费用 (金币)</value>
   </data>
   <data name="TowerEditor.Damage" xml:space="preserve">
     <value>伤害</value>
   </data>
-  <data name="TowerEditor.Cooldown" xml:space="preserve">
-    <value>冷却</value>
+  <data name="TowerEditor.Range" xml:space="preserve">
+    <value>射程</value>
+  </data>
+  <data name="TowerEditor.FireRate" xml:space="preserve">
+    <value>射速 (0=AOE)</value>
   </data>
   <data name="TowerEditor.ProjectileSpeed" xml:space="preserve">
     <value>弹丸速度</value>
   </data>
-  <data name="TowerEditor.Color" xml:space="preserve">
-    <value>颜色</value>
+  <data name="TowerEditor.SpecialEffects" xml:space="preserve">
+    <value>特殊效果</value>
   </data>
-  <data name="TowerEditor.ShapeColor" xml:space="preserve">
-    <value>形状颜色</value>
+  <data name="TowerEditor.SplashRadius" xml:space="preserve">
+    <value>溅射半径</value>
   </data>
-  <data name="TowerEditor.ProjectileColor" xml:space="preserve">
-    <value>弹丸颜色</value>
+  <data name="TowerEditor.SlowAmount" xml:space="preserve">
+    <value>减速 (0-1)</value>
   </data>
-  <data name="TowerEditor.Special" xml:space="preserve">
-    <value>特殊</value>
+  <data name="TowerEditor.MultiShot" xml:space="preserve">
+    <value>多重射击</value>
+  </data>
+  <data name="TowerEditor.ArcAngle" xml:space="preserve">
+    <value>弧形角度</value>
+  </data>
+  <data name="TowerEditor.CritChance" xml:space="preserve">
+    <value>暴击几率</value>
+  </data>
+  <data name="TowerEditor.CritMultiplier" xml:space="preserve">
+    <value>暴击倍数</value>
+  </data>
+  <data name="TowerEditor.DotDamage" xml:space="preserve">
+    <value>持续伤害</value>
+  </data>
+  <data name="TowerEditor.DotDuration" xml:space="preserve">
+    <value>持续时间</value>
+  </data>
+  <data name="TowerEditor.AoeRadius" xml:space="preserve">
+    <value>AOE 半径</value>
+  </data>
+  <data name="TowerEditor.Loaded" xml:space="preserve">
+    <value>已加载: {0}</value>
+  </data>
+  <data name="TowerEditor.NewUnsaved" xml:space="preserve">
+    <value>新建防御塔 (未保存)</value>
+  </data>
+  <data name="TowerEditor.SelectToDelete" xml:space="preserve">
+    <value>请选择一个要删除的防御塔。</value>
+  </data>
+  <data name="TowerEditor.DeletedMsg" xml:space="preserve">
+    <value>已删除: {0}</value>
+  </data>
+  <data name="TowerEditor.ShapeLabel" xml:space="preserve">
+    <value>{0} (#{1})</value>
+  </data>
+  <data name="TowerEditor.CostSummary" xml:space="preserve">
+    <value>费用: {0} 金币</value>
+  </data>
+  <data name="TowerEditor.DamageSummary" xml:space="preserve">
+    <value>伤害: {0}</value>
+  </data>
+  <data name="TowerEditor.RangeSummary" xml:space="preserve">
+    <value>射程: {0}</value>
+  </data>
+  <data name="TowerEditor.FireRateSummary" xml:space="preserve">
+    <value>射速: {0}/秒</value>
+  </data>
+  <data name="TowerEditor.FireRateContinuous" xml:space="preserve">
+    <value>射速: 持续AOE</value>
+  </data>
+  <data name="TowerEditor.ShapesCount" xml:space="preserve">
+    <value>形状: {0}</value>
+  </data>
+  <data name="TowerEditor.EnterName" xml:space="preserve">
+    <value>请输入名称。</value>
+  </data>
+  <data name="TowerEditor.Saved" xml:space="preserve">
+    <value>已保存: {0}.json</value>
   </data>
 </root>

@@ -341,8 +341,8 @@ public partial class MapEditorView : UserControl
                 GridStatusText.Text = Loc.Get("MapEditor.SelectedWaypoint", index, _mapData.PathWaypoints[index].Col, _mapData.PathWaypoints[index].Row);
             return;
         }
-        if (nodeName == "EntryMarker") { var s = _mapData.StartCell; GridStatusText.Text = s != null ? $"START @ ({s.Col}, {s.Row})" : "No start set."; return; }
-        if (nodeName == "ExitMarker") { var e = _mapData.EndCell; GridStatusText.Text = e != null ? $"END @ ({e.Col}, {e.Row})" : "No end set."; return; }
+        if (nodeName == "EntryMarker") { var s = _mapData.StartCell; GridStatusText.Text = s != null ? Loc.Get("MapEditor.StartAt", s.Col, s.Row) : Loc.Get("MapEditor.NoStartSet"); return; }
+        if (nodeName == "ExitMarker") { var e = _mapData.EndCell; GridStatusText.Text = e != null ? Loc.Get("MapEditor.EndAt", e.Col, e.Row) : Loc.Get("MapEditor.NoEndSet"); return; }
 
         var worldPos = args.WorldPosition;
         var grid = WorldToCell(worldPos);
@@ -442,7 +442,7 @@ public partial class MapEditorView : UserControl
             for (int i = 0; i < _mapData.Waves.Count; i++)
             {
                 var wave = _mapData.Waves[i];
-                WaveList.Items.Add($"Wave {i + 1} — {wave.Entries.Count} entries, delay {wave.DelayBeforeWave:F1}s");
+                WaveList.Items.Add(Loc.Get("MapEditor.WaveEntryFormat", i + 1, wave.Entries.Count, wave.DelayBeforeWave));
             }
             WaveCountText.Text = $"({_mapData.Waves.Count})";
             if (savedIndex >= 0 && savedIndex < _mapData.Waves.Count) WaveList.SelectedIndex = savedIndex;
@@ -465,7 +465,7 @@ public partial class MapEditorView : UserControl
                 var wave = _mapData.Waves[WaveList.SelectedIndex];
                 WaveDelayInput.Text = wave.DelayBeforeWave.ToString("F1");
                 foreach (var entry in wave.Entries)
-                    EntryList.Items.Add($"{entry.EnemyType} ×{entry.Count} ({entry.SpawnInterval:F1}s)");
+                    EntryList.Items.Add(Loc.Get("MapEditor.EntryFormat", entry.EnemyType, entry.Count, entry.SpawnInterval));
                 if (savedIndex >= 0 && savedIndex < wave.Entries.Count) EntryList.SelectedIndex = savedIndex;
                 else if (wave.Entries.Count > 0) EntryList.SelectedIndex = 0;
                 SyncEntryControls();
@@ -603,9 +603,9 @@ public partial class MapEditorView : UserControl
 
     private string? ValidateMap()
     {
-        if (_mapData.StartCell == null) return "Missing START point.";
-        if (_mapData.EndCell == null) return "Missing END point.";
-        if (_mapData.Waves.Count == 0) return "Add at least one wave.";
+        if (_mapData.StartCell == null) return Loc.Get("MapEditor.MissingStart");
+        if (_mapData.EndCell == null) return Loc.Get("MapEditor.MissingEnd");
+        if (_mapData.Waves.Count == 0) return Loc.Get("MapEditor.NeedWave");
         return null;
     }
 
