@@ -3,7 +3,7 @@
              xmlns:a="https://github.com/CeSun/Aura3D"
              xmlns:loc="clr-namespace:TowerDefense"
              x:Class="TowerDefense.MonsterEditorView">
-    <Grid>
+    <Grid Background="#FF60607A">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="300" />

@@ -3,7 +3,7 @@
              xmlns:a="https://github.com/CeSun/Aura3D"
              xmlns:loc="clr-namespace:TowerDefense"
              x:Class="TowerDefense.GameView">
-    <Grid>
+    <Grid Background="#FF769696">
         <!-- 3D View fills entire area as background -->
         <a:Aura3DView x:Name="AuraView"
                        SceneInitialized="OnSceneInitialized"
