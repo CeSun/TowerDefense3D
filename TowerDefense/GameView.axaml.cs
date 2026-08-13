@@ -982,19 +982,13 @@ public partial class GameView : UserControl
     private Material CreateTranslucentMaterial(DrawingColor color)
     {
         var halfAlpha = DrawingColor.FromArgb(128, color.R, color.G, color.B);
-        return new Material
+        var material = new Material
         {
             BlendMode = BlendMode.Translucent,
-            DoubleSided = true,
-            Channels =
-            {
-                new()
-                {
-                    Name = "BaseColor",
-                    Texture = Texture.CreateFromColor(halfAlpha),
-                }
-            }
+            DoubleSided = true
         };
+        material.SetTexture("BaseColor", Texture.CreateFromColor(halfAlpha));
+        return material;
     }
 
     // ==================== Game Controls ====================
@@ -1168,19 +1162,15 @@ public partial class GameView : UserControl
 
     private Material CreateColorMaterial(DrawingColor color)
     {
-        return new Material
+        var material =  new Material
         {
             BlendMode = BlendMode.Opaque,
-            DoubleSided = true,
-            Channels =
-            {
-                new()
-                {
-                    Name = "BaseColor",
-                    Texture = Texture.CreateFromColor(color),
-                }
-            }
+            DoubleSided = true
         };
+        
+        material.SetTexture("BaseColor", Texture.CreateFromColor(color));
+
+        return material;
     }
 
 }

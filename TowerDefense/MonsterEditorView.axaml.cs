@@ -458,10 +458,16 @@ public partial class MonsterEditorView : UserControl
 
     // ==================== Helpers ====================
 
-    private static Material CreateMaterial(DrawingColor color) => new()
+    private static Material CreateMaterial(DrawingColor color)
     {
-        BlendMode = BlendMode.Opaque,
-        DoubleSided = true,
-        Channels = { new() { Name = "BaseColor", Texture = Texture.CreateFromColor(color) } }
-    };
+        var material = new Material()
+        {
+            BlendMode = BlendMode.Opaque,
+            DoubleSided = true
+        };
+
+        material.SetTexture("BaseColor", Texture.CreateFromColor(color));
+
+        return material;
+    }
 }

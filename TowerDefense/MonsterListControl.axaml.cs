@@ -205,7 +205,9 @@ public partial class MonsterListControl : UserControl
             Speed = 1.8f,
             GoldReward = 10,
             Radius = 0.25f,
-            ColorR = 220, ColorG = 20, ColorB = 60,
+            ColorR = 220,
+            ColorG = 20,
+            ColorB = 60,
         };
 
         OnEditMonster?.Invoke(newEnemy, _enemiesFilePath);
@@ -299,9 +301,16 @@ public partial class MonsterListControl : UserControl
 
     // ==================== Helpers ====================
 
-    private static Material CreateMaterial(DrawingColor color) => new()
+    private static Material CreateMaterial(DrawingColor color)
     {
-        BlendMode = BlendMode.Opaque, DoubleSided = true,
-        Channels = { new() { Name = "BaseColor", Texture = Texture.CreateFromColor(color) } }
-    };
+        var material = new Material()
+        {
+            BlendMode = BlendMode.Opaque,
+            DoubleSided = true
+        };
+
+        material.SetTexture("BaseColor", Texture.CreateFromColor(color));
+
+        return material;
+    }
 }

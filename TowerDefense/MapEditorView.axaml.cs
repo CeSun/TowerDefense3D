@@ -802,10 +802,16 @@ public partial class MapEditorView : UserControl
             EnemyTypeCombo.SelectedIndex = 0;
     }
 
-    private static Material CreateMaterial(DrawingColor color) => new()
-    {
-        BlendMode = BlendMode.Opaque,
-        DoubleSided = true,
-        Channels = { new() { Name = "BaseColor", Texture = Texture.CreateFromColor(color) } }
-    };
+    private static Material CreateMaterial(DrawingColor color)
+    { 
+        var material = new Material()
+        {
+            BlendMode = BlendMode.Opaque,
+            DoubleSided = true
+        };
+
+        material.SetTexture("BaseColor", Texture.CreateFromColor(color));
+
+        return material;
+    }
 }
